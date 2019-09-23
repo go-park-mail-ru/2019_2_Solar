@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 var uploadFormTmpl = []byte(`
@@ -26,16 +27,18 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 
 func uploadPage(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(5 * 1024 * 1025)
-	file, handler, err := r.FormFile("my_file")
+	file, header, err := r.FormFile("my_file")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer file.Close()
 
-	fmt.Fprintf(w, "handler.Filename %v\n", handler.Filename)
-	fmt.Fprintf(w, "handler.Header %#v\n", handler.Header)
-
+	fmt.Fprintf(w, "handler.Filename %v\n", header.Filename)
+	fmt.Fprintf(w, "handler.Header %#v\n", header.Header)
+	newFile, err := os.Create(header.Filename)
+	defer newFile.Close()
+	io.Copy(newFile, file)
 	hasher := md5.New()
 	io.Copy(hasher, file)
 
@@ -74,5 +77,5 @@ func main() {
 	http.HandleFunc("/raw_body", uploadRawBody)
 
 	fmt.Println("starting server at :8080")
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8080", nil)
 }
