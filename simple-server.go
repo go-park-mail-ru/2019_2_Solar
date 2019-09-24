@@ -70,7 +70,21 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	return newUser
 }
 
-func CreateNewUserSession(h *Handlers, user User, sessionValue *int, expiration time.Time) UserSession {
+func CreateNewUserSession(h *Handlers, w http.ResponseWriter, user User) error {
+
+	expiration := time.Now().Add(100 * time.Hour)
+	value, err := rand.Int(rand.Reader, big.NewInt(80))
+	if err != nil {
+		return err
+	}
+	sessionValue := int((value.Int64()))
+	cookie := http.Cookie{
+		Name:    "session_id",
+		Value:   strconv.Itoa(sessionValue),
+		Expires: expiration,
+	}
+	http.SetCookie(w, &cookie)
+
 	var id uint64 = 0
 	if len(h.sessions) > 0 {
 		id = h.sessions[len(h.sessions)-1].ID + 1
@@ -80,13 +94,14 @@ func CreateNewUserSession(h *Handlers, user User, sessionValue *int, expiration 
 		ID:     id,
 		UserID: user.ID,
 		UserCookie: UserCookie{
-			Value:      strconv.Itoa(*sessionValue),
+			Value:      strconv.Itoa(sessionValue),
 			Expiration: expiration,
 		},
 
 		//SessionValue: strconv.Itoa(*sessionValue),
 	}
-	return newUserSession
+	h.sessions = append(h.sessions, newUserSession)
+	return nil
 }
 
 func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
@@ -150,26 +165,12 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expiration := time.Now().Add(100 * time.Hour)
-	value, err := rand.Int(rand.Reader, big.NewInt(80))
-	if err != nil {
+	h.mu.Lock()
+	if err := CreateNewUserSession(h, w, newUser); err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
 		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-		return
 	}
-	sessionValue := int((value.Int64()))
-	cookie := http.Cookie{
-		Name:    "session_id",
-		Value:   strconv.Itoa(sessionValue),
-		Expires: expiration,
-	}
-	http.SetCookie(w, &cookie)
-
-	h.mu.Lock()
-
-	newUserSession := CreateNewUserSession(h, newUser, &sessionValue, expiration)
-	h.sessions = append(h.sessions, newUserSession)
-
+	w.Write([]byte(`{"infoMessage":"registration successful"}`))
 	h.mu.Unlock()
 
 	return
@@ -242,27 +243,14 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	} else {
-		expiration := time.Now().Add(100 * time.Hour)
-		value, err := rand.Int(rand.Reader, big.NewInt(80))
-		if err != nil {
+		if err := CreateNewUserSession(h, w, user); err != nil {
 			log.Printf("error while generating sessionValue: %s", err)
 			w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-			return
 		}
-		sessionValue := int((value.Int64()))
-		cookie := http.Cookie{
-			Name:    "session_id",
-			Value:   strconv.Itoa(sessionValue),
-			Expires: expiration,
-		}
-		http.SetCookie(w, &cookie)
-
-		newUserSession := CreateNewUserSession(h, user, &sessionValue, expiration)
-		h.sessions = append(h.sessions, newUserSession)
 		w.Write([]byte(`{"infoMessage":"authorization successful"}`))
 	}
 	h.mu.Unlock()
-
+	return
 }
 
 func main() {
