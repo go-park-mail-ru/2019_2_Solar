@@ -30,17 +30,57 @@ type UserReg struct {
 }
 
 type User struct {
-	ID       uint64 `json:"id"`
-	Name     string `json:"name"`
-	Password string `json:"-"`
-	Email    string `json:"email"`
-	Age      string `json:"age"`
+	ID        uint64 `json:"id"`
+	Name      string `json:"name"`
+	Password  string `json:"-"`
+	Email     string `json:"email"`
+	Age       string `json:"age"`
+	AvatarDir string `json:"avatar_dir"`
 }
 
 type Handlers struct {
 	users    []User
 	sessions []UserSession
 	mu       *sync.Mutex
+}
+
+func CreateNewUser(h *Handlers, newUserReg UserReg) User {
+	var id uint64 = 0
+	if len(h.users) > 0 {
+		id = h.users[len(h.users)-1].ID + 1
+	}
+
+	newUser := User{
+		ID:       id,
+		Name:     "",
+		Password: newUserReg.Password,
+		Email:    newUserReg.Email,
+		Age:      newUserReg.Age,
+	}
+	return newUser
+}
+
+func CreateNewUserSession(h *Handlers, user User, sessionValue *int) UserSession {
+	var id uint64 = 0
+	if len(h.sessions) > 0 {
+		id = h.sessions[len(h.sessions)-1].ID + 1
+	}
+
+	newUserSession := UserSession{
+		ID:           id,
+		UserID:       user.ID,
+		SessionValue: strconv.Itoa(*sessionValue),
+	}
+	return newUserSession
+}
+
+func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
+	for _, user := range h.users {
+		if user.Email == newUserReg.Email {
+			return false
+		}
+	}
+	return true
 }
 
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
@@ -61,34 +101,20 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(newUserReg)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
 		return
 	}
 
-	for _, user := range h.users {
-		if user.Email == newUserReg.Email {
-			log.Printf("not unique Email")
-			w.Write([]byte(`{"errorMessage":"not unique Email"}`))
-			return
-		}
+	if !EmailIsUnique(h, *newUserReg) {
+		log.Printf("not unique Email")
+		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
+		return
 	}
 
 	fmt.Println(newUserReg)
 
 	h.mu.Lock()
-
-	var id uint64 = 0
-	if len(h.users) > 0 {
-		id = h.users[len(h.users)-1].ID + 1
-	}
-
-	newUser := User{
-		ID:       id,
-		Name:     "",
-		Password: newUserReg.Password,
-		Email:    newUserReg.Email,
-		Age:      newUserReg.Age,
-	}
+	newUser := CreateNewUser(h, *newUserReg)
 
 	h.users = append(h.users, newUser)
 	encoder := json.NewEncoder(w)
@@ -96,18 +122,18 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	h.mu.Unlock()
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 		return
 	}
 
 	expiration := time.Now().Add(100 * time.Hour)
 	value, err := rand.Int(rand.Reader, big.NewInt(80))
-	sessionValue := int((value.Int64()))
 	if err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte("{}"))
+		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 		return
 	}
+	sessionValue := int((value.Int64()))
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   strconv.Itoa(sessionValue),
@@ -115,16 +141,12 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &cookie)
 
-	if len(h.sessions) > 0 {
-		id = h.sessions[len(h.sessions)-1].ID + 1
-	}
+	h.mu.Lock()
 
-	newUserSession := UserSession{
-		ID:           id,
-		UserID:       newUser.ID,
-		SessionValue: strconv.Itoa(sessionValue),
-	}
+	newUserSession := CreateNewUserSession(h, newUser, &sessionValue)
 	h.sessions = append(h.sessions, newUserSession)
+
+	h.mu.Unlock()
 
 	return
 }
