@@ -170,7 +170,6 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error while generating sessionValue: %s", err)
 		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
-	w.Write([]byte(`{"infoMessage":"registration successful"}`))
 	h.mu.Unlock()
 
 	return
@@ -234,7 +233,8 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 
 	h.mu.Lock()
 	value := SearchUserByEmail(h.users, newUserLogin)
-	if user, ok := value.(User); !ok {
+	user, ok := value.(User)
+	if !ok {
 		log.Printf("email was not found")
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
@@ -242,12 +242,10 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("incorrect password")
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
-	} else {
-		if err := CreateNewUserSession(h, w, user); err != nil {
-			log.Printf("error while generating sessionValue: %s", err)
-			w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-		}
-		w.Write([]byte(`{"infoMessage":"authorization successful"}`))
+	}
+	if err := CreateNewUserSession(h, w, user); err != nil {
+		log.Printf("error while generating sessionValue: %s", err)
+		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	h.mu.Unlock()
 	return
