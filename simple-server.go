@@ -35,7 +35,7 @@ type User struct {
 	Password  string `json:"-"`
 	Email     string `json:"email"`
 	Age       string `json:"age"`
-	AvatarDir string `json:"avatar_dir"`
+	AvatarDir string `json:"-"`
 }
 
 type Handlers struct {
