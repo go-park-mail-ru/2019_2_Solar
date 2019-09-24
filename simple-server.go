@@ -29,6 +29,11 @@ type UserReg struct {
 	Age      string `json:"age"`
 }
 
+type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type User struct {
 	ID        uint64 `json:"id"`
 	Name      string `json:"name"`
@@ -81,6 +86,15 @@ func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
 		}
 	}
 	return true
+}
+
+func SearchUserByEmail(users []User, newUserLogin *UserLogin) interface{} {
+	for _, user := range users {
+		if user.Email == newUserLogin.Email {
+			return user
+		}
+	}
+	return ""
 }
 
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
@@ -192,6 +206,55 @@ func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	decoder := json.NewDecoder(r.Body)
+
+	newUserLogin := new(UserLogin)
+	err := decoder.Decode(newUserLogin)
+	if err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
+		return
+	}
+
+	fmt.Println(newUserLogin)
+
+	h.mu.Lock()
+	value := SearchUserByEmail(h.users, newUserLogin)
+	if user, ok := value.(User); !ok {
+		log.Printf("email was not found")
+		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		return
+	} else if user.Password != newUserLogin.Password {
+		log.Printf("incorrect password")
+		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		return
+	} else {
+		expiration := time.Now().Add(100 * time.Hour)
+		value, err := rand.Int(rand.Reader, big.NewInt(80))
+		if err != nil {
+			log.Printf("error while generating sessionValue: %s", err)
+			w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+			return
+		}
+		sessionValue := int((value.Int64()))
+		cookie := http.Cookie{
+			Name:    "session_id",
+			Value:   strconv.Itoa(sessionValue),
+			Expires: expiration,
+		}
+		http.SetCookie(w, &cookie)
+
+		newUserSession := CreateNewUserSession(h, user, &sessionValue)
+		h.sessions = append(h.sessions, newUserSession)
+		w.Write([]byte(`{"infoMessage":"authorization successful"}`))
+	}
+	h.mu.Unlock()
+
+}
+
 func main() {
 	handlers := Handlers{
 		users: make([]User, 0),
@@ -223,6 +286,19 @@ func main() {
 
 		if r.Method == http.MethodPost {
 			handlers.HandleRegUser(w, r)
+			return
+		}
+
+		handlers.HandleEmpty(w, r)
+	})
+
+	http.HandleFunc("/login/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		log.Println(r.URL.Path)
+
+		if r.Method == http.MethodPost {
+			handlers.HandleLoginUser(w, r)
 			return
 		}
 
