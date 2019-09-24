@@ -23,11 +23,6 @@ type UserSession struct {
 	UserCookie
 }
 
-type UserInput struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-}
-
 type UserReg struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -40,12 +35,16 @@ type UserLogin struct {
 }
 
 type User struct {
-	ID        uint64 `json:"id"`
+	ID        uint64 `json:"-"`
+	Username  string `json:"username"`
 	Name      string `json:"name"`
+	Surname   string `json:"surname"`
 	Password  string `json:"-"`
 	Email     string `json:"email"`
 	Age       string `json:"age"`
+	Status    string `json:"status"`
 	AvatarDir string `json:"-"`
+	IsActive  string `json:"isactive"`
 }
 
 type Handlers struct {
@@ -175,35 +174,6 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *Handlers) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	decoder := json.NewDecoder(r.Body)
-
-	newUserInput := new(UserInput)
-	err := decoder.Decode(newUserInput)
-	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte("{}"))
-		return
-	}
-
-	fmt.Println(newUserInput)
-	h.mu.Lock()
-
-	var id uint64 = 0
-	if len(h.users) > 0 {
-		id = h.users[len(h.users)-1].ID + 1
-	}
-
-	h.users = append(h.users, User{
-		ID:       id,
-		Name:     newUserInput.Name,
-		Password: newUserInput.Password,
-	})
-	h.mu.Unlock()
-}
-
 func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	h.mu.Lock()
@@ -240,7 +210,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if user.Password != newUserLogin.Password {
 		log.Printf("incorrect password")
-		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+			w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	if err := CreateNewUserSession(h, w, user); err != nil {
@@ -249,6 +219,62 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 	h.mu.Unlock()
 	return
+}
+
+func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	decoder := json.NewDecoder(r.Body)
+
+	newProfileUser := new(User)
+	err := decoder.Decode(newProfileUser)
+	if err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
+		return
+	}
+
+	fmt.Println(newProfileUser)
+	idUser, err := FindIdUserByCookie()
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		w.Write([]byte(`{"errorMessage":"invalid cookie"}`))
+	}
+	h.mu.Lock()
+	value := SearchUserByIdUser(h.users, idUser)
+	user, ok := value.(User)
+	if !ok {
+		log.Printf("email was not found")
+		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		return
+	}
+	SaveNewProfileUser(user, newProfileUser)
+	h.mu.Unlock()
+	w.Write([]byte(`{message":"data successfully saved"}`))
+	return
+}
+
+func FindIdUserByCookie() (uint64, error) {
+	return 1, nil
+}
+
+func SearchUserByIdUser(users []User, idUser uint64) interface{} {
+	for _, user := range users {
+		if user.ID == idUser {
+			return user
+		}
+	}
+	return ""
+}
+
+func SaveNewProfileUser(user *User, newUser User) {
+	user.Age = newUser.Age
+	user.Email = newUser.Email
+	user.Name = newUser.Name
+	user.Password = newUser.Password
+	user.Status = newUser.Status
+	user.Surname = newUser.Surname
+	user.Username = newUser.Username
 }
 
 func main() {
@@ -266,11 +292,6 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 
 		log.Println(r.URL.Path)
-
-		if r.Method == http.MethodPost {
-			handlers.HandleCreateUser(w, r)
-			return
-		}
 
 		handlers.HandleListUsers(w, r)
 	})
@@ -295,6 +316,19 @@ func main() {
 
 		if r.Method == http.MethodPost {
 			handlers.HandleLoginUser(w, r)
+			return
+		}
+
+		handlers.HandleEmpty(w, r)
+	})
+
+	http.HandleFunc("/profile/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		log.Println(r.URL.Path)
+
+		if r.Method == http.MethodPost {
+			handlers.HandleEditProfileUser(w, r)
 			return
 		}
 
