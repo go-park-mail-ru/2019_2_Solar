@@ -12,10 +12,15 @@ import (
 	"time"
 )
 
+type UserCookie struct {
+	Value      string    `json:"-"`
+	Expiration time.Time `json:"-"`
+}
+
 type UserSession struct {
-	ID           uint64 `json:"id"`
-	UserID       uint64 `json:"id"`
-	SessionValue string `json:"session"`
+	ID     uint64 `json:"id"`
+	UserID uint64 `json:"id"`
+	UserCookie
 }
 
 type UserInput struct {
@@ -65,16 +70,21 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	return newUser
 }
 
-func CreateNewUserSession(h *Handlers, user User, sessionValue *int) UserSession {
+func CreateNewUserSession(h *Handlers, user User, sessionValue *int, expiration time.Time) UserSession {
 	var id uint64 = 0
 	if len(h.sessions) > 0 {
 		id = h.sessions[len(h.sessions)-1].ID + 1
 	}
 
 	newUserSession := UserSession{
-		ID:           id,
-		UserID:       user.ID,
-		SessionValue: strconv.Itoa(*sessionValue),
+		ID:     id,
+		UserID: user.ID,
+		UserCookie: UserCookie{
+			Value:      strconv.Itoa(*sessionValue),
+			Expiration: expiration,
+		},
+
+		//SessionValue: strconv.Itoa(*sessionValue),
 	}
 	return newUserSession
 }
@@ -157,7 +167,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 
 	h.mu.Lock()
 
-	newUserSession := CreateNewUserSession(h, newUser, &sessionValue)
+	newUserSession := CreateNewUserSession(h, newUser, &sessionValue, expiration)
 	h.sessions = append(h.sessions, newUserSession)
 
 	h.mu.Unlock()
@@ -247,7 +257,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		}
 		http.SetCookie(w, &cookie)
 
-		newUserSession := CreateNewUserSession(h, user, &sessionValue)
+		newUserSession := CreateNewUserSession(h, user, &sessionValue, expiration)
 		h.sessions = append(h.sessions, newUserSession)
 		w.Write([]byte(`{"infoMessage":"authorization successful"}`))
 	}
