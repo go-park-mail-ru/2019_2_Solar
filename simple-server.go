@@ -27,7 +27,7 @@ type UserSession struct {
 type UserReg struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Age      string `json:"age"`
+	Username string `json:"username"`
 }
 
 type UserLogin struct {
@@ -65,7 +65,7 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 		Name:     "",
 		Password: newUserReg.Password,
 		Email:    newUserReg.Email,
-		Age:      newUserReg.Age,
+		Username: newUserReg.Username,
 	}
 	return newUser
 }
@@ -271,11 +271,6 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 	return
 }
 
-func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
-	session, err := r.Cookie("session_id")
-	return session, err
-}
-
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 	idSessionString, err := SearchCookieSession(r)
 	idSession, err := strconv.Atoi(idSessionString.Value)
@@ -383,8 +378,8 @@ func main() {
 
 		handlers.HandleEmpty(w, r)
 	})
-    
-  http.HandleFunc("/profile/", func(w http.ResponseWriter, r *http.Request) {
+
+	http.HandleFunc("/profile/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		log.Println(r.URL.Path)
