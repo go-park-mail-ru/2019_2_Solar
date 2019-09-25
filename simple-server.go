@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -102,6 +103,22 @@ func CreateNewUserSession(h *Handlers, w http.ResponseWriter, user User) error {
 	}
 	h.sessions = append(h.sessions, newUserSession)
 	return nil
+}
+
+func DeleteOldUserSession(h *Handlers, w http.ResponseWriter, value string) error {
+	for i, session := range h.sessions {
+		if session.Value == value {
+			h.sessions = append(h.sessions[:i], h.sessions[i+1:]...)
+			return nil
+		}
+	}
+	err := errors.New("session has not found")
+	return err
+}
+
+func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
+	session, err := r.Cookie("session_id")
+	return session, err
 }
 
 func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
@@ -251,6 +268,26 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	session, err := SearchCookieSession(r)
+	if err == http.ErrNoCookie {
+		w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
+		return
+	}
+
+	err = DeleteOldUserSession(h, w, session.Value)
+	if err != nil {
+		w.Write([]byte(`{"errorMessage":"Session has not found"}`))
+		return
+	}
+	session.Expires = time.Now().AddDate(0, 0, -999)
+	http.SetCookie(w, session)
+	w.Write([]byte(`{"infoMessage":"Session has been deleted"}`))
+	return
+}
+
 func main() {
 	handlers := Handlers{
 		users: make([]User, 0),
@@ -295,6 +332,19 @@ func main() {
 
 		if r.Method == http.MethodPost {
 			handlers.HandleLoginUser(w, r)
+			return
+		}
+
+		handlers.HandleEmpty(w, r)
+	})
+
+	http.HandleFunc("/logout/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		log.Println(r.URL.Path)
+
+		if r.Method == http.MethodPost {
+			handlers.HandleLogoutUser(w, r)
 			return
 		}
 
