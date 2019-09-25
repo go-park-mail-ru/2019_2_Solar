@@ -210,7 +210,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if user.Password != newUserLogin.Password {
 		log.Printf("incorrect password")
-			w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	if err := CreateNewUserSession(h, w, user); err != nil {
@@ -235,14 +235,14 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 	}
 
 	fmt.Println(newProfileUser)
-	idUser, err := FindIdUserByCookie()
+	idUser, err := SearchIdUserByCookie(r, h)
 	if err != nil {
 		log.Printf("Invalid cookie: %s", err)
 		w.Write([]byte(`{"errorMessage":"invalid cookie"}`))
 	}
 	h.mu.Lock()
 	value := SearchUserByIdUser(h.users, idUser)
-	user, ok := value.(User)
+	user, ok := value.(*User)
 	if !ok {
 		log.Printf("email was not found")
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
@@ -254,8 +254,20 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 	return
 }
 
-func FindIdUserByCookie() (uint64, error) {
-	return 1, nil
+func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
+	session, err := r.Cookie("session_id")
+	return session, err
+}
+
+func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
+	idSessionString, err := SearchCookieSession(r)
+	idSession, err := strconv.Atoi(idSessionString.Value)
+	for _, oneSession := range h.sessions {
+		if oneSession.ID == uint64(idSession) {
+			return oneSession.UserID, err
+		}
+	}
+	return 0, err
 }
 
 func SearchUserByIdUser(users []User, idUser uint64) interface{} {
@@ -267,7 +279,7 @@ func SearchUserByIdUser(users []User, idUser uint64) interface{} {
 	return ""
 }
 
-func SaveNewProfileUser(user *User, newUser User) {
+func SaveNewProfileUser(user *User, newUser *User) {
 	user.Age = newUser.Age
 	user.Email = newUser.Email
 	user.Name = newUser.Name
