@@ -215,7 +215,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(newUserLogin)
-
+	defer h.mu.Unlock()
 	h.mu.Lock()
 	value := SearchUserByEmail(h.users, newUserLogin)
 	user, ok := value.(User)
@@ -228,14 +228,31 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
-	if err := CreateNewUserSession(h, &w, user); err != nil {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
+		return
 	}
-	h.mu.Unlock()
+	if idUser != user.ID {
+		if err := CreateNewUserSession(h, &w, user); err != nil {
+			log.Printf("error while generating sessionValue: %s", err)
+			w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+			return
+		}
+	}
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(user)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		w.Write([]byte(`{"errorMessage":"bad user struct"}`))
+		return
+	}
+	w.Write([]byte(`{"message":"successfully log in"}`))
 	return
 }
 
+//Проверено
 func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -254,7 +271,8 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 	idUser, err := SearchIdUserByCookie(r, h)
 	if err != nil {
 		log.Printf("Invalid cookie: %s", err)
-		w.Write([]byte(`{"errorMessage":"invalid cookie"}`))
+		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
+		return
 	}
 
 	SaveNewProfileUser(&h.users[idUser], newProfileUser)
@@ -273,19 +291,34 @@ func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 			return oneSession.UserID, err
 		}
 	}
-	return 0, err
+	return 0, errors.New("idUser not found")
 }
 
 func SaveNewProfileUser(user *User, newUser *User) {
-	user.Age = newUser.Age
-	user.Email = newUser.Email
-	user.Name = newUser.Name
-	user.Password = newUser.Password
-	user.Status = newUser.Status
-	user.Surname = newUser.Surname
-	user.Username = newUser.Username
+	if newUser.Age != "" {
+		user.Age = newUser.Age
+	}
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+	if newUser.Name != "" {
+		user.Name = newUser.Name
+	}
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+	if newUser.Status != "" {
+		user.Status = newUser.Status
+	}
+	if newUser.Surname != "" {
+		user.Surname = newUser.Surname
+	}
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
 }
 
+//Проверено
 func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -294,16 +327,18 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
 		return
 	}
-
+	h.mu.Lock()
 	err = DeleteOldUserSession(h, w, session.Value)
 	if err != nil {
+		h.mu.Unlock()
 		w.Write([]byte(`{"errorMessage":"Session has not found"}`))
 		return
 	}
+	h.mu.Unlock()
 	session.Path = "/"
 	session.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(w, session)
-	w.Write([]byte(`{"infoMessage":"Session has been deleted"}`))
+	w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
 	return
 }
 
@@ -319,7 +354,8 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("qwerty"))
 }*/
 
-func main() {
+func
+main() {
 	handlers := Handlers{
 		users: make([]User, 0),
 		mu:    &sync.Mutex{},
