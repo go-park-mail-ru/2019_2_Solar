@@ -176,6 +176,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
 		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+		return
 	}
 
 	encoder := json.NewEncoder(w)
@@ -223,23 +224,31 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("email was not found")
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
-	} else if user.Password != newUserLogin.Password {
+	}
+	if user.Password != newUserLogin.Password {
 		log.Printf("incorrect password")
 		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	idUser, err := SearchIdUserByCookie(r, h)
-	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
-		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
-		return
-	}
-	if idUser != user.ID {
-		if err := CreateNewUserSession(h, &w, user); err != nil {
-			log.Printf("error while generating sessionValue: %s", err)
-			w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+	fmt.Println(idUser)
+	if err == nil {
+		//log.Printf("Invalid cookie: %s", err)
+		//w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
+		encoder := json.NewEncoder(w)
+		err = encoder.Encode(user)
+		if err != nil {
+			log.Printf("error while marshalling JSON: %s", err)
+			w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 			return
 		}
+		w.Write([]byte(`{"message":"successfully log in yet"}`))
+		return
+	}
+	if err := CreateNewUserSession(h, &w, user); err != nil {
+		log.Printf("error while generating sessionValue: %s", err)
+		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+		return
 	}
 	encoder := json.NewEncoder(w)
 	err = encoder.Encode(user)
