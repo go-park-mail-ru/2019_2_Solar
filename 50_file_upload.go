@@ -20,11 +20,13 @@ var uploadFormTmpl = []byte(`
 	</body>
 </html>
 `)
+
 type UserRe struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Username string `json:"username"`
 }
+
 func mainPage(w http.ResponseWriter, r *http.Request) {
 	w.Write(uploadFormTmpl)
 }
@@ -37,8 +39,16 @@ func uploadPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+	user :=UserRe{
+		Email:    "",
+		Password: "",
+		Username: "",
+	}
+	jsonString := r.FormValue("json")
+	bytes := []byte(jsonString)
+	json.Unmarshal(bytes, &user)
+	fmt.Println(user)
 	defer file.Close()
-
 
 	fmt.Fprintf(w, "handler.Filename %v\n", header.Filename)
 	fmt.Fprintf(w, "handler.Header %#v\n", header.Header)
