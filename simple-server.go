@@ -363,8 +363,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("qwerty"))
 }*/
 
-func
-main() {
+func main() {
 	handlers := Handlers{
 		users: make([]User, 0),
 		mu:    &sync.Mutex{},

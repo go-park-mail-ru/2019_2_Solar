@@ -20,19 +20,25 @@ var uploadFormTmpl = []byte(`
 	</body>
 </html>
 `)
-
+type UserRe struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
 func mainPage(w http.ResponseWriter, r *http.Request) {
 	w.Write(uploadFormTmpl)
 }
 
 func uploadPage(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(5 * 1024 * 1025)
+
 	file, header, err := r.FormFile("my_file")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer file.Close()
+
 
 	fmt.Fprintf(w, "handler.Filename %v\n", header.Filename)
 	fmt.Fprintf(w, "handler.Header %#v\n", header.Header)
