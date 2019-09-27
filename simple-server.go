@@ -461,6 +461,15 @@ func ExtractFormatFile(FileName string) (string, error) {
 
 // ================================= Handler functions =================================
 
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		next.ServeHTTP(w, r)
+	})
+}
+
 var handlers = Handlers{
 	users:    make([]User, 0),
 	sessions: make([]UserSession, 0),
@@ -545,13 +554,13 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	
-	http.HandleFunc("/", HandleRoot)
-	http.HandleFunc("/users/", HandleUsers)
-	http.HandleFunc("/registration/", HandleRegistration)
-	http.HandleFunc("/login/", HandleLogin)
-	http.HandleFunc("/logout/", HandleLogout)
-	http.HandleFunc("/profile/data", HandleProfileData)
-	http.HandleFunc("/profile/picture", HandleProfilePicture)
+	http.Handle("/", CORSMiddleware(http.HandlerFunc(HandleRoot)))
+	http.Handle("/users/", CORSMiddleware(http.HandlerFunc(HandleUsers)))
+	http.Handle("/registration/", CORSMiddleware(http.HandlerFunc(HandleRegistration)))
+	http.Handle("/login/", CORSMiddleware(http.HandlerFunc(HandleLogin)))
+	http.Handle("/logout/", CORSMiddleware(http.HandlerFunc(HandleLogout)))
+	http.Handle("/profile/data", CORSMiddleware(http.HandlerFunc(HandleProfileData)))
+	http.Handle("/profile/picture", CORSMiddleware(http.HandlerFunc(HandleProfilePicture)))
 
 	/*	http.HandleFunc("/cookies/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -559,7 +568,7 @@ func main() {
 		log.Println(r.URL.Path)
 
 		if r.Method == http.MethodPost {
-			handlers.HandleCookies(w, r)
+			handlers.HandleCookies(w, r)z
 			return
 		}
 
