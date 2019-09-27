@@ -7,4 +7,6 @@ COPY simple-server.go .
 COPY simple-server_test.go .
 RUN go build -o main .
 
+EXPOSE 8080
+
 CMD ["./main"]
