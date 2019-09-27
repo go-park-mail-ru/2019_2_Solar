@@ -123,15 +123,23 @@ func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
 	return session, err
 }
 
-func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
+func EmailIsUnique(h *Handlers, email string) bool {
 	for _, user := range h.users {
-		if user.Email == newUserReg.Email {
+		if user.Email == email {
 			return false
 		}
 	}
 	return true
 }
 
+func UsernameIsUnique(h *Handlers, username string) bool {
+	for _, user := range h.users {
+		if user.Username == username {
+			return false
+		}
+	}
+	return true
+}
 func SearchUserByEmail(users []User, newUserLogin *UserLogin) interface{} {
 	for _, user := range users {
 		if user.Email == newUserLogin.Email {
@@ -164,7 +172,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 
 	defer h.mu.Unlock()
 	h.mu.Lock()
-	if !EmailIsUnique(h, *newUserReg) {
+	if !EmailIsUnique(h, newUserReg.Email) {
 		log.Printf("not unique Email")
 		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
 		return
@@ -264,7 +272,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 //Проверено
-func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	decoder := json.NewDecoder(r.Body)
@@ -285,7 +293,16 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
 		return
 	}
-
+	if !EmailIsUnique(h, newProfileUser.Email) {
+		log.Printf("not unique Email")
+		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
+		return
+	}
+	if !UsernameIsUnique(h, newProfileUser.Username) {
+		log.Printf("not unique Username")
+		w.Write([]byte(`{"errorMessage":"not unique Username"}`))
+		return
+	}
 	SaveNewProfileUser(&h.users[idUser], newProfileUser)
 
 	w.Write([]byte(`{"message":"data successfully saved"}`))
@@ -471,13 +488,13 @@ func main() {
 		handlers.HandleEmpty(w, r)
 	})
 
-	http.HandleFunc("/profile/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/profile/data", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		log.Println(r.URL.Path)
 
 		if r.Method == http.MethodPost {
-			handlers.HandleEditProfileUser(w, r)
+			handlers.HandleEditProfileUserData(w, r)
 			return
 		}
 
