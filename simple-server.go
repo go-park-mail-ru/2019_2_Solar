@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"math/big"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -292,6 +294,9 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 	idSessionString, err := SearchCookieSession(r)
+	if err == http.ErrNoCookie {
+		return 0, errors.New("cookies not found")
+	}
 	fmt.Println(idSessionString)
 	for _, oneSession := range h.sessions {
 		first, _ := strconv.Atoi(oneSession.UserCookie.Value)
@@ -348,6 +353,34 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	session.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(w, session)
 	w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
+	return
+}
+
+func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	/*	session, err := SearchCookieSession(r)
+		if err == http.ErrNoCookie {
+			w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
+			return
+		}*/
+	r.ParseMultipartForm(5 * 1024 * 1025)
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err !=nil {
+		w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
+		return
+	}
+	//Header not used
+	file, _, err := r.FormFile("profilePicture")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture")
+	defer newFile.Close()
+	io.Copy(newFile, file)
+	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
 	return
 }
 
@@ -428,6 +461,19 @@ func main() {
 
 		if r.Method == http.MethodPost {
 			handlers.HandleEditProfileUser(w, r)
+			return
+		}
+
+		handlers.HandleEmpty(w, r)
+	})
+
+	http.HandleFunc("/profile/picture", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		log.Println(r.URL.Path)
+
+		if r.Method == http.MethodPost {
+			handlers.HandleEditProfileUserPicture(w, r)
 			return
 		}
 
