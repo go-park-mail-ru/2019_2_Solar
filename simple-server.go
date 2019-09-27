@@ -459,90 +459,99 @@ func ExtractFormatFile(FileName string) (string, error) {
 	w.Write([]byte("qwerty"))
 }*/
 
-func main() {
-	handlers := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+// ================================= Handler functions =================================
+
+var handlers = Handlers{
+	users:    make([]User, 0),
+	sessions: make([]UserSession, 0),
+	mu:       &sync.Mutex{},
+}
+
+func HandleRoot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{}"))
+}
+
+func HandleUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	log.Println(r.URL.Path)
+	handlers.HandleListUsers(w, r)
+}
+
+func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	log.Println(r.URL.Path)
+
+	if r.Method == http.MethodPost {
+		handlers.HandleRegUser(w, r)
+		return
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte("{}"))
-	})
+	handlers.HandleEmpty(w, r)
+}
 
-	http.HandleFunc("/users/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+func HandleLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		log.Println(r.URL.Path)
+	log.Println(r.URL.Path)
 
-		handlers.HandleListUsers(w, r)
-	})
+	if r.Method == http.MethodPost {
+		handlers.HandleLoginUser(w, r)
+		return
+	}
 
-	http.HandleFunc("/registration/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+	handlers.HandleEmpty(w, r)
+}
 
-		log.Println(r.URL.Path)
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		if r.Method == http.MethodPost {
-			handlers.HandleRegUser(w, r)
-			return
-		}
+	log.Println(r.URL.Path)
 
-		handlers.HandleEmpty(w, r)
-	})
+	if r.Method == http.MethodPost {
+		handlers.HandleLogoutUser(w, r)
+		return
+	}
 
-	http.HandleFunc("/login/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+	handlers.HandleEmpty(w, r)
+}
 
-		log.Println(r.URL.Path)
+func HandleProfileData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		if r.Method == http.MethodPost {
-			handlers.HandleLoginUser(w, r)
-			return
-		}
+	log.Println(r.URL.Path)
 
-		handlers.HandleEmpty(w, r)
-	})
+	if r.Method == http.MethodPost {
+		handlers.HandleEditProfileUserData(w, r)
+		return
+	}
 
-	http.HandleFunc("/logout/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+	handlers.HandleEmpty(w, r)
+}
 
-		log.Println(r.URL.Path)
+func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		if r.Method == http.MethodPost {
-			handlers.HandleLogoutUser(w, r)
-			return
-		}
+	log.Println(r.URL.Path)
 
-		handlers.HandleEmpty(w, r)
-	})
+	if r.Method == http.MethodPost {
+		handlers.HandleEditProfileUserPicture(w, r)
+		return
+	}
 
-	http.HandleFunc("/profile/data", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+	handlers.HandleEmpty(w, r)
+}
 
-		log.Println(r.URL.Path)
-
-		if r.Method == http.MethodPost {
-			handlers.HandleEditProfileUserData(w, r)
-			return
-		}
-
-		handlers.HandleEmpty(w, r)
-	})
-
-	http.HandleFunc("/profile/picture", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		log.Println(r.URL.Path)
-
-		if r.Method == http.MethodPost {
-			handlers.HandleEditProfileUserPicture(w, r)
-			return
-		}
-
-		handlers.HandleEmpty(w, r)
-	})
+func main() {
+	
+	http.HandleFunc("/", HandleRoot)
+	http.HandleFunc("/users/", HandleUsers)
+	http.HandleFunc("/registration/", HandleRegistration)
+	http.HandleFunc("/login/", HandleLogin)
+	http.HandleFunc("/logout/", HandleLogout)
+	http.HandleFunc("/profile/data", HandleProfileData)
+	http.HandleFunc("/profile/picture", HandleProfilePicture)
 
 	/*	http.HandleFunc("/cookies/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
