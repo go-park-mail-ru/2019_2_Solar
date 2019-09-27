@@ -39,7 +39,7 @@ func uploadPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	user :=UserRe{
+	user := UserRe{
 		Email:    "",
 		Password: "",
 		Username: "",
@@ -87,11 +87,11 @@ func uploadRawBody(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "params %#v\n", p)
 }
 
-func main() {
-	http.HandleFunc("/", mainPage)
-	http.HandleFunc("/upload", uploadPage)
-	http.HandleFunc("/raw_body", uploadRawBody)
+// func main() {
+// 	http.HandleFunc("/", mainPage)
+// 	http.HandleFunc("/upload", uploadPage)
+// 	http.HandleFunc("/raw_body", uploadRawBody)
 
-	fmt.Println("starting server at :8080")
-	http.ListenAndServe(":8080", nil)
-}
+// 	fmt.Println("starting server at :8080")
+// 	http.ListenAndServe(":8080", nil)
+// }

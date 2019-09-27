@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -13,15 +12,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	`))
 }
 
-func main() {
-	http.HandleFunc("/", handler)
+// func main() {
+// 	http.HandleFunc("/", handler)
 
-	staticHandler := http.StripPrefix(
-		"/data/",
-		http.FileServer(http.Dir("./static")),
-	)
-	http.Handle("/data/", staticHandler)
+// 	staticHandler := http.StripPrefix(
+// 		"/data/",
+// 		http.FileServer(http.Dir("./static")),
+// 	)
+// 	http.Handle("/data/", staticHandler)
 
-	fmt.Println("starting server at :8080")
-	http.ListenAndServe(":8080", nil)
-}
+// 	fmt.Println("starting server at :8080")
+// 	http.ListenAndServe(":8080", nil)
+// }
