@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"math/big"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -120,15 +122,23 @@ func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
 	return session, err
 }
 
-func EmailIsUnique(h *Handlers, newUserReg UserReg) bool {
+func EmailIsUnique(h *Handlers, email string) bool {
 	for _, user := range h.users {
-		if user.Email == newUserReg.Email {
+		if user.Email == email {
 			return false
 		}
 	}
 	return true
 }
 
+func UsernameIsUnique(h *Handlers, username string) bool {
+	for _, user := range h.users {
+		if user.Username == username {
+			return false
+		}
+	}
+	return true
+}
 func SearchUserByEmail(users []User, newUserLogin *UserLogin) interface{} {
 	for _, user := range users {
 		if user.Email == newUserLogin.Email {
@@ -161,7 +171,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 
 	defer h.mu.Unlock()
 	h.mu.Lock()
-	if !EmailIsUnique(h, *newUserReg) {
+	if !EmailIsUnique(h, newUserReg.Email) {
 		log.Printf("not unique Email")
 		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
 		return
@@ -274,7 +284,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 //Проверено
-func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	decoder := json.NewDecoder(r.Body)
@@ -295,7 +305,16 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
 		return
 	}
-
+	if !EmailIsUnique(h, newProfileUser.Email) {
+		log.Printf("not unique Email")
+		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
+		return
+	}
+	if !UsernameIsUnique(h, newProfileUser.Username) {
+		log.Printf("not unique Username")
+		w.Write([]byte(`{"errorMessage":"not unique Username"}`))
+		return
+	}
 	SaveNewProfileUser(&h.users[idUser], newProfileUser)
 
 	w.Write([]byte(`{"message":"data successfully saved"}`))
@@ -304,6 +323,9 @@ func (h *Handlers) HandleEditProfileUser(w http.ResponseWriter, r *http.Request)
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 	idSessionString, err := SearchCookieSession(r)
+	if err == http.ErrNoCookie {
+		return 0, errors.New("cookies not found")
+	}
 	fmt.Println(idSessionString)
 	for _, oneSession := range h.sessions {
 		first, _ := strconv.Atoi(oneSession.UserCookie.Value)
@@ -361,6 +383,51 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, session)
 	w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
 	return
+}
+
+func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	/*	session, err := SearchCookieSession(r)
+		if err == http.ErrNoCookie {
+			w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
+			return
+		}*/
+	r.ParseMultipartForm(5 * 1024 * 1025)
+	h.mu.Lock()
+	idUser, err := SearchIdUserByCookie(r, h)
+	h.mu.Unlock()
+	if err != nil {
+		w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
+		return
+	}
+	//Header not used
+	file, header, err := r.FormFile("profilePicture")
+	if err != nil {
+		w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
+		return
+	}
+
+	defer file.Close()
+	formatFile, err := ExtractFormatFile(header.Filename)
+	if err != nil {
+		w.Write([]byte(`{"errorMessage"` + err.Error() + "}"))
+		return
+	}
+	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture" + formatFile)
+	defer newFile.Close()
+	io.Copy(newFile, file)
+	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
+	return
+}
+
+func ExtractFormatFile(FileName string) (string, error) {
+	for i := 0; i < len(FileName); i++ {
+		if string(FileName[i]) == "." {
+			return FileName[i:], nil
+		}
+	}
+	return "", errors.New("Invalid file name")
 }
 
 /*func (h *Handlers) HandleCookies(w http.ResponseWriter, r *http.Request) {
@@ -434,13 +501,26 @@ func main() {
 		handlers.HandleEmpty(w, r)
 	})
 
-	http.HandleFunc("/profile/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/profile/data", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		log.Println(r.URL.Path)
 
 		if r.Method == http.MethodPost {
-			handlers.HandleEditProfileUser(w, r)
+			handlers.HandleEditProfileUserData(w, r)
+			return
+		}
+
+		handlers.HandleEmpty(w, r)
+	})
+
+	http.HandleFunc("/profile/picture", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		log.Println(r.URL.Path)
+
+		if r.Method == http.MethodPost {
+			handlers.HandleEditProfileUserPicture(w, r)
 			return
 		}
 
