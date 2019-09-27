@@ -37,6 +37,17 @@ type UserLogin struct {
 	Password string `json:"password"`
 }
 
+type EditUserProfile struct {
+	Username string `json:"username"`
+	Name     string `json:"name"`
+	Surname  string `json:"surname"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Age      string `json:"age"`
+	Status   string `json:"status"`
+	IsActive string `json:"isactive"`
+}
+
 type User struct {
 	ID        uint64 `json:"-"`
 	Username  string `json:"username"`
@@ -148,6 +159,14 @@ func SearchUserByEmail(users []User, newUserLogin *UserLogin) interface{} {
 	return ""
 }
 
+func GetUserIndexByID(h *Handlers, id uint64) int {
+	for index, user := range h.users {
+		if user.ID == id {
+			return index
+		}
+	}
+	return -1
+}
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -289,7 +308,7 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 
 	decoder := json.NewDecoder(r.Body)
 
-	newProfileUser := new(User)
+	newProfileUser := new(EditUserProfile)
 	err := decoder.Decode(newProfileUser)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
@@ -315,7 +334,7 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 		w.Write([]byte(`{"errorMessage":"not unique Username"}`))
 		return
 	}
-	SaveNewProfileUser(&h.users[idUser], newProfileUser)
+	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
 
 	w.Write([]byte(`{"message":"data successfully saved"}`))
 	return
@@ -328,16 +347,14 @@ func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 	}
 	fmt.Println(idSessionString)
 	for _, oneSession := range h.sessions {
-		first, _ := strconv.Atoi(oneSession.UserCookie.Value)
-		second, _ := strconv.Atoi(idSessionString.Value)
-		if first == second {
+		if oneSession.UserCookie.Value == idSessionString.Value {
 			return oneSession.UserID, err
 		}
 	}
 	return 0, errors.New("idUser not found")
 }
 
-func SaveNewProfileUser(user *User, newUser *User) {
+func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
 	if newUser.Age != "" {
 		user.Age = newUser.Age
 	}
