@@ -365,23 +365,40 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 			return
 		}*/
 	r.ParseMultipartForm(5 * 1024 * 1025)
+	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
-	if err !=nil {
+	h.mu.Unlock()
+	if err != nil {
 		w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
 		return
 	}
 	//Header not used
-	file, _, err := r.FormFile("profilePicture")
+	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
-		fmt.Println(err)
+		w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
 		return
 	}
+
 	defer file.Close()
-	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture")
+	formatFile, err := ExtractFormatFile(header.Filename)
+	if err != nil {
+		w.Write([]byte(`{"errorMessage"` + err.Error() + "}"))
+		return
+	}
+	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture" + formatFile)
 	defer newFile.Close()
 	io.Copy(newFile, file)
 	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
 	return
+}
+
+func ExtractFormatFile(FileName string) (string, error) {
+	for i := 0; i < len(FileName); i++ {
+		if string(FileName[i]) == "." {
+			return FileName[i:], nil
+		}
+	}
+	return "", errors.New("Invalid file name")
 }
 
 /*func (h *Handlers) HandleCookies(w http.ResponseWriter, r *http.Request) {
