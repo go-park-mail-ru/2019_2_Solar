@@ -67,22 +67,14 @@ type Handlers struct {
 	mu       *sync.Mutex
 }
 
-type ForUserBodyJSON struct {
-	User `json:"user",omitempty`
-}
-
-type ForUsersBodyJSON struct {
-	Users []User `json:"users",omitempty`
-}
-
-type InfoJSON struct {
-	Error   string `json:"error"`
-	Message string `json:"message`
-}
-
 type DataJSON struct {
+	UserJSON  interface{} `json:"user,omitempty"`
+	UsersJSON interface{} `json:"users,omitempty"`
+	InfoJSON  interface{} `json:"info,omitempty"`
+}
+
+type OutJSON struct {
 	BodyJSON interface{} `json:"body"`
-	InfoJSON `json:"info"`
 }
 
 func CreateNewUser(h *Handlers, newUserReg UserReg) User {
@@ -187,15 +179,33 @@ func GetUserIndexByID(h *Handlers, id uint64) int {
 	return -1
 }
 
-func SetJsonData(bodyData interface{}, errMsg string, infMsg string) DataJSON {
-	data := DataJSON{
-		BodyJSON: bodyData,
-		InfoJSON: InfoJSON{
-			Error:   errMsg,
-			Message: infMsg,
-		},
+func SetJsonData(data interface{}, infMsg string) OutJSON {
+
+	user, ok := data.(User)
+	if ok {
+		outJSON := OutJSON{
+			BodyJSON: DataJSON{
+				UserJSON: user,
+				InfoJSON: infMsg,
+			},
+		}
+		return outJSON
+	} else if users, ok := data.([]User); ok {
+		outJSON := OutJSON{
+			BodyJSON: DataJSON{
+				UsersJSON: users,
+				InfoJSON:  infMsg,
+			},
+		}
+		return outJSON
+	} else {
+		outJSON := OutJSON{
+			BodyJSON: DataJSON{
+				InfoJSON: infMsg,
+			},
+		}
+		return outJSON
 	}
-	return data
 }
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
@@ -249,7 +259,7 @@ func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
-	data := SetJsonData(nil, "", "Empty handler has been done")
+	data := SetJsonData(nil, "Empty handler has been done")
 	encoder.Encode(data)
 	//w.Write([]byte("{}"))
 	log.Printf("Empty handler has been done")
@@ -267,7 +277,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(newUserReg)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		data := SetJsonData(nil, "incorrect json", "")
+		data := SetJsonData(nil, "incorrect json")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"incorrect json"}`))
 		return
@@ -277,7 +287,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	h.mu.Lock()
 	if !EmailIsUnique(h, newUserReg.Email) {
 		log.Printf("not unique Email")
-		data := SetJsonData(nil, "not unique Email", "")
+		data := SetJsonData(nil, "not unique Email")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"not unique Email"}`))
 		return
@@ -290,7 +300,7 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	cookie, err := CreateNewUserSession(h, newUser)
 	if err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
-		data := SetJsonData(nil, "error while generating sessionValue", "")
+		data := SetJsonData(nil, "error while generating sessionValue")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 		return
@@ -298,18 +308,18 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	correctCookie, ok := cookie.(http.Cookie)
 	if !ok {
 		log.Printf("error while generating sessionValue: %s", err)
-		data := SetJsonData(nil, "error while generating sessionValue", "")
+		data := SetJsonData(nil, "error while generating sessionValue")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	http.SetCookie(w, &correctCookie)
 
-	userJson := ForUserBodyJSON{newUser}
-	data := SetJsonData(userJson, "", "OK")
+	//userJson := ForUserBodyJSON{newUser}
+	data := SetJsonData(newUser, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		data := SetJsonData(nil, "bad user struct", "")
+		data := SetJsonData(nil, "bad user struct")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 		return
@@ -321,13 +331,13 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	h.mu.Lock()
-	users := ForUsersBodyJSON{h.users}
-	data := SetJsonData(users, "", "OK")
+	//users := ForUsersBodyJSON{h.users}
+	data := SetJsonData(h.users, "OK")
 	err := encoder.Encode(data)
 	h.mu.Unlock()
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		data := SetJsonData(nil, "error while marshalling JSON", "")
+		data := SetJsonData(nil, "error while marshalling JSON")
 		encoder.Encode(data)
 		//w.Write([]byte("{}"))
 		return
@@ -345,7 +355,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(newUserLogin)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		data := SetJsonData(nil, "incorrect json", "")
+		data := SetJsonData(nil, "incorrect json")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"incorrect json"}`))
 		return
@@ -358,14 +368,14 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	user, ok := value.(User)
 	if !ok {
 		log.Printf("email was not found")
-		data := SetJsonData(nil, "incorrect combination of Email and Password", "")
+		data := SetJsonData(nil, "incorrect combination of Email and Password")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	if user.Password != newUserLogin.Password {
 		log.Printf("incorrect password")
-		data := SetJsonData(nil, "incorrect combination of Email and Password", "")
+		data := SetJsonData(nil, "incorrect combination of Email and Password")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
@@ -379,13 +389,13 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		//err = encoder.Encode(user)
 		if err != nil {
 			log.Printf("error while marshalling JSON: %s", err)
-			data := SetJsonData(nil, "bad user struct", "")
+			data := SetJsonData(nil, "bad user struct")
 			encoder.Encode(data)
 			//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 			return
 		}
 		infMsg = "successfully log in yet"
-		data := SetJsonData(user, "", infMsg)
+		data := SetJsonData(user, infMsg)
 		encoder.Encode(data)
 		//w.Write([]byte(`{"message":"successfully log in yet"}`))
 		return
@@ -393,7 +403,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	cookie, err := CreateNewUserSession(h, user)
 	if err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
-		data := SetJsonData(nil, "error while generating sessionValue", "")
+		data := SetJsonData(nil, "error while generating sessionValue")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 		return
@@ -401,18 +411,18 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	correctCookie, ok := cookie.(http.Cookie)
 	if !ok {
 		log.Printf("error while generating sessionValue: %s", err)
-		data := SetJsonData(nil, "error while generating sessionValue", "")
+		data := SetJsonData(nil, "error while generating sessionValue")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	http.SetCookie(w, &correctCookie)
-	userJson := ForUserBodyJSON{user}
-	data := SetJsonData(userJson, "", infMsg)
+	//userJson := ForUserBodyJSON{user}
+	data := SetJsonData(user, infMsg)
 
 	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		data := SetJsonData(nil, "bad user struct", "")
+		data := SetJsonData(nil, "bad user struct")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 		return
@@ -431,7 +441,7 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	err := decoder.Decode(newProfileUser)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		data := SetJsonData(nil, "incorrect json", "")
+		data := SetJsonData(nil, "incorrect json")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"incorrect json"}`))
 		return
@@ -442,28 +452,28 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	idUser, err := SearchIdUserByCookie(r, h)
 	if err != nil {
 		log.Printf("Invalid cookie: %s", err)
-		data := SetJsonData(nil, "invalid cookie or user", "")
+		data := SetJsonData(nil, "invalid cookie or user")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
 		return
 	}
 	if !EmailIsUnique(h, newProfileUser.Email) {
 		log.Printf("not unique Email")
-		data := SetJsonData(nil, "not unique Email", "")
+		data := SetJsonData(nil, "not unique Email")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"not unique Email"}`))
 		return
 	}
 	if !UsernameIsUnique(h, newProfileUser.Username) {
 		log.Printf("not unique Username")
-		data := SetJsonData(nil, "not unique Username", "")
+		data := SetJsonData(nil, "not unique Username")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"not unique Username"}`))
 		return
 	}
 	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
 
-	data := SetJsonData(nil, "", "data successfully saved")
+	data := SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
 	//w.Write([]byte(`{"message":"data successfully saved"}`))
 	return
@@ -477,7 +487,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	session, err := SearchCookieSession(r)
 	if err == http.ErrNoCookie {
-		data := SetJsonData(nil, "Cookies have not found", "")
+		data := SetJsonData(nil, "Cookies have not found")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
 		return
@@ -486,7 +496,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	err = DeleteOldUserSession(h, session.Value)
 	if err != nil {
 		h.mu.Unlock()
-		data := SetJsonData(nil, "Session has not found", "")
+		data := SetJsonData(nil, "Session has not found")
 		encoder.Encode(data)
 		//w.Write([]byte(`{"errorMessage":"Session has not found"}`))
 		return
@@ -495,7 +505,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	session.Path = "/"
 	session.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(w, session)
-	data := SetJsonData(nil, "", "Session has been successfully deleted")
+	data := SetJsonData(nil, "Session has been successfully deleted")
 	encoder.Encode(data)
 	//w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
 	return
