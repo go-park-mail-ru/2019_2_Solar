@@ -12,10 +12,6 @@ import (
 	//"github.com/stretchr/testify/assert"
 )
 
-func (h *Handlers) HandleForTest(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func TestCreateNewUser1(t *testing.T) {
 
 	hTest := Handlers{
@@ -712,7 +708,7 @@ func TestHandleEmpty1(t *testing.T) {
 	r := httptest.NewRequest("PUT", "/", nil)
 	w := httptest.NewRecorder()
 
-	expectedJSON := "{}"
+	expectedJSON := `{"body":null,"info":{"error":"","Message":"Empty handler has been done"}}`
 
 	hTest.HandleEmpty(w, r)
 
@@ -735,7 +731,7 @@ func TestHandleEmpty2(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
 
-	expectedJSON := "{}"
+	expectedJSON := `{"body":null,"info":{"error":"","Message":"Empty handler has been done"}}`
 
 	hTest.HandleEmpty(w, r)
 
@@ -782,7 +778,7 @@ func TestHandleRegUser2(t *testing.T) {
 
 	hTest.HandleRegUser(w, r)
 
-	expectedJSON := `{"errorMessage":"incorrect json"}`
+	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -828,7 +824,7 @@ func TestHandleRegUser3(t *testing.T) {
 
 	hTest.HandleRegUser(w, r)
 
-	expectedJSON := `{"errorMessage":"not unique Email"}`
+	expectedJSON := `{"body":null,"info":{"error":"not unique Email","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -872,10 +868,11 @@ func TestHandleListUsers1(t *testing.T) {
 
 	hTest.HandleListUsers(w, r)
 
-	expectedJSON := `[{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su","age":"","status":"","isactive":""},{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su","age":"","status":"","isactive":""}]`
+	expectedJSON := `{"body":{"users":[{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su","age":"","status":"","isactive":""},{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su","age":"","status":"","isactive":""}]},"info":{"error":"","Message":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -1213,7 +1210,7 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"message":"data successfully saved"}`
+	expectedJSON := `{"body":null,"info":{"error":"","Message":"data successfully saved"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1291,7 +1288,7 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"errorMessage":"incorrect json"}`
+	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1369,7 +1366,7 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"errorMessage":"invalid cookie or user"}`
+	expectedJSON := `{"body":null,"info":{"error":"invalid cookie or user","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1447,7 +1444,7 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"errorMessage":"not unique Email"}`
+	expectedJSON := `{"body":null,"info":{"error":"not unique Email","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1525,7 +1522,7 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"errorMessage":"not unique Username"}`
+	expectedJSON := `{"body":null,"info":{"error":"not unique Username","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1601,7 +1598,7 @@ func TestHandleLogoutUser1(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"infoMessage":"Session has been successfully deleted"}`
+	expectedJSON := `{"body":null,"info":{"error":"","Message":"Session has been successfully deleted"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1677,7 +1674,7 @@ func TestHandleLogoutUser2(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"errorMessage":"Session has not found"}`
+	expectedJSON := `{"body":null,"info":{"error":"Session has not found","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1746,7 +1743,7 @@ func TestHandleLogoutUser3(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"errorMessage":"Cookies have not found"}`
+	expectedJSON := `{"body":null,"info":{"error":"Cookies have not found","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
