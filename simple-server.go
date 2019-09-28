@@ -304,7 +304,8 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &correctCookie)
 
-	err = encoder.Encode(newUser)
+	data := SetJsonData(newUser, "", "OK")
+	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
 		data := SetJsonData(nil, "bad user struct", "")
