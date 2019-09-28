@@ -67,6 +67,24 @@ type Handlers struct {
 	mu       *sync.Mutex
 }
 
+type ForUserBodyJSON struct {
+	User `json:"user",omitempty`
+}
+
+type ForUsersBodyJSON struct {
+	Users []User `json:"users",omitempty`
+}
+
+type InfoJSON struct {
+	Error   string `json:"error"`
+	Message string `json:"message`
+}
+
+type DataJSON struct {
+	BodyJSON interface{} `json:"body"`
+	InfoJSON `json:"info"`
+}
+
 func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	var id uint64 = 0
 	if len(h.users) > 0 {
@@ -167,6 +185,18 @@ func GetUserIndexByID(h *Handlers, id uint64) int {
 	}
 	return -1
 }
+
+func SetJsonData(bodyData interface{}, errMsg string, infMsg string) DataJSON {
+	data := DataJSON{
+		BodyJSON: bodyData,
+		InfoJSON: InfoJSON{
+			Error:   errMsg,
+			Message: infMsg,
+		},
+	}
+	return data
+}
+
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -240,12 +270,16 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	decoder := json.NewDecoder(r.Body)
+	encoder := json.NewEncoder(w)
+	infMsg := ""
 
 	newUserLogin := new(UserLogin)
 	err := decoder.Decode(newUserLogin)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
+		data := SetJsonData(nil, "incorrect json", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"incorrect json"}`))
 		return
 	}
 
@@ -256,12 +290,16 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	user, ok := value.(User)
 	if !ok {
 		log.Printf("email was not found")
-		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		data := SetJsonData(nil, "incorrect combination of Email and Password", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	if user.Password != newUserLogin.Password {
 		log.Printf("incorrect password")
-		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
+		data := SetJsonData(nil, "incorrect combination of Email and Password", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
 		return
 	}
 	idUser, err := SearchIdUserByCookie(r, h)
@@ -269,34 +307,46 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		//log.Printf("Invalid cookie: %s", err)
 		//w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
-		encoder := json.NewEncoder(w)
-		err = encoder.Encode(user)
+		//encoder := json.NewEncoder(w)
+		//err = encoder.Encode(user)
 		if err != nil {
 			log.Printf("error while marshalling JSON: %s", err)
-			w.Write([]byte(`{"errorMessage":"bad user struct"}`))
+			data := SetJsonData(nil, "bad user struct", "")
+			encoder.Encode(data)
+			//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 			return
 		}
-		w.Write([]byte(`{"message":"successfully log in yet"}`))
+		infMsg = "successfully log in yet"
+		data := SetJsonData(user, "", infMsg)
+		encoder.Encode(data)
+		//w.Write([]byte(`{"message":"successfully log in yet"}`))
 		return
 	}
 	cookie, err := CreateNewUserSession(h, user)
 	if err != nil {
 		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+		data := SetJsonData(nil, "error while generating sessionValue", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 		return
 	}
 	correctCookie, ok := cookie.(http.Cookie)
 	if !ok {
 		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
+		data := SetJsonData(nil, "error while generating sessionValue", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	http.SetCookie(w, &correctCookie)
 
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(user)
+	data := SetJsonData(user, "", infMsg)
+
+	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"bad user struct"}`))
+		data := SetJsonData(nil, "bad user struct", "")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 		return
 	}
 	return
@@ -553,7 +603,7 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	
+
 	http.Handle("/", CORSMiddleware(http.HandlerFunc(HandleRoot)))
 	http.Handle("/users/", CORSMiddleware(http.HandlerFunc(HandleUsers)))
 	http.Handle("/registration/", CORSMiddleware(http.HandlerFunc(HandleRegistration)))
