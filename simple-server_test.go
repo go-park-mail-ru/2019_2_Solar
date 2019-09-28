@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -916,10 +917,11 @@ func TestHandleLoginUser1(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""}`
+	expectedJSON := `{"body":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},"info":{"error":"","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -961,10 +963,11 @@ func TestHandleLoginUser2(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"errorMessage":"incorrect combination of Email and Password"}`
+	expectedJSON := `{"body":null,"info":{"error":"incorrect combination of Email and Password","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -1039,11 +1042,11 @@ func TestHandleLoginUser3(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"username":"12d7","name":"Bob","surname":"","email":"bob42@mail.su","age":"","status":"","isactive":""}
-{"message":"successfully log in yet"}`
+	expectedJSON := `{"body":{"username":"12d7","name":"Bob","surname":"","email":"bob42@mail.su","age":"","status":"","isactive":""},"info":{"error":"","Message":"successfully log in yet"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -1085,10 +1088,11 @@ func TestHandleLoginUser4(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"errorMessage":"incorrect json"}`
+	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -1130,10 +1134,11 @@ func TestHandleLoginUser5(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"errorMessage":"incorrect combination of Email and Password"}`
+	expectedJSON := `{"body":null,"info":{"error":"incorrect combination of Email and Password","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
+	fmt.Println(bodyJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
