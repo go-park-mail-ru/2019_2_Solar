@@ -197,6 +197,53 @@ func SetJsonData(bodyData interface{}, errMsg string, infMsg string) DataJSON {
 	return data
 }
 
+func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
+	idSessionString, err := SearchCookieSession(r)
+	if err == http.ErrNoCookie {
+		return 0, errors.New("cookies not found")
+	}
+	fmt.Println(idSessionString)
+	for _, oneSession := range h.sessions {
+		if oneSession.UserCookie.Value == idSessionString.Value {
+			return oneSession.UserID, err
+		}
+	}
+	return 0, errors.New("idUser not found")
+}
+
+func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
+	if newUser.Age != "" {
+		user.Age = newUser.Age
+	}
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+	if newUser.Name != "" {
+		user.Name = newUser.Name
+	}
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+	if newUser.Status != "" {
+		user.Status = newUser.Status
+	}
+	if newUser.Surname != "" {
+		user.Surname = newUser.Surname
+	}
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
+}
+
+func ExtractFormatFile(FileName string) (string, error) {
+	for i := 0; i < len(FileName); i++ {
+		if string(FileName[i]) == "." {
+			return FileName[i:], nil
+		}
+	}
+	return "", errors.New("Invalid file name")
+}
+
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -390,44 +437,6 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	return
 }
 
-func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
-	idSessionString, err := SearchCookieSession(r)
-	if err == http.ErrNoCookie {
-		return 0, errors.New("cookies not found")
-	}
-	fmt.Println(idSessionString)
-	for _, oneSession := range h.sessions {
-		if oneSession.UserCookie.Value == idSessionString.Value {
-			return oneSession.UserID, err
-		}
-	}
-	return 0, errors.New("idUser not found")
-}
-
-func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
-	if newUser.Age != "" {
-		user.Age = newUser.Age
-	}
-	if newUser.Email != "" {
-		user.Email = newUser.Email
-	}
-	if newUser.Name != "" {
-		user.Name = newUser.Name
-	}
-	if newUser.Password != "" {
-		user.Password = newUser.Password
-	}
-	if newUser.Status != "" {
-		user.Status = newUser.Status
-	}
-	if newUser.Surname != "" {
-		user.Surname = newUser.Surname
-	}
-	if newUser.Username != "" {
-		user.Username = newUser.Username
-	}
-}
-
 //Проверено
 func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -486,15 +495,6 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	io.Copy(newFile, file)
 	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
 	return
-}
-
-func ExtractFormatFile(FileName string) (string, error) {
-	for i := 0; i < len(FileName); i++ {
-		if string(FileName[i]) == "." {
-			return FileName[i:], nil
-		}
-	}
-	return "", errors.New("Invalid file name")
 }
 
 /*func (h *Handlers) HandleCookies(w http.ResponseWriter, r *http.Request) {
