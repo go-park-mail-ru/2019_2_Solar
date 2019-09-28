@@ -914,7 +914,7 @@ func TestHandleLoginUser1(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},"info":{"error":"","Message":""}}`
+	expectedJSON := `{"body":{"user":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""}},"info":{"error":"","Message":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
