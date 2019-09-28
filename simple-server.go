@@ -304,7 +304,8 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &correctCookie)
 
-	data := SetJsonData(newUser, "", "OK")
+	userJson := ForUserBodyJSON{newUser}
+	data := SetJsonData(userJson, "", "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
@@ -405,8 +406,8 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	http.SetCookie(w, &correctCookie)
-
-	data := SetJsonData(user, "", infMsg)
+	userJson := ForUserBodyJSON{user}
+	data := SetJsonData(userJson, "", infMsg)
 
 	err = encoder.Encode(data)
 	if err != nil {
