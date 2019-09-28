@@ -257,9 +257,7 @@ func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	data := SetJsonData(nil, "Empty handler has been done")
 	encoder.Encode(data)
-	//w.Write([]byte("{}"))
 	log.Printf("Empty handler has been done")
-
 	return
 }
 
@@ -302,18 +300,15 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error while generating sessionValue: %s", err)
 		data := SetJsonData(nil, "error while generating sessionValue")
 		encoder.Encode(data)
-		//w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
 	}
 	http.SetCookie(w, &correctCookie)
 
-	//userJson := ForUserBodyJSON{newUser}
 	data := SetJsonData(newUser, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
 		data := SetJsonData(nil, "bad user struct")
 		encoder.Encode(data)
-		//w.Write([]byte(`{"errorMessage":"bad user struct"}`))
 		return
 	}
 
@@ -428,6 +423,53 @@ func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Reque
 	return
 }
 
+func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	encoder := json.NewEncoder(w)
+
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		data := SetJsonData(nil, "invalid cookie or user")
+		encoder.Encode(data)
+		return
+	}
+	filename := strconv.FormatUint(idUser, 10) + "_picture" + ".jpg"
+
+	openfile, err := os.Open(filename)
+	defer openfile.Close() //Close after function return
+	if err != nil {
+		//File not found, send 404
+		http.Error(w, "File not found.", 404)
+		return
+	}
+	//File is found, create and send the correct headers
+	//Get the Content-Type of the file
+	//Create a buffer to store the header of the file in
+	FileHeader := make([]byte, 512)
+	//Copy the headers into the FileHeader buffer
+	openfile.Read(FileHeader)
+	//Get content type of file
+	FileContentType := http.DetectContentType(FileHeader)
+
+	//Get the file size
+	FileStat, _ := openfile.Stat()                     //Get info from file
+	FileSize := strconv.FormatInt(FileStat.Size(), 10) //Get file size as a string
+
+	//Send the headers
+	w.Header().Set("Content-Disposition", "attachment; filename="+filename)
+	w.Header().Set("Content-Type", FileContentType)
+	w.Header().Set("Content-Length", FileSize)
+	//Send the file
+	//We read 512 bytes from the file already, so we reset the offset back to 0
+	openfile.Seek(0, 0)
+	io.Copy(w, openfile) //'Copy' the file to the client
+	return
+}
+
 func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -502,12 +544,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-
-	/*	session, err := SearchCookieSession(r)
-		if err == http.ErrNoCookie {
-			w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
-			return
-		}*/
+	w.Header().Set("Content-Type", "application/json")
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
@@ -534,18 +571,6 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
 	return
 }
-
-/*func (h *Handlers) HandleCookies(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	expiration := time.Now().Add(100 * time.Hour)
-	cookie := http.Cookie{
-		Name:    "ses_id",
-		Value:   "qwert",
-		Expires: expiration,
-	}
-	http.SetCookie(w, &cookie)
-	w.Write([]byte("qwerty"))
-}*/
 
 // ================================= Handler functions =================================
 
@@ -631,7 +656,6 @@ func HandleProfileData(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 
 	log.Println(r.URL.Path)
 
@@ -639,7 +663,10 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 		handlers.HandleEditProfileUserPicture(w, r)
 		return
 	}
-
+	if r.Method == http.MethodGet {
+		handlers.HandleGetProfileUserPicture(w, r)
+		return
+	}
 	handlers.HandleEmpty(w, r)
 }
 
