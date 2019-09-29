@@ -67,6 +67,16 @@ type Handlers struct {
 	mu       *sync.Mutex
 }
 
+type DataJSON struct {
+	UserJSON  interface{} `json:"user,omitempty"`
+	UsersJSON interface{} `json:"users,omitempty"`
+	InfoJSON  interface{} `json:"info,omitempty"`
+}
+
+type OutJSON struct {
+	BodyJSON interface{} `json:"body"`
+}
+
 func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	var id uint64 = 0
 	if len(h.users) > 0 {
@@ -84,13 +94,12 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 }
 
 func CreateNewUserSession(h *Handlers, user User) (interface{}, error) {
-
 	expiration := time.Now().Add(100 * time.Hour)
-	value, err := rand.Int(rand.Reader, big.NewInt(80))
+	value, err := rand.Int(rand.Reader, big.NewInt(80)) //Могут повториться. Исправить
 	if err != nil {
 		return nil, err
 	}
-	sessionValue := int((value.Int64()))
+	sessionValue := int(value.Int64())
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   strconv.Itoa(sessionValue),
@@ -110,8 +119,6 @@ func CreateNewUserSession(h *Handlers, user User) (interface{}, error) {
 			Value:      strconv.Itoa(sessionValue),
 			Expiration: expiration,
 		},
-
-		//SessionValue: strconv.Itoa(*sessionValue),
 	}
 	h.sessions = append(h.sessions, newUserSession)
 	return cookie, nil
@@ -124,8 +131,7 @@ func DeleteOldUserSession(h *Handlers, value string) error {
 			return nil
 		}
 	}
-	err := errors.New("session has not found")
-	return err
+	return errors.New("session has not found")
 }
 
 func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
@@ -150,6 +156,7 @@ func UsernameIsUnique(h *Handlers, username string) bool {
 	}
 	return true
 }
+
 func SearchUserByEmail(users []User, newUserLogin *UserLogin) interface{} {
 	for _, user := range users {
 		if user.Email == newUserLogin.Email {
@@ -167,177 +174,35 @@ func GetUserIndexByID(h *Handlers, id uint64) int {
 	}
 	return -1
 }
-func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 
-	w.Write([]byte("{}"))
-	fmt.Println("Empty handler has been done")
+func SetJsonData(data interface{}, infMsg string) OutJSON {
 
-	return
-}
-
-func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	newUserReg := new(UserReg)
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(newUserReg)
-	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
-		return
-	}
-
-	defer h.mu.Unlock()
-	h.mu.Lock()
-	if !EmailIsUnique(h, newUserReg.Email) {
-		log.Printf("not unique Email")
-		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
-		return
-	}
-
-	fmt.Println(newUserReg)
-
-	newUser := CreateNewUser(h, *newUserReg)
-	h.users = append(h.users, newUser)
-	cookie, err := CreateNewUserSession(h, newUser)
-	if err != nil {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-		return
-	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-	}
-	http.SetCookie(w, &correctCookie)
-
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(newUser)
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"bad user struct"}`))
-		return
-	}
-
-	return
-}
-
-func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
-	h.mu.Lock()
-	err := encoder.Encode(h.users)
-	h.mu.Unlock()
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte("{}"))
-		return
-	}
-}
-
-func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	decoder := json.NewDecoder(r.Body)
-
-	newUserLogin := new(UserLogin)
-	err := decoder.Decode(newUserLogin)
-	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
-		return
-	}
-
-	fmt.Println(newUserLogin)
-	defer h.mu.Unlock()
-	h.mu.Lock()
-	value := SearchUserByEmail(h.users, newUserLogin)
-	user, ok := value.(User)
-	if !ok {
-		log.Printf("email was not found")
-		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
-		return
-	}
-	if user.Password != newUserLogin.Password {
-		log.Printf("incorrect password")
-		w.Write([]byte(`{"errorMessage":"incorrect combination of Email and Password"}`))
-		return
-	}
-	idUser, err := SearchIdUserByCookie(r, h)
-	fmt.Println(idUser)
-	if err == nil {
-		//log.Printf("Invalid cookie: %s", err)
-		//w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
-		encoder := json.NewEncoder(w)
-		err = encoder.Encode(user)
-		if err != nil {
-			log.Printf("error while marshalling JSON: %s", err)
-			w.Write([]byte(`{"errorMessage":"bad user struct"}`))
-			return
+	user, ok := data.(User)
+	if ok {
+		outJSON := OutJSON{
+			BodyJSON: DataJSON{
+				UserJSON: user,
+				InfoJSON: infMsg,
+			},
 		}
-		w.Write([]byte(`{"message":"successfully log in yet"}`))
-		return
+		return outJSON
 	}
-	cookie, err := CreateNewUserSession(h, user)
-	if err != nil {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-		return
-	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.Write([]byte(`{"errorMessage":"error while generating sessionValue"}`))
-	}
-	http.SetCookie(w, &correctCookie)
+	if users, ok := data.([]User); ok {
 
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(user)
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"bad user struct"}`))
-		return
+		outJSON := OutJSON{
+			BodyJSON: DataJSON{
+				UsersJSON: users,
+				InfoJSON:  infMsg,
+			},
+		}
+		return outJSON
 	}
-	return
-}
-
-//Проверено
-func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	decoder := json.NewDecoder(r.Body)
-
-	newProfileUser := new(EditUserProfile)
-	err := decoder.Decode(newProfileUser)
-	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte(`{"errorMessage":"incorrect json"}`))
-		return
+	outJSON := OutJSON{
+		BodyJSON: DataJSON{
+			InfoJSON: infMsg,
+		},
 	}
-
-	defer h.mu.Unlock()
-	h.mu.Lock()
-	idUser, err := SearchIdUserByCookie(r, h)
-	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
-		w.Write([]byte(`{"errorMessage":"invalid cookie or user"}`))
-		return
-	}
-	if !EmailIsUnique(h, newProfileUser.Email) {
-		log.Printf("not unique Email")
-		w.Write([]byte(`{"errorMessage":"not unique Email"}`))
-		return
-	}
-	if !UsernameIsUnique(h, newProfileUser.Username) {
-		log.Printf("not unique Username")
-		w.Write([]byte(`{"errorMessage":"not unique Username"}`))
-		return
-	}
-	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
-
-	w.Write([]byte(`{"message":"data successfully saved"}`))
-	return
+	return outJSON
 }
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
@@ -378,50 +243,328 @@ func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
 	}
 }
 
+func ExtractFormatFile(FileName string) (string, error) {
+	for i := 0; i < len(FileName); i++ {
+		if string(FileName[i]) == "." {
+			return FileName[i:], nil
+		}
+	}
+	return "", errors.New("Invalid file name")
+}
+
+func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	encoder := json.NewEncoder(w)
+	data := SetJsonData(nil, "Empty handler has been done")
+	encoder.Encode(data)
+	log.Printf("Empty handler has been done")
+	return
+}
+
+func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	encoder := json.NewEncoder(w)
+
+	decoder := json.NewDecoder(r.Body)
+	newUserReg := new(UserReg)
+	err := decoder.Decode(newUserReg)
+	if err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		data := SetJsonData(nil, "incorrect json")
+		encoder.Encode(data)
+		return
+	}
+
+	defer h.mu.Unlock()
+
+	h.mu.Lock()
+	if !EmailIsUnique(h, newUserReg.Email) {
+		log.Printf("not unique Email")
+		data := SetJsonData(nil, "not unique Email")
+		encoder.Encode(data)
+		return
+	}
+
+	newUser := CreateNewUser(h, *newUserReg)
+	h.users = append(h.users, newUser)
+	cookie, err := CreateNewUserSession(h, newUser)
+	if err != nil {
+		log.Printf("error while generating sessionValue: %s", err)
+		data := SetJsonData(nil, "error while generating sessionValue")
+		encoder.Encode(data)
+		return
+	}
+	correctCookie, ok := cookie.(http.Cookie)
+	if !ok {
+		log.Printf("error while generating sessionValue: %s", err)
+		data := SetJsonData(nil, "error while generating sessionValue")
+		encoder.Encode(data)
+	}
+	http.SetCookie(w, &correctCookie)
+
+	data := SetJsonData(newUser, "OK")
+	err = encoder.Encode(data)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		data := SetJsonData(nil, "bad user struct")
+		encoder.Encode(data)
+		return
+	}
+
+	return
+}
+
+func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
+	encoder := json.NewEncoder(w)
+	h.mu.Lock()
+	//users := ForUsersBodyJSON{h.users}
+	data := SetJsonData(h.users, "OK")
+	err := encoder.Encode(data)
+	h.mu.Unlock()
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		data := SetJsonData(nil, "error while marshalling JSON")
+		encoder.Encode(data)
+		//w.Write([]byte("{}"))
+		return
+	}
+}
+
+func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	decoder := json.NewDecoder(r.Body)
+	encoder := json.NewEncoder(w)
+	infMsg := ""
+
+	newUserLogin := new(UserLogin)
+	err := decoder.Decode(newUserLogin)
+	if err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		data := SetJsonData(nil, "incorrect json")
+		encoder.Encode(data)
+		return
+	}
+
+	defer h.mu.Unlock()
+	h.mu.Lock()
+	value := SearchUserByEmail(h.users, newUserLogin)
+	user, ok := value.(User)
+	if !ok {
+		log.Printf("email was not found")
+		data := SetJsonData(nil, "incorrect combination of Email and Password")
+		encoder.Encode(data)
+		return
+	}
+	if user.Password != newUserLogin.Password {
+		log.Printf("incorrect password")
+		data := SetJsonData(nil, "incorrect combination of Email and Password")
+		encoder.Encode(data)
+		return
+	}
+	//Если пришли валидные куки, значит новую сессию не создаём
+	idUser, err := SearchIdUserByCookie(r, h)
+	fmt.Println(idUser)
+	if err == nil {
+		infMsg = "successfully log in yet"
+		data := SetJsonData(user, infMsg)
+		encoder.Encode(data)
+		return
+	}
+	cookie, err := CreateNewUserSession(h, user)
+	if err != nil {
+		log.Printf("error while generating sessionValue: %s", err)
+		data := SetJsonData(nil, "error while generating sessionValue")
+		encoder.Encode(data)
+		return
+	}
+	correctCookie, ok := cookie.(http.Cookie)
+	if !ok {
+		log.Printf("error while generating sessionValue: %s", err)
+		data := SetJsonData(nil, "error while generating sessionValue")
+		encoder.Encode(data)
+	}
+	http.SetCookie(w, &correctCookie)
+
+	data := SetJsonData(user, infMsg)
+
+	err = encoder.Encode(data)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		data := SetJsonData(nil, "bad user struct")
+		encoder.Encode(data)
+		return
+	}
+	return
+}
+
+func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	encoder := json.NewEncoder(w)
+
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		data := SetJsonData(nil, "invalid cookie or user")
+		encoder.Encode(data)
+		return
+	}
+	infMsg := ""
+	data := SetJsonData(h.users[GetUserIndexByID(h, idUser)], infMsg)
+
+	err = encoder.Encode(data)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		data := SetJsonData(nil, "bad user struct")
+		encoder.Encode(data)
+		return
+	}
+	return
+}
+
+func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	encoder := json.NewEncoder(w)
+
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		data := SetJsonData(nil, "invalid cookie or user")
+		encoder.Encode(data)
+		return
+	}
+	filename := strconv.FormatUint(idUser, 10) + "_picture" + ".jpg"
+
+	openfile, err := os.Open(filename)
+	defer openfile.Close() //Close after function return
+	if err != nil {
+		//File not found, send 404
+		http.Error(w, "File not found.", 404)
+		return
+	}
+	//File is found, create and send the correct headers
+	//Get the Content-Type of the file
+	//Create a buffer to store the header of the file in
+	FileHeader := make([]byte, 512)
+	//Copy the headers into the FileHeader buffer
+	openfile.Read(FileHeader)
+	//Get content type of file
+	FileContentType := http.DetectContentType(FileHeader)
+
+	//Get the file size
+	FileStat, _ := openfile.Stat()                     //Get info from file
+	FileSize := strconv.FormatInt(FileStat.Size(), 10) //Get file size as a string
+
+	//Send the headers
+	w.Header().Set("Content-Disposition", "attachment; filename="+filename)
+	w.Header().Set("Content-Type", FileContentType)
+	w.Header().Set("Content-Length", FileSize)
+	//Send the file
+	//We read 512 bytes from the file already, so we reset the offset back to 0
+	openfile.Seek(0, 0)
+	io.Copy(w, openfile) //'Copy' the file to the client
+	return
+}
+
+func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	decoder := json.NewDecoder(r.Body)
+	encoder := json.NewEncoder(w)
+
+	newProfileUser := new(EditUserProfile)
+	err := decoder.Decode(newProfileUser)
+	if err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		data := SetJsonData(nil, "incorrect json")
+		encoder.Encode(data)
+		return
+	}
+
+	defer h.mu.Unlock()
+	h.mu.Lock()
+	idUser, err := SearchIdUserByCookie(r, h)
+	if err != nil {
+		log.Printf("Invalid cookie: %s", err)
+		data := SetJsonData(nil, "invalid cookie or user")
+		encoder.Encode(data)
+		return
+	}
+	if !EmailIsUnique(h, newProfileUser.Email) {
+		log.Printf("not unique Email")
+		data := SetJsonData(nil, "not unique Email")
+		encoder.Encode(data)
+		return
+	}
+	if !UsernameIsUnique(h, newProfileUser.Username) {
+		log.Printf("not unique Username")
+		data := SetJsonData(nil, "not unique Username")
+		encoder.Encode(data)
+		return
+	}
+	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
+
+	data := SetJsonData(nil, "data successfully saved")
+	encoder.Encode(data)
+	return
+}
+
 //Проверено
 func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
+	encoder := json.NewEncoder(w)
+
 	session, err := SearchCookieSession(r)
 	if err == http.ErrNoCookie {
-		w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
+		data := SetJsonData(nil, "Cookies have not found")
+		encoder.Encode(data)
 		return
 	}
 	h.mu.Lock()
 	err = DeleteOldUserSession(h, session.Value)
 	if err != nil {
 		h.mu.Unlock()
-		w.Write([]byte(`{"errorMessage":"Session has not found"}`))
+		data := SetJsonData(nil, "Session has not found")
+		encoder.Encode(data)
 		return
 	}
 	h.mu.Unlock()
 	session.Path = "/"
 	session.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(w, session)
-	w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
+	data := SetJsonData(nil, "Session has been successfully deleted")
+	encoder.Encode(data)
+	//w.Write([]byte(`{"infoMessage":"Session has been successfully deleted"}`))
 	return
 }
 
 func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-
-	/*	session, err := SearchCookieSession(r)
-		if err == http.ErrNoCookie {
-			w.Write([]byte(`{"errorMessage":"Cookies have not found"}`))
-			return
-		}*/
+	w.Header().Set("Content-Type", "application/json")
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
 	h.mu.Unlock()
 	if err != nil {
-		w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
+		encoder := json.NewEncoder(w)
+		data := SetJsonData(nil, "user not found or not valid cookies")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
 		return
 	}
-	//Header not used
 	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
-		w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
+		encoder := json.NewEncoder(w)
+		data := SetJsonData(nil, "Cannot read profile picture")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
 		return
 	}
 
@@ -437,27 +580,6 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	w.Write([]byte(`{"Message":"profile picture has been successfully saved"}`))
 	return
 }
-
-func ExtractFormatFile(FileName string) (string, error) {
-	for i := 0; i < len(FileName); i++ {
-		if string(FileName[i]) == "." {
-			return FileName[i:], nil
-		}
-	}
-	return "", errors.New("Invalid file name")
-}
-
-/*func (h *Handlers) HandleCookies(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	expiration := time.Now().Add(100 * time.Hour)
-	cookie := http.Cookie{
-		Name:    "ses_id",
-		Value:   "qwert",
-		Expires: expiration,
-	}
-	http.SetCookie(w, &cookie)
-	w.Write([]byte("qwerty"))
-}*/
 
 // ================================= Handler functions =================================
 
@@ -537,12 +659,14 @@ func HandleProfileData(w http.ResponseWriter, r *http.Request) {
 		handlers.HandleEditProfileUserData(w, r)
 		return
 	}
-
+	if r.Method == http.MethodGet {
+		handlers.HandleGetProfileUserData(w, r)
+		return
+	}
 	handlers.HandleEmpty(w, r)
 }
 
 func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 
 	log.Println(r.URL.Path)
 
@@ -550,12 +674,15 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 		handlers.HandleEditProfileUserPicture(w, r)
 		return
 	}
-
+	if r.Method == http.MethodGet {
+		handlers.HandleGetProfileUserPicture(w, r)
+		return
+	}
 	handlers.HandleEmpty(w, r)
 }
 
 func main() {
-	
+
 	http.Handle("/", CORSMiddleware(http.HandlerFunc(HandleRoot)))
 	http.Handle("/users/", CORSMiddleware(http.HandlerFunc(HandleUsers)))
 	http.Handle("/registration/", CORSMiddleware(http.HandlerFunc(HandleRegistration)))
@@ -563,19 +690,6 @@ func main() {
 	http.Handle("/logout/", CORSMiddleware(http.HandlerFunc(HandleLogout)))
 	http.Handle("/profile/data", CORSMiddleware(http.HandlerFunc(HandleProfileData)))
 	http.Handle("/profile/picture", CORSMiddleware(http.HandlerFunc(HandleProfilePicture)))
-
-	/*	http.HandleFunc("/cookies/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		log.Println(r.URL.Path)
-
-		if r.Method == http.MethodPost {
-			handlers.HandleCookies(w, r)z
-			return
-		}
-
-		handlers.HandleEmpty(w, r)
-	})*/
 
 	http.ListenAndServe(":8080", nil)
 }
