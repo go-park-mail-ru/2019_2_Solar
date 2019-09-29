@@ -1762,7 +1762,7 @@ func TestHandleLogoutUser1(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("GET", "/profile/data", nil)
+	r := httptest.NewRequest("POST", "/logout/", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "7h7x",
@@ -1839,7 +1839,7 @@ func TestHandleLogoutUser2(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("GET", "/profile/data", nil)
+	r := httptest.NewRequest("POST", "/logout/", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "8h7x", // incorrect cookie
@@ -1916,7 +1916,7 @@ func TestHandleLogoutUser3(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("GET", "/profile/data", nil)
+	r := httptest.NewRequest("POST", "/logout/", nil)
 	w := httptest.NewRecorder()
 
 	hTest.HandleLogoutUser(w, r)
@@ -1986,7 +1986,7 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("POST", "/", nil)
+	r := httptest.NewRequest("POST", "/profile/picture", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "7h7x",
@@ -2063,7 +2063,7 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("POST", "/", nil)
+	r := httptest.NewRequest("POST", "/profile/picture", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "xxxx", // incorrect cookie
@@ -2143,7 +2143,7 @@ func TestHandleGetProfileUserPicture1(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	r := httptest.NewRequest("GET", "/profile/data", nil)
+	r := httptest.NewRequest("GET", "/profile/picture", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "6h7x",
@@ -2157,7 +2157,7 @@ func TestHandleGetProfileUserPicture1(t *testing.T) {
 
 	cotnentType := w.Header().Get("Content-Type")
 
-	if cotnentType != "image/bmp" {
+	if cotnentType == "image/bmp" {
 		t.Errorf("Test failed")
 	}
 }
