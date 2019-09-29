@@ -387,7 +387,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		encoder.Encode(data)
 	}
 	http.SetCookie(w, &correctCookie)
-  
+
 	data := SetJsonData(user, infMsg)
 
 	err = encoder.Encode(data)
@@ -553,12 +553,18 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	idUser, err := SearchIdUserByCookie(r, h)
 	h.mu.Unlock()
 	if err != nil {
-		w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
+		encoder := json.NewEncoder(w)
+		data := SetJsonData(nil, "user not found or not valid cookies")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"user not found or not valid cookies"}`))
 		return
 	}
 	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
-		w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
+		encoder := json.NewEncoder(w)
+		data := SetJsonData(nil, "Cannot read profile picture")
+		encoder.Encode(data)
+		//w.Write([]byte(`{"errorMessage":"Cannot read profile picture"}`))
 		return
 	}
 

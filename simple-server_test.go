@@ -708,7 +708,7 @@ func TestHandleEmpty1(t *testing.T) {
 	r := httptest.NewRequest("PUT", "/", nil)
 	w := httptest.NewRecorder()
 
-	expectedJSON := `{"body":null,"info":{"error":"","Message":"Empty handler has been done"}}`
+	expectedJSON := `{"body":{"info":"Empty handler has been done"}}`
 
 	hTest.HandleEmpty(w, r)
 
@@ -731,7 +731,7 @@ func TestHandleEmpty2(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
 
-	expectedJSON := `{"body":null,"info":{"error":"","Message":"Empty handler has been done"}}`
+	expectedJSON := `{"body":{"info":"Empty handler has been done"}}`
 
 	hTest.HandleEmpty(w, r)
 
@@ -778,7 +778,7 @@ func TestHandleRegUser2(t *testing.T) {
 
 	hTest.HandleRegUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
+	expectedJSON := `{"body":{"info":"incorrect json"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -824,7 +824,7 @@ func TestHandleRegUser3(t *testing.T) {
 
 	hTest.HandleRegUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"not unique Email","Message":""}}`
+	expectedJSON := `{"body":{"info":"not unique Email"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -868,7 +868,10 @@ func TestHandleListUsers1(t *testing.T) {
 
 	hTest.HandleListUsers(w, r)
 
-	expectedJSON := `{"body":{"users":[{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su","age":"","status":"","isactive":""},{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su","age":"","status":"","isactive":""}]},"info":{"error":"","Message":"OK"}}`
+	expectedJSON := `{"body":{"users":[{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su",` +
+		`"age":"","status":"","isactive":""},{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su",` +
+		`"age":"","status":"","isactive":""},{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su",` +
+		`"age":"","status":"","isactive":""}],"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -914,7 +917,9 @@ func TestHandleLoginUser1(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":{"user":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""}},"info":{"error":"","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"user":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},` +
+		`"info":""}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -960,7 +965,8 @@ func TestHandleLoginUser2(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"incorrect combination of Email and Password","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"incorrect combination of Email and Password"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1039,7 +1045,9 @@ func TestHandleLoginUser3(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":{"username":"12d7","name":"Bob","surname":"","email":"bob42@mail.su","age":"","status":"","isactive":""},"info":{"error":"","Message":"successfully log in yet"}}`
+	expectedJSON := `{"body":{` +
+		`"user":{"username":"12d7","name":"Bob","surname":"","email":"bob42@mail.su","age":"","status":"","isactive":""},` +
+		`"info":"successfully log in yet"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1085,7 +1093,8 @@ func TestHandleLoginUser4(t *testing.T) {
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"incorrect json"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1124,14 +1133,15 @@ func TestHandleLoginUser5(t *testing.T) {
 		sessions: make([]UserSession, 0),
 		mu:       &sync.Mutex{},
 	}
-	bodyReader := strings.NewReader(`{"email": "_@mail.su", "password": "mypass"}`) // incorrect password
+	bodyReader := strings.NewReader(`{"email": "NEO43@mail.su", "password": "mypass"}`) // incorrect password
 
-	r := httptest.NewRequest("POST", "/login/", bodyReader) // incorrect email
+	r := httptest.NewRequest("POST", "/login/", bodyReader)
 	w := httptest.NewRecorder()
 
 	hTest.HandleLoginUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"incorrect combination of Email and Password","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"incorrect combination of Email and Password"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1210,7 +1220,8 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"","Message":"data successfully saved"}}`
+	expectedJSON := `{"body":{` +
+		`"info":"data successfully saved"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1288,7 +1299,8 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"incorrect json","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"incorrect json"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1354,7 +1366,7 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 
 	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
-	r := httptest.NewRequest("GET", "/profile/data", bodyReader)
+	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "ummmm", // incorrect cookie
@@ -1366,7 +1378,8 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"invalid cookie or user","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"invalid cookie or user"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1432,7 +1445,7 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 
 	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Liza@mail.com", "age": "40", "status": "active", "isactive": "true"}`)
 
-	r := httptest.NewRequest("GET", "/profile/data", bodyReader) // not unique email
+	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique email
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "6h7x",
@@ -1444,7 +1457,8 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"not unique Email","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"not unique Email"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1510,7 +1524,7 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 
 	bodyReader := strings.NewReader(`{"username": "Dima", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
-	r := httptest.NewRequest("GET", "/profile/data", bodyReader) // not unique username
+	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique username
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "6h7x",
@@ -1522,7 +1536,169 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 
 	hTest.HandleEditProfileUserData(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"not unique Username","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"not unique Username"}}`
+
+	bytes, _ := ioutil.ReadAll(w.Body)
+	bodyJSON := strings.Trim(string(bytes), "\n")
+	if bodyJSON != expectedJSON {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestHandleGetProfileUserData1(t *testing.T) {
+
+	hTest := Handlers{
+		users: []User{
+			{
+				ID:       0,
+				Name:     "Anton",
+				Password: "123",
+				Email:    "Anton@mail.ru",
+				Username: "Anton",
+				Surname:  "Shlyapnikov",
+				Age:      "42",
+				Status:   "Hello World",
+			},
+			{
+				ID:       1,
+				Name:     "Dima",
+				Password: "abc",
+				Email:    "Dima@mail.su",
+				Username: "Dima",
+			},
+			{
+				ID:       2,
+				Name:     "Liza",
+				Password: "xyz",
+				Email:    "Liza@mail.com",
+				Username: "Liza",
+			},
+		},
+		sessions: []UserSession{
+			{
+				ID:     1,
+				UserID: 1,
+				UserCookie: UserCookie{
+					Value:      "5h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     2,
+				UserID: 0,
+				UserCookie: UserCookie{
+					Value:      "6h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     3,
+				UserID: 2,
+				UserCookie: UserCookie{
+					Value:      "7h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+		},
+		mu: &sync.Mutex{},
+	}
+
+	r := httptest.NewRequest("GET", "/profile/data", nil)
+	cookie := http.Cookie{
+		Name:    "session_id",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie)
+	w := httptest.NewRecorder()
+
+	hTest.HandleGetProfileUserData(w, r)
+
+	expectedJSON := `{"body":{` +
+		`"user":{"username":"Anton","name":"Anton","surname":"Shlyapnikov","email":"Anton@mail.ru","age":"42","status":"Hello World","isactive":""},` +
+		`"info":""}}`
+
+	bytes, _ := ioutil.ReadAll(w.Body)
+	bodyJSON := strings.Trim(string(bytes), "\n")
+	if bodyJSON != expectedJSON {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestHandleGetProfileUserData2(t *testing.T) {
+
+	hTest := Handlers{
+		users: []User{
+			{
+				ID:       0,
+				Name:     "Anton",
+				Password: "123",
+				Email:    "Anton@mail.ru",
+				Username: "Anton",
+				Surname:  "Shlyapnikov",
+				Age:      "42",
+				Status:   "Hello World",
+			},
+			{
+				ID:       1,
+				Name:     "Dima",
+				Password: "abc",
+				Email:    "Dima@mail.su",
+				Username: "Dima",
+			},
+			{
+				ID:       2,
+				Name:     "Liza",
+				Password: "xyz",
+				Email:    "Liza@mail.com",
+				Username: "Liza",
+			},
+		},
+		sessions: []UserSession{
+			{
+				ID:     1,
+				UserID: 1,
+				UserCookie: UserCookie{
+					Value:      "5h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     2,
+				UserID: 0,
+				UserCookie: UserCookie{
+					Value:      "6h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     3,
+				UserID: 2,
+				UserCookie: UserCookie{
+					Value:      "7h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+		},
+		mu: &sync.Mutex{},
+	}
+
+	r := httptest.NewRequest("GET", "/profile/data", nil)
+	cookie := http.Cookie{
+		Name:    "session_id",
+		Value:   "1", // bad cookie
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie)
+	w := httptest.NewRecorder()
+
+	hTest.HandleGetProfileUserData(w, r)
+
+	expectedJSON := `{"body":{` +
+		`"info":"invalid cookie or user"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1598,7 +1774,8 @@ func TestHandleLogoutUser1(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"","Message":"Session has been successfully deleted"}}`
+	expectedJSON := `{"body":{` +
+		`"info":"Session has been successfully deleted"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1674,7 +1851,8 @@ func TestHandleLogoutUser2(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"Session has not found","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"Session has not found"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1743,7 +1921,8 @@ func TestHandleLogoutUser3(t *testing.T) {
 
 	hTest.HandleLogoutUser(w, r)
 
-	expectedJSON := `{"body":null,"info":{"error":"Cookies have not found","Message":""}}`
+	expectedJSON := `{"body":{` +
+		`"info":"Cookies have not found"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1819,7 +1998,8 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 
 	hTest.HandleEditProfileUserPicture(w, r)
 
-	expectedJSON := `{"errorMessage":"Cannot read profile picture"}`
+	expectedJSON := `{"body":{` +
+		`"info":"Cannot read profile picture"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1895,11 +2075,89 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 
 	hTest.HandleEditProfileUserPicture(w, r)
 
-	expectedJSON := `{"errorMessage":"user not found or not valid cookies"}`
+	expectedJSON := `{"body":{` +
+		`"info":"user not found or not valid cookies"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
 	if bodyJSON != expectedJSON {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestHandleGetProfileUserPicture1(t *testing.T) {
+
+	hTest := Handlers{
+		users: []User{
+			{
+				ID:       0,
+				Name:     "Anton",
+				Password: "123",
+				Email:    "Anton@mail.ru",
+				Username: "Anton",
+				Surname:  "Shlyapnikov",
+				Age:      "42",
+				Status:   "Hello World",
+			},
+			{
+				ID:       1,
+				Name:     "Dima",
+				Password: "abc",
+				Email:    "Dima@mail.su",
+				Username: "Dima",
+			},
+			{
+				ID:       2,
+				Name:     "Liza",
+				Password: "xyz",
+				Email:    "Liza@mail.com",
+				Username: "Liza",
+			},
+		},
+		sessions: []UserSession{
+			{
+				ID:     1,
+				UserID: 1,
+				UserCookie: UserCookie{
+					Value:      "5h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     2,
+				UserID: 0,
+				UserCookie: UserCookie{
+					Value:      "6h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+			{
+				ID:     3,
+				UserID: 2,
+				UserCookie: UserCookie{
+					Value:      "7h7x",
+					Expiration: time.Now().Add(1 * time.Hour),
+				},
+			},
+		},
+		mu: &sync.Mutex{},
+	}
+
+	r := httptest.NewRequest("GET", "/profile/data", nil)
+	cookie := http.Cookie{
+		Name:    "session_id",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie)
+	w := httptest.NewRecorder()
+
+	hTest.HandleGetProfileUserPicture(w, r)
+
+	cotnentType := w.Header().Get("Content-Type")
+
+	if cotnentType != "image/bmp" {
 		t.Errorf("Test failed")
 	}
 }
