@@ -188,6 +188,7 @@ func SetJsonData(data interface{}, infMsg string) OutJSON {
 		return outJSON
 	}
 	if users, ok := data.([]User); ok {
+
 		outJSON := OutJSON{
 			BodyJSON: DataJSON{
 				UsersJSON: users,
@@ -386,6 +387,7 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		encoder.Encode(data)
 	}
 	http.SetCookie(w, &correctCookie)
+  
 	data := SetJsonData(user, infMsg)
 
 	err = encoder.Encode(data)
@@ -507,6 +509,7 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
+
 	data := SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
 	return
