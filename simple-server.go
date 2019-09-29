@@ -547,7 +547,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	w.Header().Set("Content-Type", "application/json")
+
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
