@@ -95,16 +95,13 @@ func TestCreateNewUserSession1(t *testing.T) {
 
 	sessionsCountOK := 1
 
-	cookie, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
 
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		t.Errorf("Test failed")
-	}
-	if correctCookie.Name != "session_id" {
+
+	if len(cookies) < 2 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -147,16 +144,13 @@ func TestCreateNewUserSession2(t *testing.T) {
 
 	sessionsCountOK := len(hTest.sessions) + 1
 
-	cookie, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
 
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		t.Errorf("Test failed")
-	}
-	if correctCookie.Name != "session_id" {
+
+	if len(cookies) < 2 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -165,6 +159,7 @@ func TestCreateNewUserSession2(t *testing.T) {
 	if hTest.sessions[len(hTest.sessions)-1].UserID != hTest.users[len(hTest.users)-1].ID {
 		t.Errorf("Test failed")
 	}
+
 }
 
 func TestCreateNewUserSession3(t *testing.T) {
@@ -208,16 +203,13 @@ func TestCreateNewUserSession3(t *testing.T) {
 
 	sessionsCountOK := len(hTest.sessions) + 1
 
-	cookie, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
 
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		t.Errorf("Test failed")
-	}
-	if correctCookie.Name != "session_id" {
+
+	if len(cookies) < 2 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -269,7 +261,7 @@ func TestDeleteOldUserSession1(t *testing.T) {
 
 	sessionsCoutOK := len(hTest.sessions) - 1
 
-	value := "5h7x"
+	value := "1"
 
 	err := DeleteOldUserSession(&hTest, value)
 
@@ -338,8 +330,8 @@ func TestDeleteOldUserSession2(t *testing.T) {
 
 	sessionsCoutOK := len(hTest.sessions) - 2
 
-	cookieValue1 := "6h7x"
-	cookieValue2 := "5h7x"
+	cookieValue1 := "2"
+	cookieValue2 := "1"
 
 	err := DeleteOldUserSession(&hTest, cookieValue1)
 	if err != nil {
@@ -361,20 +353,30 @@ func TestDeleteOldUserSession2(t *testing.T) {
 func TestSearchCookieSession1(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/", nil)
-	cookie := http.Cookie{
-		Name:    "session_id",
+	cookie1 := http.Cookie{
+		Name:    "session_key",
 		Value:   "6h7x",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
-	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_id",
+		Value:   "1",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie1)
+	r.AddCookie(&cookie2)
 
-	session, err := SearchCookieSession(r)
+	sessionID, sessionKey, err := SearchCookie(r)
 
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	if session.Value != "6h7x" {
+	if sessionID.Value != "1" {
+		t.Errorf("Test failed")
+	}
+	if sessionKey.Value != "6h7x" {
 		t.Errorf("Test failed")
 	}
 }
@@ -382,22 +384,29 @@ func TestSearchCookieSession1(t *testing.T) {
 func TestSearchCookieSession2(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/", nil)
-	cookie := http.Cookie{
-		Name:    "ABC", //incorrect name
+	cookie1 := http.Cookie{
+		Name:    "sesskey", // incorrect name
 		Value:   "6h7x",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
-	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_id",
+		Value:   "1",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie1)
+	r.AddCookie(&cookie2)
 
-	_, err := SearchCookieSession(r)
+	_, _, err := SearchCookie(r)
 
 	if err == nil {
 		t.Errorf("Test failed")
 	}
 }
 
-func TestEmailIsUnique1(t *testing.T) {
+func TestRegEmailIsUnique1(t *testing.T) {
 
 	hTest := Handlers{
 		users: []User{
@@ -433,14 +442,14 @@ func TestEmailIsUnique1(t *testing.T) {
 		Username: "jonny",
 	}
 
-	ok := EmailIsUnique(&hTest, newUserReg.Username)
+	ok := RegEmailIsUnique(&hTest, newUserReg.Username)
 	if !ok {
 		t.Errorf("Test failed")
 	}
 
 }
 
-func TestEmailIsUnique2(t *testing.T) {
+func TestRegEmailIsUnique2(t *testing.T) {
 
 	hTest := Handlers{
 		users: []User{
@@ -476,14 +485,14 @@ func TestEmailIsUnique2(t *testing.T) {
 		Username: "jonny",
 	}
 
-	ok := EmailIsUnique(&hTest, newUserReg.Email)
+	ok := RegEmailIsUnique(&hTest, newUserReg.Email)
 	if ok {
 		t.Errorf("Test failed")
 	}
 
 }
 
-func TestUserNameIsUnique1(t *testing.T) {
+func TestREgUserNameIsUnique1(t *testing.T) {
 
 	hTest := Handlers{
 		users: []User{
@@ -519,13 +528,13 @@ func TestUserNameIsUnique1(t *testing.T) {
 		Username: "jonny",
 	}
 
-	ok := UsernameIsUnique(&hTest, newUserReg.Username)
+	ok := RegUsernameIsUnique(&hTest, newUserReg.Username)
 	if !ok {
 		t.Errorf("Test failed")
 	}
 }
 
-func TestUserNameIsUnique2(t *testing.T) {
+func TestREgUserNameIsUnique2(t *testing.T) {
 
 	hTest := Handlers{
 		users: []User{
@@ -561,7 +570,7 @@ func TestUserNameIsUnique2(t *testing.T) {
 		Username: "12d8", // not unique
 	}
 
-	ok := UsernameIsUnique(&hTest, newUserReg.Username)
+	ok := RegUsernameIsUnique(&hTest, newUserReg.Username)
 	if ok {
 		t.Errorf("Test failed")
 	}
@@ -918,7 +927,7 @@ func TestHandleLoginUser1(t *testing.T) {
 
 	expectedJSON := `{"body":{` +
 		`"user":{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},` +
-		`"info":""}}`
+		`"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1035,18 +1044,25 @@ func TestHandleLoginUser3(t *testing.T) {
 	r := httptest.NewRequest("POST", "/login/", bodyReader)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "5h7x",
+		Value:   "1",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "5h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleLoginUser(w, r)
 
 	expectedJSON := `{"body":{` +
 		`"user":{"username":"12d7","name":"Bob","surname":"","email":"bob42@mail.su","age":"","status":"","isactive":""},` +
-		`"info":"successfully log in yet"}}`
+		`"info":"Successfully log in yet"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1208,13 +1224,20 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("GET", "/profile/data", bodyReader)
-	cookie := http.Cookie{
+	cookie1 := http.Cookie{
 		Name:    "session_id",
+		Value:   "2",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie1)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
 		Value:   "6h7x",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
-	r.AddCookie(&cookie)
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
@@ -1289,11 +1312,18 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 	r := httptest.NewRequest("GET", "/profile/data", bodyReader) // incorrect json
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "6h7x",
+		Value:   "2",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
@@ -1373,6 +1403,13 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "7h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
@@ -1447,11 +1484,18 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique email
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "6h7x",
+		Value:   "2",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
@@ -1526,11 +1570,18 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique username
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "6h7x",
+		Value:   "2",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
@@ -1606,18 +1657,25 @@ func TestHandleGetProfileUserData1(t *testing.T) {
 	r := httptest.NewRequest("GET", "/profile/data", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "6h7x",
+		Value:   "2",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "6h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleGetProfileUserData(w, r)
 
 	expectedJSON := `{"body":{` +
 		`"user":{"username":"Anton","name":"Anton","surname":"Shlyapnikov","email":"Anton@mail.ru","age":"42","status":"Hello World","isactive":""},` +
-		`"info":""}}`
+		`"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1687,11 +1745,18 @@ func TestHandleGetProfileUserData2(t *testing.T) {
 	r := httptest.NewRequest("GET", "/profile/data", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "1", // bad cookie
+		Value:   "afnajfna", // bad cookie
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "1", // bad cookie
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleGetProfileUserData(w, r)
@@ -1764,11 +1829,18 @@ func TestHandleLogoutUser1(t *testing.T) {
 	r := httptest.NewRequest("POST", "/logout/", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "7h7x",
+		Value:   "3",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "7h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleLogoutUser(w, r)
@@ -1841,11 +1913,18 @@ func TestHandleLogoutUser2(t *testing.T) {
 	r := httptest.NewRequest("POST", "/logout/", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "8h7x", // incorrect cookie
+		Value:   "12", // incorrect cookie
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "8h7x", // incorrect cookie
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleLogoutUser(w, r)
@@ -1921,7 +2000,7 @@ func TestHandleLogoutUser3(t *testing.T) {
 	hTest.HandleLogoutUser(w, r)
 
 	expectedJSON := `{"body":{` +
-		`"info":"Cookies have not found"}}`
+		`"info":"Cookie has not found"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
@@ -1988,11 +2067,18 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 	r := httptest.NewRequest("POST", "/profile/picture", nil)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   "7h7x",
+		Value:   "3",
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
+	cookie2 := http.Cookie{
+		Name:    "session_key",
+		Value:   "7h7x",
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserPicture(w, r)
