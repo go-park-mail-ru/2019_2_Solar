@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -139,7 +140,7 @@ func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
 	return session, err
 }
 
-func EmailIsUnique(h *Handlers, email string) bool {
+func RegEmailIsUnique(h *Handlers, email string) bool {
 	for _, user := range h.users {
 		if user.Email == email {
 			return false
@@ -148,10 +149,32 @@ func EmailIsUnique(h *Handlers, email string) bool {
 	return true
 }
 
-func UsernameIsUnique(h *Handlers, username string) bool {
+func RegUsernameIsUnique(h *Handlers, username string) bool {
 	for _, user := range h.users {
 		if user.Username == username {
 			return false
+		}
+	}
+	return true
+}
+
+func EditEmailIsUnique(h *Handlers, email string, idUser uint64) bool {
+	for _, user := range h.users {
+		if user.Email == email {
+			if user.ID != idUser {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func EditUsernameIsUnique(h *Handlers, username string, idUser uint64) bool {
+	for _, user := range h.users {
+		if user.Username == username {
+			if user.ID != idUser {
+				return false
+			}
 		}
 	}
 	return true
@@ -265,7 +288,6 @@ func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	data := SetJsonData(nil, "Empty handler has been done")
 	encoder.Encode(data)
 	log.Printf("Empty handler has been done")
-	return
 }
 
 func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
@@ -281,11 +303,28 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !strings.Contains(newUserReg.Email, "@") {
+		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+		return
+	}
+	if len(newUserReg.Username) < 1 {
+		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
+		return
+	}
+	if len(newUserReg.Password) < 1 {
+		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
+		return
+	}
+
 	defer h.mu.Unlock()
 
 	h.mu.Lock()
-	if !EmailIsUnique(h, newUserReg.Email) {
+	if !RegEmailIsUnique(h, newUserReg.Email) {
 		SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
+		return
+	}
+	if !RegUsernameIsUnique(h, newUserReg.Username) {
+		SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return
 	}
 
@@ -324,7 +363,6 @@ func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
 		encoder.Encode(data)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
@@ -398,7 +436,6 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		encoder.Encode(data)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Request) {
@@ -427,7 +464,6 @@ func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Reque
 		encoder.Encode(data)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Request) {
@@ -476,7 +512,6 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 	//We read 512 bytes from the file already, so we reset the offset back to 0
 	openFile.Seek(0, 0)
 	io.Copy(w, openFile) //'Copy' the file to the client
-	return
 }
 
 func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
@@ -495,35 +530,42 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if !strings.Contains(newProfileUser.Email, "@") {
+		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+		return
+	}
+	if len(newProfileUser.Username) < 1 {
+		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
+		return
+	}
+	if len(newProfileUser.Password) < 1 {
+		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
+		return
+	}
+
 	defer h.mu.Unlock()
 	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
 	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
 		w.WriteHeader(http.StatusUnauthorized)
-		data := SetJsonData(nil, "invalid cookie or user")
-		encoder.Encode(data)
+		SetResponseError(encoder, "invalid cookie or user", err)
 		return
 	}
-	if !EmailIsUnique(h, newProfileUser.Email) {
-		log.Printf("not unique Email")
+	if !EditEmailIsUnique(h, newProfileUser.Email, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "not unique Email")
-		encoder.Encode(data)
+		SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return
 	}
-	if !UsernameIsUnique(h, newProfileUser.Username) {
-		log.Printf("not unique Username")
+	if !EditUsernameIsUnique(h, newProfileUser.Username, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "not unique Username")
-		encoder.Encode(data)
+		SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return
 	}
+
 	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
 
 	data := SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
-	return
 }
 
 func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
@@ -552,7 +594,6 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, session)
 	data := SetJsonData(nil, "Session has been successfully deleted")
 	encoder.Encode(data)
-	return
 }
 
 func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
