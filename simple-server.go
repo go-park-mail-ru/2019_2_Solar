@@ -549,19 +549,9 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if !strings.Contains(newProfileUser.Email, "@") {
+	if !strings.Contains(newProfileUser.Email, "@") && newProfileUser.Email != "" {
 		w.WriteHeader(http.StatusBadRequest)
 		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
-		return
-	}
-	if len(newProfileUser.Username) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
-		return
-	}
-	if len(newProfileUser.Password) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
 		return
 	}
 
