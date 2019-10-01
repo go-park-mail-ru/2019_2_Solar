@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"strconv"
@@ -94,40 +93,54 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	return newUser
 }
 
-func CreateNewUserSession(h *Handlers, user User) (interface{}, error) {
-	expiration := time.Now().Add(100 * time.Hour)
-	value, err := rand.Int(rand.Reader, big.NewInt(80)) //Могут повториться. Исправить
-	if err != nil {
-		return nil, err
+func CreateNewUserSession(h *Handlers, user User) ([]http.Cookie, error) {
+
+	cookies := []http.Cookie{}
+
+	var sessionValue uint64 = 0
+	if len(h.sessions) > 0 {
+		sessionValue = h.sessions[len(h.sessions)-1].ID + 1
 	}
-	sessionValue := int(value.Int64())
-	cookie := http.Cookie{
+	sessionID := int(sessionValue)
+
+	sessionKey := GenSessionKey(12)
+
+	cookieSessionID := http.Cookie{
 		Name:    "session_id",
-		Value:   strconv.Itoa(sessionValue),
+		Value:   strconv.Itoa(sessionID),
 		Path:    "/",
-		Expires: expiration,
+		Expires: time.Now().Add(1 * time.Hour),
+	}
+	cookieSessionKey := http.Cookie{
+		Name:    "session_key",
+		Value:   sessionKey,
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
 	}
 
-	var id uint64 = 0
-	if len(h.sessions) > 0 {
-		id = h.sessions[len(h.sessions)-1].ID + 1
-	}
+	cookies = append(cookies, cookieSessionID, cookieSessionKey)
 
 	newUserSession := UserSession{
-		ID:     id,
+		ID:     sessionValue,
 		UserID: user.ID,
 		UserCookie: UserCookie{
-			Value:      strconv.Itoa(sessionValue),
-			Expiration: expiration,
+			Value:      sessionKey,
+			Expiration: time.Now().Add(1 * time.Hour),
 		},
 	}
+
 	h.sessions = append(h.sessions, newUserSession)
-	return cookie, nil
+
+	return cookies, nil
 }
 
 func DeleteOldUserSession(h *Handlers, value string) error {
+
+	cookieVal, _ := strconv.Atoi(value)
+	sessionIdInt := uint64(cookieVal)
+
 	for i, session := range h.sessions {
-		if session.Value == value {
+		if session.ID == sessionIdInt {
 			h.sessions = append(h.sessions[:i], h.sessions[i+1:]...)
 			return nil
 		}
@@ -135,9 +148,13 @@ func DeleteOldUserSession(h *Handlers, value string) error {
 	return errors.New("session has not found")
 }
 
-func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
+func SearchCookie(r *http.Request) (*http.Cookie, *http.Cookie, error) {
 	session, err := r.Cookie("session_id")
-	return session, err
+	if err != nil {
+		return session, session, err
+	}
+	key, err := r.Cookie("session_key")
+	return session, key, err
 }
 
 func RegEmailIsUnique(h *Handlers, email string) bool {
@@ -229,14 +246,20 @@ func SetJsonData(data interface{}, infMsg string) OutJSON {
 }
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
-	idSessionString, err := SearchCookieSession(r)
+	sessionID, sessionKey, err := SearchCookie(r)
 	if err == http.ErrNoCookie {
 		return 0, errors.New("cookies not found")
 	}
-	fmt.Println(idSessionString)
+
+	cookieVal, _ := strconv.Atoi(sessionID.Value)
+	sessionIdInt := uint64(cookieVal)
+
 	for _, oneSession := range h.sessions {
-		if oneSession.UserCookie.Value == idSessionString.Value {
-			return oneSession.UserID, err
+		if oneSession.ID == sessionIdInt {
+			if oneSession.UserCookie.Value == sessionKey.Value {
+				return oneSession.UserID, err
+			}
+			return oneSession.UserID, errors.New("Incorrect cookie key")
 		}
 	}
 	return 0, errors.New("idUser not found")
@@ -279,6 +302,39 @@ func SetResponseError(encoder *json.Encoder, msg string, err error) {
 	log.Printf("%s: %s", msg, err)
 	data := SetJsonData(nil, msg)
 	encoder.Encode(data)
+}
+
+const (
+	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" // 62 possibilities
+	letterIdxBits = 6                                                                // 6 bits to represent 64 possibilities / indexes
+	letterIdxMask = 1<<letterIdxBits - 1                                             // All 1-bits, as many as letterIdxBits
+)
+
+func GenSessionKey(length int) string {
+
+	result := make([]byte, length)
+	bufferSize := int(float64(length) * 1.3)
+	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
+		if j%bufferSize == 0 {
+			randomBytes = SecureRandomBytes(bufferSize)
+		}
+		if idx := int(randomBytes[j%length] & letterIdxMask); idx < len(letterBytes) {
+			result[i] = letterBytes[idx]
+			i++
+		}
+	}
+
+	return string(result)
+}
+
+// SecureRandomBytes returns the requested number of bytes using crypto/rand
+func SecureRandomBytes(length int) []byte {
+	var randomBytes = make([]byte, length)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		log.Fatal("Unable to generate random bytes")
+	}
+	return randomBytes
 }
 
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
@@ -330,17 +386,19 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 
 	newUser := CreateNewUser(h, *newUserReg)
 	h.users = append(h.users, newUser)
-	cookie, err := CreateNewUserSession(h, newUser)
+	cookies, err := CreateNewUserSession(h, newUser)
 	if err != nil {
-		SetResponseError(encoder, "error while generating sessionValue", errors.New("error while generating sessionValue"))
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "error while generating sessionValue", err)
 		return
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		SetResponseError(encoder, "error while generating sessionValue", errors.New("error while generating sessionValue"))
+	if len(cookies) < 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
 		return
 	}
-	http.SetCookie(w, &correctCookie)
+	http.SetCookie(w, &cookies[0])
+	http.SetCookie(w, &cookies[1])
 
 	data := SetJsonData(newUser, "OK")
 	err = encoder.Encode(data)
@@ -403,19 +461,19 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := CreateNewUserSession(h, user)
+	cookies, err := CreateNewUserSession(h, user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		SetResponseError(encoder, "error while generating sessionValue", err)
 		return
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
+	if len(cookies) < 2 {
 		w.WriteHeader(http.StatusBadRequest)
 		SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
 		return
 	}
-	http.SetCookie(w, &correctCookie)
+	http.SetCookie(w, &cookies[0])
+	http.SetCookie(w, &cookies[1])
 
 	data := SetJsonData(user, "OK")
 
@@ -560,7 +618,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	session, err := SearchCookieSession(r)
+	sessionID, sessionKey, err := SearchCookie(r)
 	if err == http.ErrNoCookie {
 		w.WriteHeader(http.StatusBadRequest)
 		SetResponseError(encoder, "Cookie has not found", err)
@@ -568,7 +626,7 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.mu.Lock()
-	err = DeleteOldUserSession(h, session.Value)
+	err = DeleteOldUserSession(h, sessionID.Value)
 	h.mu.Unlock()
 
 	if err != nil {
@@ -576,9 +634,12 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 		SetResponseError(encoder, "Session has not found", err)
 		return
 	}
-	session.Path = "/"
-	session.Expires = time.Now().AddDate(0, 0, -999)
-	http.SetCookie(w, session)
+	sessionKey.Path = "/"
+	sessionKey.Expires = time.Now().AddDate(0, 0, -999)
+	http.SetCookie(w, sessionKey)
+	sessionID.Path = "/"
+	sessionID.Expires = time.Now().AddDate(0, 0, -999)
+	http.SetCookie(w, sessionID)
 
 	data := SetJsonData(nil, "Session has been successfully deleted")
 	encoder.Encode(data)
