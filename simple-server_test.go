@@ -9,7 +9,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-	//"github.com/stretchr/testify/assert"
 )
 
 func TestCreateNewUser1(t *testing.T) {
