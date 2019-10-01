@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -93,38 +93,42 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 	return newUser
 }
 
-func CreateNewUserSession(h *Handlers, user User) (interface{}, error) {
-	expiration := time.Now().Add(100 * time.Hour)
-	value, err := rand.Int(rand.Reader, big.NewInt(80)) //Могут повториться. Исправить
-	if err != nil {
-		return nil, err
-	}
-	sessionValue := int(value.Int64())
-	cookie := http.Cookie{
-		Name:    "session_id",
-		Value:   strconv.Itoa(sessionValue),
-		Path:    "/",
-		Expires: expiration,
+func CreateNewUserSession(h *Handlers, user User) ([]http.Cookie, error) {
+
+	cookies := []http.Cookie{}
+
+	var sessionValue uint64 = 0
+	if len(h.sessions) > 0 {
+		sessionValue = h.sessions[len(h.sessions)-1].ID + 1
 	}
 
-	var id uint64 = 0
-	if len(h.sessions) > 0 {
-		id = h.sessions[len(h.sessions)-1].ID + 1
+	sessionKey := GenSessionKey(12)
+
+	cookieSessionKey := http.Cookie{
+		Name:    "session_key",
+		Value:   sessionKey,
+		Path:    "/",
+		Expires: time.Now().Add(1 * time.Hour),
 	}
+
+	cookies = append(cookies, cookieSessionKey)
 
 	newUserSession := UserSession{
-		ID:     id,
+		ID:     sessionValue,
 		UserID: user.ID,
 		UserCookie: UserCookie{
-			Value:      strconv.Itoa(sessionValue),
-			Expiration: expiration,
+			Value:      sessionKey,
+			Expiration: time.Now().Add(1 * time.Hour),
 		},
 	}
+
 	h.sessions = append(h.sessions, newUserSession)
-	return cookie, nil
+
+	return cookies, nil
 }
 
 func DeleteOldUserSession(h *Handlers, value string) error {
+
 	for i, session := range h.sessions {
 		if session.Value == value {
 			h.sessions = append(h.sessions[:i], h.sessions[i+1:]...)
@@ -134,12 +138,12 @@ func DeleteOldUserSession(h *Handlers, value string) error {
 	return errors.New("session has not found")
 }
 
-func SearchCookieSession(r *http.Request) (*http.Cookie, error) {
-	session, err := r.Cookie("session_id")
-	return session, err
+func SearchCookie(r *http.Request) (*http.Cookie, error) {
+	key, err := r.Cookie("session_key")
+	return key, err
 }
 
-func EmailIsUnique(h *Handlers, email string) bool {
+func RegEmailIsUnique(h *Handlers, email string) bool {
 	for _, user := range h.users {
 		if user.Email == email {
 			return false
@@ -148,10 +152,32 @@ func EmailIsUnique(h *Handlers, email string) bool {
 	return true
 }
 
-func UsernameIsUnique(h *Handlers, username string) bool {
+func RegUsernameIsUnique(h *Handlers, username string) bool {
 	for _, user := range h.users {
 		if user.Username == username {
 			return false
+		}
+	}
+	return true
+}
+
+func EditEmailIsUnique(h *Handlers, email string, idUser uint64) bool {
+	for _, user := range h.users {
+		if user.Email == email {
+			if user.ID != idUser {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func EditUsernameIsUnique(h *Handlers, username string, idUser uint64) bool {
+	for _, user := range h.users {
+		if user.Username == username {
+			if user.ID != idUser {
+				return false
+			}
 		}
 	}
 	return true
@@ -206,14 +232,14 @@ func SetJsonData(data interface{}, infMsg string) OutJSON {
 }
 
 func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
-	idSessionString, err := SearchCookieSession(r)
+	sessionKey, err := SearchCookie(r)
 	if err == http.ErrNoCookie {
 		return 0, errors.New("cookies not found")
 	}
-	fmt.Println(idSessionString)
+
 	for _, oneSession := range h.sessions {
-		if oneSession.UserCookie.Value == idSessionString.Value {
-			return oneSession.UserID, err
+		if oneSession.Value == sessionKey.Value {
+			return oneSession.UserID, nil
 		}
 	}
 	return 0, errors.New("idUser not found")
@@ -252,6 +278,45 @@ func ExtractFormatFile(FileName string) (string, error) {
 	return "", errors.New("invalid file name")
 }
 
+func SetResponseError(encoder *json.Encoder, msg string, err error) {
+	log.Printf("%s: %s", msg, err)
+	data := SetJsonData(nil, msg)
+	encoder.Encode(data)
+}
+
+const (
+	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" // 62 possibilities
+	letterIdxBits = 6                                                                // 6 bits to represent 64 possibilities / indexes
+	letterIdxMask = 1<<letterIdxBits - 1                                             // All 1-bits, as many as letterIdxBits
+)
+
+func GenSessionKey(length int) string {
+
+	result := make([]byte, length)
+	bufferSize := int(float64(length) * 1.3)
+	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
+		if j%bufferSize == 0 {
+			randomBytes = SecureRandomBytes(bufferSize)
+		}
+		if idx := int(randomBytes[j%length] & letterIdxMask); idx < len(letterBytes) {
+			result[i] = letterBytes[idx]
+			i++
+		}
+	}
+
+	return string(result)
+}
+
+// SecureRandomBytes returns the requested number of bytes using crypto/rand
+func SecureRandomBytes(length int) []byte {
+	var randomBytes = make([]byte, length)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		log.Fatal("Unable to generate random bytes")
+	}
+	return randomBytes
+}
+
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -259,81 +324,82 @@ func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	data := SetJsonData(nil, "Empty handler has been done")
 	encoder.Encode(data)
 	log.Printf("Empty handler has been done")
-	return
 }
 
 func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
-
 	decoder := json.NewDecoder(r.Body)
+
 	newUserReg := new(UserReg)
 	err := decoder.Decode(newUserReg)
 	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "incorrect json")
-		encoder.Encode(data)
+		SetResponseError(encoder, "incorrect json", err)
+		return
+	}
+
+	if !strings.Contains(newUserReg.Email, "@") {
+		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+		return
+	}
+	if len(newUserReg.Username) < 1 {
+		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
+		return
+	}
+	if len(newUserReg.Password) < 1 {
+		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
 		return
 	}
 
 	defer h.mu.Unlock()
 
 	h.mu.Lock()
-	if !EmailIsUnique(h, newUserReg.Email) {
-		log.Printf("not unique Email")
-		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "not unique Email")
-		encoder.Encode(data)
+	if !RegEmailIsUnique(h, newUserReg.Email) {
+		SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
+		return
+	}
+	if !RegUsernameIsUnique(h, newUserReg.Username) {
+		SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return
 	}
 
 	newUser := CreateNewUser(h, *newUserReg)
 	h.users = append(h.users, newUser)
-	cookie, err := CreateNewUserSession(h, newUser)
+	cookies, err := CreateNewUserSession(h, newUser)
 	if err != nil {
-		log.Printf("error while generating sessionValue: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "error while generating sessionValue")
-		encoder.Encode(data)
+		SetResponseError(encoder, "error while generating sessionValue", err)
 		return
 	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		log.Printf("error while generating sessionValue: %s", err)
+	if len(cookies) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "error while generating sessionValue")
-		encoder.Encode(data)
+		SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
+		return
 	}
-	http.SetCookie(w, &correctCookie)
+	http.SetCookie(w, &cookies[0])
 
 	data := SetJsonData(newUser, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "bad user struct")
-		encoder.Encode(data)
+		SetResponseError(encoder, "bad user struct", err)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleListUsers(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
+
 	h.mu.Lock()
 	data := SetJsonData(h.users, "OK")
 	h.mu.Unlock()
+
 	err := encoder.Encode(data)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "error while marshalling JSON")
-		encoder.Encode(data)
+		SetResponseError(encoder, "error while marshalling JSON", err)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
@@ -341,15 +407,12 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
 	encoder := json.NewEncoder(w)
-	infMsg := ""
 
 	newUserLogin := new(UserLogin)
 	err := decoder.Decode(newUserLogin)
 	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "incorrect json")
-		encoder.Encode(data)
+		SetResponseError(encoder, "incorrect json", err)
 		return
 	}
 
@@ -358,56 +421,46 @@ func (h *Handlers) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	value := SearchUserByEmail(h.users, newUserLogin)
 	user, ok := value.(User)
 	if !ok {
-		log.Printf("email was not found")
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "incorrect combination of Email and Password")
-		encoder.Encode(data)
+		SetResponseError(encoder, "incorrect combination of Email and Password", errors.New("incorrect Email"))
 		return
 	}
 	if user.Password != newUserLogin.Password {
-		log.Printf("incorrect password")
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "incorrect combination of Email and Password")
-		encoder.Encode(data)
+		SetResponseError(encoder, "incorrect combination of Email and Password", errors.New("incorrect Password"))
 		return
 	}
+
 	//Если пришли валидные куки, значит новую сессию не создаём
 	idUser, err := SearchIdUserByCookie(r, h)
 	fmt.Println(idUser)
 	if err == nil {
-		infMsg = "successfully log in yet"
-		data := SetJsonData(user, infMsg)
+		data := SetJsonData(user, "Successfully log in yet")
 		encoder.Encode(data)
 		return
 	}
-	cookie, err := CreateNewUserSession(h, user)
-	if err != nil {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "error while generating sessionValue")
-		encoder.Encode(data)
-		return
-	}
-	correctCookie, ok := cookie.(http.Cookie)
-	if !ok {
-		log.Printf("error while generating sessionValue: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "error while generating sessionValue")
-		encoder.Encode(data)
-	}
-	http.SetCookie(w, &correctCookie)
 
-	data := SetJsonData(user, infMsg)
+	cookies, err := CreateNewUserSession(h, user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "error while generating sessionValue", err)
+		return
+	}
+	if len(cookies) < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
+		return
+	}
+	http.SetCookie(w, &cookies[0])
+
+	data := SetJsonData(user, "OK")
 
 	err = encoder.Encode(data)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "bad user struct")
-		encoder.Encode(data)
+		SetResponseError(encoder, "bad user struct", err)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Request) {
@@ -418,39 +471,35 @@ func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Reque
 	idUser, err := SearchIdUserByCookie(r, h)
 	h.mu.Unlock()
 	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
 		w.WriteHeader(http.StatusUnauthorized)
-		data := SetJsonData(nil, "invalid cookie or user")
-		encoder.Encode(data)
+		SetResponseError(encoder, "invalid cookie or user", err)
 		return
 	}
-	infMsg := ""
+
 	h.mu.Lock()
-	data := SetJsonData(h.users[GetUserIndexByID(h, idUser)], infMsg)
+	data := SetJsonData(h.users[GetUserIndexByID(h, idUser)], "OK")
 	h.mu.Unlock()
+
 	err = encoder.Encode(data)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "bad user struct")
-		encoder.Encode(data)
+		SetResponseError(encoder, "bad user struct", err)
 		return
 	}
-	return
 }
 
 func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
+
 	h.mu.Lock()
 	idUser, err := SearchIdUserByCookie(r, h)
 	h.mu.Unlock()
+
 	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
 		w.WriteHeader(http.StatusUnauthorized)
-		data := SetJsonData(nil, "invalid cookie or user")
-		encoder.Encode(data)
+		SetResponseError(encoder, "invalid cookie or user", err)
 		return
 	}
 	filename := strconv.FormatUint(idUser, 10) + "_picture" + ".jpg"
@@ -460,8 +509,7 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		//File not found, send 404
 		w.WriteHeader(http.StatusNotFound)
-		data := SetJsonData(nil, "file not found")
-		encoder.Encode(data)
+		SetResponseError(encoder, "file not found", err)
 		return
 	}
 	//File is found, create and send the correct headers
@@ -485,7 +533,6 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 	//We read 512 bytes from the file already, so we reset the offset back to 0
 	openFile.Seek(0, 0)
 	io.Copy(w, openFile) //'Copy' the file to the client
-	return
 }
 
 func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
@@ -497,42 +544,51 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	newProfileUser := new(EditUserProfile)
 	err := decoder.Decode(newProfileUser)
 	if err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "incorrect json")
-		encoder.Encode(data)
+		SetResponseError(encoder, "incorrect json", err)
+		return
+	}
+
+	if !strings.Contains(newProfileUser.Email, "@") {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+		return
+	}
+	if len(newProfileUser.Username) < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
+		return
+	}
+	if len(newProfileUser.Password) < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
 		return
 	}
 
 	defer h.mu.Unlock()
 	h.mu.Lock()
+
 	idUser, err := SearchIdUserByCookie(r, h)
 	if err != nil {
-		log.Printf("Invalid cookie: %s", err)
 		w.WriteHeader(http.StatusUnauthorized)
-		data := SetJsonData(nil, "invalid cookie or user")
-		encoder.Encode(data)
+		SetResponseError(encoder, "invalid cookie or user", err)
 		return
 	}
-	if !EmailIsUnique(h, newProfileUser.Email) {
-		log.Printf("not unique Email")
+	if !EditEmailIsUnique(h, newProfileUser.Email, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "not unique Email")
-		encoder.Encode(data)
+		SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return
 	}
-	if !UsernameIsUnique(h, newProfileUser.Username) {
-		log.Printf("not unique Username")
+	if !EditUsernameIsUnique(h, newProfileUser.Username, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "not unique Username")
-		encoder.Encode(data)
+		SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return
 	}
+
 	SaveNewProfileUser(&h.users[GetUserIndexByID(h, idUser)], newProfileUser)
 
 	data := SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
-	return
 }
 
 func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
@@ -540,28 +596,28 @@ func (h *Handlers) HandleLogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	session, err := SearchCookieSession(r)
+	sessionKey, err := SearchCookie(r)
 	if err == http.ErrNoCookie {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "Cookies have not found")
-		encoder.Encode(data)
+		SetResponseError(encoder, "Cookie has not found", err)
 		return
 	}
+
 	h.mu.Lock()
-	err = DeleteOldUserSession(h, session.Value)
+	err = DeleteOldUserSession(h, sessionKey.Value)
 	h.mu.Unlock()
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "Session has not found")
-		encoder.Encode(data)
+		SetResponseError(encoder, "Session has not found", err)
 		return
 	}
-	session.Path = "/"
-	session.Expires = time.Now().AddDate(0, 0, -999)
-	http.SetCookie(w, session)
+	sessionKey.Path = "/"
+	sessionKey.Expires = time.Now().AddDate(0, 0, -999)
+	http.SetCookie(w, sessionKey)
+
 	data := SetJsonData(nil, "Session has been successfully deleted")
 	encoder.Encode(data)
-	return
 }
 
 func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
@@ -574,31 +630,35 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	h.mu.Unlock()
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		data := SetJsonData(nil, "user not found or not valid cookies")
-		encoder.Encode(data)
+		SetResponseError(encoder, "user not found or not valid cookies", err)
 		return
 	}
 	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		data := SetJsonData(nil, "Cannot read profile picture")
-		encoder.Encode(data)
+		SetResponseError(encoder, "Cannot read profile picture", err)
 		return
 	}
 
 	defer file.Close()
 	formatFile, err := ExtractFormatFile(header.Filename)
 	if err != nil {
-		data := SetJsonData(nil, err.Error())
-		encoder.Encode(data)
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "Cannot read profile picture", err)
 		return
 	}
 	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture" + formatFile)
+
 	defer newFile.Close()
-	io.Copy(newFile, file)
+	_, err = io.Copy(newFile, file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		SetResponseError(encoder, "File recording has failed", err)
+		return
+	}
+
 	data := SetJsonData(nil, "profile picture has been successfully saved")
 	encoder.Encode(data)
-	return
 }
 
 // ================================= Handler functions =================================
