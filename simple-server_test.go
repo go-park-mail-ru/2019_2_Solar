@@ -101,7 +101,7 @@ func TestCreateNewUserSession1(t *testing.T) {
 		t.Errorf("Test failed")
 	}
 
-	if len(cookies) < 2 {
+	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -150,7 +150,7 @@ func TestCreateNewUserSession2(t *testing.T) {
 		t.Errorf("Test failed")
 	}
 
-	if len(cookies) < 2 {
+	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -209,7 +209,7 @@ func TestCreateNewUserSession3(t *testing.T) {
 		t.Errorf("Test failed")
 	}
 
-	if len(cookies) < 2 {
+	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
 	if len(hTest.sessions) < sessionsCountOK {
@@ -261,7 +261,7 @@ func TestDeleteOldUserSession1(t *testing.T) {
 
 	sessionsCoutOK := len(hTest.sessions) - 1
 
-	value := "1"
+	value := "5h7x"
 
 	err := DeleteOldUserSession(&hTest, value)
 
@@ -330,8 +330,8 @@ func TestDeleteOldUserSession2(t *testing.T) {
 
 	sessionsCoutOK := len(hTest.sessions) - 2
 
-	cookieValue1 := "2"
-	cookieValue2 := "1"
+	cookieValue1 := "6h7x"
+	cookieValue2 := "5h7x"
 
 	err := DeleteOldUserSession(&hTest, cookieValue1)
 	if err != nil {
@@ -368,12 +368,9 @@ func TestSearchCookieSession1(t *testing.T) {
 	r.AddCookie(&cookie1)
 	r.AddCookie(&cookie2)
 
-	sessionID, sessionKey, err := SearchCookie(r)
+	sessionKey, err := SearchCookie(r)
 
 	if err != nil {
-		t.Errorf("Test failed")
-	}
-	if sessionID.Value != "1" {
 		t.Errorf("Test failed")
 	}
 	if sessionKey.Value != "6h7x" {
@@ -399,7 +396,7 @@ func TestSearchCookieSession2(t *testing.T) {
 	r.AddCookie(&cookie1)
 	r.AddCookie(&cookie2)
 
-	_, _, err := SearchCookie(r)
+	_, err := SearchCookie(r)
 
 	if err == nil {
 		t.Errorf("Test failed")
@@ -1396,20 +1393,14 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
+
 	cookie := http.Cookie{
-		Name:    "session_id",
-		Value:   "ummmm", // incorrect cookie
+		Name:    "session_key",
+		Value:   "7h", // incorrct cookie
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	r.AddCookie(&cookie)
-	cookie2 := http.Cookie{
-		Name:    "session_key",
-		Value:   "7h7x",
-		Path:    "/",
-		Expires: time.Now().Add(1 * time.Hour),
-	}
-	r.AddCookie(&cookie2)
 	w := httptest.NewRecorder()
 
 	hTest.HandleEditProfileUserData(w, r)
