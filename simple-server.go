@@ -502,8 +502,9 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 		SetResponseError(encoder, "invalid cookie or user", err)
 		return
 	}
-	filename := strconv.FormatUint(idUser, 10) + "_picture" + ".jpg"
-
+	h.mu.Lock()
+	filename := h.users[GetUserIndexByID(h, idUser)].AvatarDir
+	h.mu.Unlock()
 	openFile, err := os.Open(filename)
 	defer openFile.Close() //Close after function return
 	if err != nil {
@@ -637,8 +638,11 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 		SetResponseError(encoder, "Cannot read profile picture", err)
 		return
 	}
-	newFile, err := os.Create(strconv.FormatUint(idUser, 10) + "_picture" + formatFile)
-
+	fileName := strconv.FormatUint(idUser, 10) + "_picture" + formatFile
+	newFile, err := os.Create(fileName)
+	h.mu.Lock()
+	h.users[GetUserIndexByID(h, idUser)].AvatarDir = fileName
+	h.mu.Unlock()
 	defer newFile.Close()
 	_, err = io.Copy(newFile, file)
 	if err != nil {
