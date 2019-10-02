@@ -94,7 +94,6 @@ func CreateNewUser(h *Handlers, newUserReg UserReg) User {
 }
 
 func CreateNewUserSession(h *Handlers, user User) ([]http.Cookie, error) {
-
 	cookies := []http.Cookie{}
 
 	var sessionValue uint64 = 0
@@ -128,7 +127,6 @@ func CreateNewUserSession(h *Handlers, user User) ([]http.Cookie, error) {
 }
 
 func DeleteOldUserSession(h *Handlers, value string) error {
-
 	for i, session := range h.sessions {
 		if session.Value == value {
 			h.sessions = append(h.sessions[:i], h.sessions[i+1:]...)
@@ -202,7 +200,6 @@ func GetUserIndexByID(h *Handlers, id uint64) int {
 }
 
 func SetJsonData(data interface{}, infMsg string) OutJSON {
-
 	user, ok := data.(User)
 	if ok {
 		outJSON := OutJSON{
@@ -246,7 +243,6 @@ func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 }
 
 func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
-
 	user.Age = newUser.Age
 	user.Status = newUser.Status
 	user.Name = newUser.Name
@@ -285,7 +281,6 @@ const (
 )
 
 func GenSessionKey(length int) string {
-
 	result := make([]byte, length)
 	bufferSize := int(float64(length) * 1.3)
 	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
@@ -750,7 +745,6 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
 	http.Handle("/", CORSMiddleware(http.HandlerFunc(HandleRoot)))
 	http.Handle("/users/", CORSMiddleware(http.HandlerFunc(HandleUsers)))
 	http.Handle("/registration/", CORSMiddleware(http.HandlerFunc(HandleRegistration)))
