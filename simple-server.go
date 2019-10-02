@@ -246,26 +246,20 @@ func SearchIdUserByCookie(r *http.Request, h *Handlers) (uint64, error) {
 }
 
 func SaveNewProfileUser(user *User, newUser *EditUserProfile) {
-	if newUser.Age != "" {
-		user.Age = newUser.Age
-	}
+
+	user.Age = newUser.Age
+	user.Status = newUser.Status
+	user.Name = newUser.Name
+	user.Surname = newUser.Surname
+
 	if newUser.Email != "" {
 		user.Email = newUser.Email
 	}
-	if newUser.Name != "" {
-		user.Name = newUser.Name
+	if newUser.Username != "" {
+		user.Username = newUser.Username
 	}
 	if newUser.Password != "" {
 		user.Password = newUser.Password
-	}
-	if newUser.Status != "" {
-		user.Status = newUser.Status
-	}
-	if newUser.Surname != "" {
-		user.Surname = newUser.Surname
-	}
-	if newUser.Username != "" {
-		user.Username = newUser.Username
 	}
 }
 
