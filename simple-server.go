@@ -734,6 +734,7 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 
 	if r.Method == http.MethodPost {
+		w.Header().Set("Content-Type", "application/json")
 		handlers.HandleEditProfileUserPicture(w, r)
 		return
 	}
@@ -752,6 +753,10 @@ func main() {
 	http.Handle("/logout/", CORSMiddleware(http.HandlerFunc(HandleLogout)))
 	http.Handle("/profile/data", CORSMiddleware(http.HandlerFunc(HandleProfileData)))
 	http.Handle("/profile/picture", CORSMiddleware(http.HandlerFunc(HandleProfilePicture)))
-
+	HandleAvatar:=	http.StripPrefix(
+		"/avatar/",
+		http.FileServer(http.Dir("./static/avatar")),
+	)
+	http.Handle("/avatar/", CORSMiddleware(HandleAvatar))
 	http.ListenAndServe(":8080", nil)
 }
