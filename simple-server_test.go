@@ -702,6 +702,102 @@ func TestUserIndexByID2(t *testing.T) {
 	}
 }
 
+func TestUsernameCheck1(t *testing.T) {
+	if err := UsernameCheck("Vova"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestUsernameCheck2(t *testing.T) {
+	if err := UsernameCheck("Vova2000_Nitrogen"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestUsernameCheck3(t *testing.T) {
+	if err := UsernameCheck("Папа_может"); err == nil { // incorrect username
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck1(t *testing.T) {
+	if err := EmailCheck("vitalian42@mail.ru"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck2(t *testing.T) {
+	if err := EmailCheck("green23_day@yandex.com"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck3(t *testing.T) {
+	if err := EmailCheck("@yandex.com"); err == nil { // incorrect email
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck1(t *testing.T) {
+	if err := PasswordCheck("!Alarm42!"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck2(t *testing.T) {
+	if err := PasswordCheck("KoT!K"); err == nil { // small length (<8)
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck3(t *testing.T) {
+	if err := PasswordCheck("BigPasswordWithoutSpecialSymbols"); err == nil { // has not special symbol
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck4(t *testing.T) {
+	if err := PasswordCheck("only#down&case"); err == nil { // has not upper case letter
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck1(t *testing.T) {
+	if err := NameCheck("Andrey"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck2(t *testing.T) {
+	if err := NameCheck("Виталий"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck3(t *testing.T) {
+	if err := NameCheck("Notrth2"); err == nil { // incorrect name
+		t.Errorf("Test failed")
+	}
+}
+
+func TestSurameCheck1(t *testing.T) {
+	if err := SurnameCheck("Alibaba-Great"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestSurameCheck2(t *testing.T) {
+	if err := SurnameCheck("Alibaba_Greate"); err == nil { // incorrect surname
+		t.Errorf("Test failed")
+	}
+}
+
+func TestStatusCheck1(t *testing.T) {
+	if err := StatusCheck("All is Хорошо. (!№;%$@#)"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
 func TestHandleEmpty1(t *testing.T) {
 
 	hTest := Handlers{
@@ -756,7 +852,7 @@ func TestHandleRegUser1(t *testing.T) {
 		mu:       &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"email": "vitalian42@mail.ru", "password": "1234", "username": "Vitalian42"}`)
+	bodyReader := strings.NewReader(`{"email": "vitalian42@mail.ru", "password": "Alibaba1234#", "username": "Vitalian42"}`)
 
 	r := httptest.NewRequest("POST", "/registration/", bodyReader)
 	w := httptest.NewRecorder()
@@ -822,7 +918,7 @@ func TestHandleRegUser3(t *testing.T) {
 		mu:       &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "1234", "username": "Vitalian42"}`) // mot unique email
+	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "NewUniquePass!", "username": "Vitalian42"}`) // mot unique email
 
 	r := httptest.NewRequest("POST", "/registration/", bodyReader)
 	w := httptest.NewRecorder()
@@ -1218,9 +1314,9 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
-	r := httptest.NewRequest("GET", "/profile/data", bodyReader)
+	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
 	cookie1 := http.Cookie{
 		Name:    "session_id",
 		Value:   "2",
@@ -1304,7 +1400,7 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "And "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "And "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("GET", "/profile/data", bodyReader) // incorrect json
 	cookie := http.Cookie{
@@ -1390,7 +1486,7 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
 
@@ -1470,7 +1566,7 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Liza@mail.com", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Liza@mail.com", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique email
 	cookie := http.Cookie{
@@ -1556,7 +1652,7 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 		mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Dima", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Dima", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique username
 	cookie := http.Cookie{

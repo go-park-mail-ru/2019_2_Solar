@@ -9,10 +9,25 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
+)
+
+var (
+	emailIsCorrect    = regexp.MustCompile(`^\w+@\w+\.\w+$`)
+	usernameIsCorrect = regexp.MustCompile(`^[\w\d]*$`)
+
+	passwordIsCorrect       = regexp.MustCompile(`^[\w\d!?_#&^%]{8,30}$`)
+	passwordHasDownCaseChar = regexp.MustCompile(`^.*[a-z]+.*$`)
+	passwordHasAperCaseChar = regexp.MustCompile(`^.*[A-Z]+.*$`)
+	passwordHasSpecChar     = regexp.MustCompile(`^.*[!?_#&^%]+.*$`)
+
+	nameIsCorrect    = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
+	surnameIsCorrect = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
+	statusIsCorrect  = regexp.MustCompile(`^.*$`)
+	ageIsCorrect     = regexp.MustCompile(`^[0-9]{1,3}$`)
 )
 
 type UserCookie struct {
@@ -306,6 +321,110 @@ func SecureRandomBytes(length int) []byte {
 	return randomBytes
 }
 
+func UsernameCheck(username string) error {
+	if len(username) >= 1 && len(username) <= 30 && usernameIsCorrect.MatchString(username) {
+		return nil
+	}
+	return errors.New("Incorrect username")
+}
+
+func EmailCheck(email string) error {
+	if emailIsCorrect.MatchString(email) {
+		return nil
+	}
+	return errors.New("Incorrect email")
+}
+
+func PasswordCheck(password string) error {
+	if len(password) >= 8 && len(password) <= 30 && passwordIsCorrect.MatchString(password) {
+		if passwordHasAperCaseChar.MatchString(password) {
+			if passwordHasDownCaseChar.MatchString(password) {
+				if passwordHasSpecChar.MatchString(password) {
+					return nil
+				}
+				return errors.New("Password has not special symbol")
+			}
+			return errors.New("Password has not symbol in down case")
+		}
+		return errors.New("Password has not symbol in upper case")
+	}
+	return errors.New("Incorrect password")
+}
+
+func NameCheck(name string) error {
+	if len(name) >= 1 && len(name) <= 30 && nameIsCorrect.MatchString(name) {
+		return nil
+	}
+	return errors.New("Incorrct name")
+}
+
+func SurnameCheck(surname string) error {
+	if len(surname) >= 1 && len(surname) <= 30 && surnameIsCorrect.MatchString(surname) {
+		return nil
+	}
+	return errors.New("Incorrect surname")
+}
+
+func AgeCheck(age string) error {
+	if ageIsCorrect.MatchString(age) {
+		return nil
+	}
+	return errors.New("Incorrect age")
+}
+
+func StatusCheck(status string) error {
+	if len(status) >= 1 && len(status) <= 200 && statusIsCorrect.MatchString(status) {
+		return nil
+	}
+	return errors.New("Incorrect status")
+}
+
+func EditProfileDataCheck(newProfileUser *EditUserProfile) error {
+	if newProfileUser.Email != "" {
+		if err := EmailCheck(newProfileUser.Email); err != nil {
+			//SetResponseError(encoder, "incorrect Email", err)
+			return err
+		}
+	}
+	if newProfileUser.Username != "" {
+		if err := UsernameCheck(newProfileUser.Username); err != nil {
+			//SetResponseError(encoder, "incorrect Username", err)
+			return err
+		}
+	}
+	if newProfileUser.Password != "" {
+		if err := PasswordCheck(newProfileUser.Password); err != nil {
+			//SetResponseError(encoder, "incorrect Password", err)
+			return err
+		}
+	}
+	if newProfileUser.Name != "" {
+		if err := NameCheck(newProfileUser.Name); err != nil {
+			//SetResponseError(encoder, "incorrect Name", err)
+			return err
+		}
+	}
+	if newProfileUser.Surname != "" {
+		if err := SurnameCheck(newProfileUser.Surname); err != nil {
+			//SetResponseError(encoder, "incorrect Surname", err)
+			return err
+		}
+	}
+	if newProfileUser.Status != "" {
+		if err := StatusCheck(newProfileUser.Status); err != nil {
+			//SetResponseError(encoder, "incorrect Status", err)
+			return err
+		}
+	}
+	if newProfileUser.Age != "" {
+		if err := AgeCheck(newProfileUser.Age); err != nil {
+			//SetResponseError(encoder, "incorrect Status", err)
+			return err
+		}
+	}
+	return nil
+}
+
 func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -328,16 +447,16 @@ func (h *Handlers) HandleRegUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !strings.Contains(newUserReg.Email, "@") {
-		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+	if err := EmailCheck(newUserReg.Email); err != nil {
+		SetResponseError(encoder, "incorrect Email", err)
 		return
 	}
-	if len(newUserReg.Username) < 1 {
-		SetResponseError(encoder, "incorrect Username", errors.New("incorrect Username"))
+	if err := UsernameCheck(newUserReg.Username); err != nil {
+		SetResponseError(encoder, "incorrect Username", err)
 		return
 	}
-	if len(newUserReg.Password) < 1 {
-		SetResponseError(encoder, "incorrect Password", errors.New("incorrect Password"))
+	if err := PasswordCheck(newUserReg.Password); err != nil {
+		SetResponseError(encoder, err.Error(), err)
 		return
 	}
 
@@ -539,9 +658,9 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if !strings.Contains(newProfileUser.Email, "@") && newProfileUser.Email != "" {
+	if err := EditProfileDataCheck(newProfileUser); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		SetResponseError(encoder, "incorrect Email", errors.New("incorrect Email"))
+		SetResponseError(encoder, err.Error(), err)
 		return
 	}
 
