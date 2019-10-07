@@ -2,9 +2,11 @@ package main
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	_ "github.com/lib/pq"
 	"io"
 	"log"
 	"net/http"
@@ -744,7 +746,44 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	handlers.HandleEmpty(w, r)
 }
 
+type readUser struct {
+	id       int
+	username string
+	name     string
+	surename string
+	email    string
+	age      int
+	hashpass string
+	status   string
+	isactive bool
+}
+
 func main() {
+	connStr := "user=postgres password=7396 dbname=testdatabase sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("select * from testschema.users")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	products := []readUser{}
+
+	for rows.Next() {
+		p := readUser{}
+		err := rows.Scan(&p.id, &p.username, &p.name, &p.surename, &p.email, &p.age, &p.hashpass, &p.status, &p.isactive)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		products = append(products, p)
+	}
+	for _, p := range products {
+		fmt.Println(p.id, p.username, p.name, p.surename, p.email, p.age, p.hashpass, p.status, p.isactive)
+	}
 	http.Handle("/", CORSMiddleware(http.HandlerFunc(HandleRoot)))
 	http.Handle("/users/", CORSMiddleware(http.HandlerFunc(HandleUsers)))
 	http.Handle("/registration/", CORSMiddleware(http.HandlerFunc(HandleRegistration)))
