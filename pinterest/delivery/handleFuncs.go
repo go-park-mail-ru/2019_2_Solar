@@ -4,8 +4,8 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/labstack/echo"
 	"log"
-	"net/http"
 	"sync"
 )
 
@@ -23,18 +23,20 @@ var handlers = Handlers{
 	Mu:       &sync.Mutex{},
 }
 
-func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{}"))
+func HandleRoot(ctx echo.Context) error {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	ctx.Response().Write([]byte("{123}"))
+	return nil
 }
 
-func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	log.Println(r.URL.Path)
-	handlers.HandleListUsers(w, r)
+func HandleUsers(ctx echo.Context) error {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	log.Println(ctx.Request().URL.Path)
+	handlers.HandleListUsers(ctx.Response(), ctx.Request())
+	return nil
 }
 
-func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+/*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	log.Println(r.URL.Path)
@@ -103,3 +105,4 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	}
 	handlers.HandleEmpty(w, r)
 }
+*/

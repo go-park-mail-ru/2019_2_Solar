@@ -1,14 +1,16 @@
 package middlewares
 
-import "net/http"
+import (
+	"github.com/labstack/echo"
+)
 
-func CORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		w.Header().Set("Access-Control-Allow-Origin", "http://solar-env.v2zxh2s3me.us-east-2.elasticbeanstalk.com")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		next.ServeHTTP(w, r)
-	})
+func CORSMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error  {
+		ctx.Response().Header().Set("Content-Type", "*")
+		ctx.Response().Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		ctx.Response().Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		ctx.Response().Header().Set("Access-Control-Allow-Origin", "http://solar-env.v2zxh2s3me.us-east-2.elasticbeanstalk.com")
+		ctx.Response().Header().Set("Access-Control-Allow-Credentials", "true")
+		return next(ctx)
+	}
 }
