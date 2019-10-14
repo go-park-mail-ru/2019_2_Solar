@@ -12,6 +12,9 @@ import (
 
 func (h* Handlers) HandleRegUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
+
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
 	encoder := json.NewEncoder(ctx.Response())
 	decoder := json.NewDecoder(ctx.Request().Body)
 
@@ -28,21 +31,18 @@ func (h* Handlers) HandleRegUser(ctx echo.Context) error {
 		return nil
 	}
 
-	defer h.Mu.Unlock()
-
-	h.Mu.Lock()
-	if !h.PUsecase.RegEmailIsUnique(h.Users, newUserReg.Email) {
+	if !h.PUsecase.RegEmailIsUnique(newUserReg.Email) {
 		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return nil
 	}
-	if !h.PUsecase.RegUsernameIsUnique(h.Users, newUserReg.Username) {
+	if !h.PUsecase.RegUsernameIsUnique(newUserReg.Username) {
 		h.PUsecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return nil
 	}
 
-	newUser := h.PUsecase.CreateNewUser(h.Users, *newUserReg)
-	h.Users = append(h.Users, newUser)
-	cookies, newSession, err := h.PUsecase.CreateNewUserSession(h.Sessions, newUser)
+	newUser := h.PUsecase.CreateNewUser(newUserReg)
+
+	cookies, _, err := h.PUsecase.CreateNewUserSession(newUser)
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
@@ -54,7 +54,6 @@ func (h* Handlers) HandleRegUser(ctx echo.Context) error {
 		return nil
 	}
 	http.SetCookie(ctx.Response(), &cookies[0])
-	h.Sessions = append(h.Sessions, newSession)
 
 	data := h.PUsecase.SetJsonData(newUser, "OK")
 	err = encoder.Encode(data)
@@ -68,6 +67,8 @@ func (h* Handlers) HandleRegUser(ctx echo.Context) error {
 func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
 
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
 	decoder := json.NewDecoder(ctx.Request().Body)
 	encoder := json.NewEncoder(ctx.Response())
 
@@ -79,9 +80,7 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 		return nil
 	}
 
-	defer h.Mu.Unlock()
-	h.Mu.Lock()
-	value := h.PUsecase.SearchUserByEmail(h.Users, newUserLogin)
+	value := h.PUsecase.SearchUserByEmail(newUserLogin)
 	user, ok := value.(models.User)
 	if !ok {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
@@ -95,7 +94,7 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 	}
 
 	//Если пришли валидные куки, значит новую сессию не создаём
-	idUser, err := h.PUsecase.SearchIdUserByCookie(ctx.Request(), h.Sessions)
+	idUser, err := h.PUsecase.SearchIdUserByCookie(ctx.Request())
 	fmt.Println(idUser)
 	if err == nil {
 		data := h.PUsecase.SetJsonData(user, "Successfully log in yet")
@@ -103,7 +102,7 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 		return nil
 	}
 
-	cookies, newSession, err := h.PUsecase.CreateNewUserSession(h.Sessions, user)
+	cookies, _, err := h.PUsecase.CreateNewUserSession(user)
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
@@ -115,7 +114,6 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 		return nil
 	}
 	http.SetCookie(ctx.Response(), &cookies[0])
-	h.Sessions = append(h.Sessions, newSession)
 
 	data := h.PUsecase.SetJsonData(user, "OK")
 
@@ -131,6 +129,8 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 func (h* Handlers) HandleLogoutUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
 
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
 	encoder := json.NewEncoder(ctx.Response())
 
 	sessionKey, err := h.PUsecase.SearchCookie(ctx.Request())
@@ -140,9 +140,7 @@ func (h* Handlers) HandleLogoutUser(ctx echo.Context) error {
 		return nil
 	}
 
-	h.Mu.Lock()
-	err = h.PUsecase.DeleteOldUserSession(&h.Sessions, sessionKey.Value)
-	h.Mu.Unlock()
+	err = h.PUsecase.DeleteOldUserSession(sessionKey.Value)
 
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)

@@ -3,21 +3,38 @@ package usecase
 import (
 	"encoding/json"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
-type PinterestUseCase struct {
+type PinterestUsecase struct {
+	Users    []models.User
+	Sessions []models.UserSession
+	Mu       *sync.Mutex
 }
 
-func (p *PinterestUseCase) CreateNewUser(users []models.User, newUserReg models.UserReg) models.User {
+func NewPinterestUsecase(users []models.User, sessions []models.UserSession,
+	mu *sync.Mutex) pinterest.Usecase {
+	return &PinterestUsecase{
+		Users:    users,
+		Sessions: sessions,
+		Mu:       mu,
+	}
+}
+
+func (p PinterestUsecase) CreateNewUser(newUserReg *models.UserReg) models.User {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
 	var id uint64 = 0
-	if len(users) > 0 {
-		id = users[len(users)-1].ID + 1
+	if len(p.Users) > 0 {
+		id = p.Users[len(p.Users)-1].ID + 1
 	}
 
 	newUser := models.User{
@@ -27,15 +44,21 @@ func (p *PinterestUseCase) CreateNewUser(users []models.User, newUserReg models.
 		Email:    newUserReg.Email,
 		Username: newUserReg.Username,
 	}
+
+	p.Users = append(p.Users, newUser)
+
 	return newUser
 }
 
-func (p *PinterestUseCase) CreateNewUserSession(sessions []models.UserSession, user models.User) ([]http.Cookie, models.UserSession, error) {
+func (p PinterestUsecase) CreateNewUserSession(user models.User) ([]http.Cookie, models.UserSession, error) {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
 	cookies := []http.Cookie{}
 
 	var sessionValue uint64 = 0
-	if len(sessions) > 0 {
-		sessionValue = sessions[len(sessions)-1].ID + 1
+	if len(p.Sessions) > 0 {
+		sessionValue = p.Sessions[len(p.Sessions)-1].ID + 1
 	}
 
 	sessionKey := p.GenSessionKey(12)
@@ -58,26 +81,37 @@ func (p *PinterestUseCase) CreateNewUserSession(sessions []models.UserSession, u
 		},
 	}
 
+	p.Sessions = append(p.Sessions, newUserSession)
+
 	return cookies, newUserSession, nil
 }
 
-func (p *PinterestUseCase) DeleteOldUserSession(sessions *([]models.UserSession), value string) error {
-	for i, session := range *sessions {
+func (p PinterestUsecase) DeleteOldUserSession(value string) error {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for i, session := range p.Sessions {
 		if session.Value == value {
-			*sessions = append((*sessions)[:i], (*sessions)[i+1:]...)
+			p.Sessions = append(p.Sessions[:i], p.Sessions[i+1:]...)
 			return nil
 		}
 	}
 	return errors.New("session has not found")
 }
 
-func (p *PinterestUseCase) SearchCookie(r *http.Request) (*http.Cookie, error) {
+func (p PinterestUsecase) SearchCookie(r *http.Request) (*http.Cookie, error) {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
 	key, err := r.Cookie("session_key")
 	return key, err
 }
 
-func (p *PinterestUseCase) RegEmailIsUnique(users []models.User, email string) bool {
-	for _, user := range users {
+func (p PinterestUsecase) RegEmailIsUnique(email string) bool {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for _, user := range p.Users {
 		if user.Email == email {
 			return false
 		}
@@ -85,8 +119,11 @@ func (p *PinterestUseCase) RegEmailIsUnique(users []models.User, email string) b
 	return true
 }
 
-func (p *PinterestUseCase) RegUsernameIsUnique(users []models.User, username string) bool {
-	for _, user := range users {
+func (p PinterestUsecase) RegUsernameIsUnique(username string) bool {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for _, user := range p.Users {
 		if user.Username == username {
 			return false
 		}
@@ -94,8 +131,11 @@ func (p *PinterestUseCase) RegUsernameIsUnique(users []models.User, username str
 	return true
 }
 
-func (p *PinterestUseCase) EditEmailIsUnique(users []models.User, email string, idUser uint64) bool {
-	for _, user := range users {
+func (p PinterestUsecase) EditEmailIsUnique(email string, idUser uint64) bool {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for _, user := range p.Users {
 		if user.Email == email {
 			if user.ID != idUser {
 				return false
@@ -105,8 +145,11 @@ func (p *PinterestUseCase) EditEmailIsUnique(users []models.User, email string, 
 	return true
 }
 
-func (p *PinterestUseCase) EditUsernameIsUnique(users []models.User, username string, idUser uint64) bool {
-	for _, user := range users {
+func (p PinterestUsecase) EditUsernameIsUnique(username string, idUser uint64) bool {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for _, user := range p.Users {
 		if user.Username == username {
 			if user.ID != idUser {
 				return false
@@ -116,8 +159,11 @@ func (p *PinterestUseCase) EditUsernameIsUnique(users []models.User, username st
 	return true
 }
 
-func (p *PinterestUseCase) SearchUserByEmail(users []models.User, newUserLogin *models.UserLogin) interface{} {
-	for _, user := range users {
+func (p PinterestUsecase) SearchUserByEmail(newUserLogin *models.UserLogin) interface{} {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for _, user := range p.Users {
 		if user.Email == newUserLogin.Email {
 			return user
 		}
@@ -125,8 +171,11 @@ func (p *PinterestUseCase) SearchUserByEmail(users []models.User, newUserLogin *
 	return ""
 }
 
-func (p *PinterestUseCase) GetUserIndexByID(users []models.User, id uint64) int {
-	for index, user := range users {
+func (p PinterestUsecase) GetUserIndexByID(id uint64) int {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	for index, user := range p.Users {
 		if user.ID == id {
 			return index
 		}
@@ -134,7 +183,24 @@ func (p *PinterestUseCase) GetUserIndexByID(users []models.User, id uint64) int 
 	return -1
 }
 
-func (p *PinterestUseCase) SetJsonData(data interface{}, infMsg string) models.OutJSON {
+func (p PinterestUsecase) GetAllUsers() []models.User {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	return p.Users
+}
+
+func (p PinterestUsecase) GetUserByID(id uint64) models.User {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	return p.Users[id]
+}
+
+func (p PinterestUsecase) SetJsonData(data interface{}, infMsg string) models.OutJSON {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
 	user, ok := data.(models.User)
 	if ok {
 		outJSON := models.OutJSON{
@@ -163,13 +229,17 @@ func (p *PinterestUseCase) SetJsonData(data interface{}, infMsg string) models.O
 	return outJSON
 }
 
-func (p *PinterestUseCase) SearchIdUserByCookie(r *http.Request, sessions []models.UserSession) (uint64, error) {
+func (p PinterestUsecase) SearchIdUserByCookie(r *http.Request) (uint64, error) {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+
 	sessionKey, err := p.SearchCookie(r)
 	if err == http.ErrNoCookie {
 		return 0, errors.New("cookies not found")
 	}
 
-	for _, oneSession := range sessions {
+	for _, oneSession := range p.Sessions {
 		if oneSession.Value == sessionKey.Value {
 			return oneSession.UserID, nil
 		}
@@ -177,7 +247,12 @@ func (p *PinterestUseCase) SearchIdUserByCookie(r *http.Request, sessions []mode
 	return 0, errors.New("idUser not found")
 }
 
-func (p *PinterestUseCase) SaveNewProfileUser(user *models.User, newUser *models.EditUserProfile) {
+func (p PinterestUsecase) SaveNewProfileUser(userID uint64, newUser *models.EditUserProfile) {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
+	user := p.Users[userID]
+
 	user.Age = newUser.Age
 	user.Status = newUser.Status
 	user.Name = newUser.Name
@@ -194,7 +269,10 @@ func (p *PinterestUseCase) SaveNewProfileUser(user *models.User, newUser *models
 	}
 }
 
-func (p *PinterestUseCase) ExtractFormatFile(FileName string) (string, error) {
+func (p PinterestUsecase) ExtractFormatFile(FileName string) (string, error) {
+	p.Mu.Lock()
+	defer p.Mu.Unlock()
+
 	for i := 0; i < len(FileName); i++ {
 		if string(FileName[i]) == "." {
 			return FileName[i:], nil
@@ -203,13 +281,13 @@ func (p *PinterestUseCase) ExtractFormatFile(FileName string) (string, error) {
 	return "", errors.New("invalid file name")
 }
 
-func (p *PinterestUseCase) SetResponseError(encoder *json.Encoder, msg string, err error) {
+func (p PinterestUsecase) SetResponseError(encoder *json.Encoder, msg string, err error) {
 	log.Printf("%s: %s", msg, err)
 	data := p.SetJsonData(nil, msg)
 	encoder.Encode(data)
 }
 
-func (p *PinterestUseCase) GenSessionKey(length int) string {
+func (p PinterestUsecase) GenSessionKey(length int) string {
 	result := make([]byte, length)
 	bufferSize := int(float64(length) * 1.3)
 	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
@@ -225,7 +303,7 @@ func (p *PinterestUseCase) GenSessionKey(length int) string {
 	return string(result)
 }
 
-func (p *PinterestUseCase) RegDataCheck(newUser *models.UserReg) error {
+func (p PinterestUsecase) RegDataCheck(newUser *models.UserReg) error {
 	if err := functions.EmailCheck(newUser.Email); err != nil {
 		return err
 	}
@@ -238,7 +316,7 @@ func (p *PinterestUseCase) RegDataCheck(newUser *models.UserReg) error {
 	return nil
 }
 
-func (p *PinterestUseCase) EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
+func (p PinterestUsecase) EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {
 		if err := functions.EmailCheck(newProfileUser.Email); err != nil {
 			//SetResponseError(encoder, "incorrect Email", err)

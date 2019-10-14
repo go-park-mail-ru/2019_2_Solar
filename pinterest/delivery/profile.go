@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
@@ -14,21 +15,22 @@ import (
 func (h *Handlers) HandleGetProfileUserData(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
+
 	defer r.Body.Close()
 
+	w.Header().Set("Content-Type", "application/json")
+
 	encoder := json.NewEncoder(w)
-	h.Mu.Lock()
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r, h.Sessions)
-	h.Mu.Unlock()
+
+	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
+
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
 		return nil
 	}
-
-	h.Mu.Lock()
-	data := h.PUsecase.SetJsonData(h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)], "OK")
-	h.Mu.Unlock()
+	user := h.PUsecase.GetUserByID(idUser)
+	data := h.PUsecase.SetJsonData(user, "OK")
 
 	err = encoder.Encode(data)
 	if err != nil {
@@ -42,22 +44,21 @@ func (h *Handlers) HandleGetProfileUserData(ctx echo.Context) error {
 func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
+
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
 
-	h.Mu.Lock()
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r, h.Sessions)
-	h.Mu.Unlock()
+	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
 		return nil
 	}
-	h.Mu.Lock()
-	filename := h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)].AvatarDir
-	h.Mu.Unlock()
+	user := h.PUsecase.GetUserByID(idUser)
+	filename := user.AvatarDir
+
 	openFile, err := os.Open(filename)
 	defer openFile.Close() //Close after function return nil
 	if err != nil {
@@ -93,7 +94,10 @@ func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
 func (h *Handlers) HandleEditProfileUserData(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
+
 	defer r.Body.Close()
+
+	w.Header().Set("Content-Type", "application/json")
 
 	decoder := json.NewDecoder(r.Body)
 	encoder := json.NewEncoder(w)
@@ -112,27 +116,24 @@ func (h *Handlers) HandleEditProfileUserData(ctx echo.Context) error {
 		return nil
 	}
 
-	defer h.Mu.Unlock()
-	h.Mu.Lock()
-
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r, h.Sessions)
+	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
 		return nil
 	}
-	if !h.PUsecase.EditEmailIsUnique(h.Users, newProfileUser.Email, idUser) {
+	if !h.PUsecase.EditEmailIsUnique(newProfileUser.Email, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return nil
 	}
-	if !h.PUsecase.EditUsernameIsUnique(h.Users, newProfileUser.Username, idUser) {
+	if !h.PUsecase.EditUsernameIsUnique(newProfileUser.Username, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return nil
 	}
 
-	h.PUsecase.SaveNewProfileUser(&h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)], newProfileUser)
+	h.PUsecase.SaveNewProfileUser(idUser, newProfileUser)
 
 	data := h.PUsecase.SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
@@ -146,9 +147,9 @@ func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
 
 	encoder := json.NewEncoder(w)
 	r.ParseMultipartForm(5 * 1024 * 1025)
-	h.Mu.Lock()
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r, h.Sessions)
-	h.Mu.Unlock()
+
+	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
+
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "user not found or not valid cookies", err)
@@ -170,9 +171,10 @@ func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
 	}
 	fileName := strconv.FormatUint(idUser, 10) + "_picture" + formatFile
 	newFile, err := os.Create(fileName)
-	h.Mu.Lock()
-	h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)].AvatarDir = fileName
-	h.Mu.Unlock()
+
+	user := h.PUsecase.GetUserByID(idUser)
+	user.AvatarDir = fileName
+
 	defer newFile.Close()
 	_, err = io.Copy(newFile, file)
 	if err != nil {

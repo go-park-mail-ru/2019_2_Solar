@@ -2,25 +2,11 @@ package delivery
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
-	"log"
-	"sync"
 )
 
 type Handlers struct {
 	PUsecase pinterest.Usecase
-	Users    []models.User
-	Sessions []models.UserSession
-	Mu       *sync.Mutex
-}
-
-var Handler = Handlers{
-	PUsecase: &usecase.PinterestUseCase{},
-	Users:    make([]models.User, 0),
-	Sessions: make([]models.UserSession, 0),
-	Mu:       &sync.Mutex{},
 }
 
 func HandleRoot(ctx echo.Context) error {
@@ -29,23 +15,20 @@ func HandleRoot(ctx echo.Context) error {
 	return nil
 }
 
-func HandleUsers(ctx echo.Context) error {
-	ctx.Response().Header().Set("Content-Type", "application/json")
-	log.Println(ctx.Request().URL.Path)
-	Handler.HandleListUsers(ctx.Response(), ctx.Request())
-	return nil
-}
+func NewHandlers(e *echo.Echo, uc pinterest.Usecase) {
+	handler := &Handlers{
+		PUsecase: uc,
+			}
 
-func NewHandlers(e *echo.Echo) {
 	e.GET("/", HandleRoot)
-	e.GET("/users/", HandleUsers)
-	e.POST("/registration/", Handler.HandleRegUser)
-	e.POST("/login/", Handler.HandleLoginUser)
-	e.GET("/logout/", Handler.HandleLogoutUser)
-	e.GET("/profile/data", Handler.HandleGetProfileUserData)
-	e.GET("/profile/picture", Handler.HandleEditProfileUserPicture)
-	e.POST("/profile/data", Handler.HandleEditProfileUserData)
-	e.POST("/profile/picture", Handler.HandleGetProfileUserPicture)
+	e.GET("/users/", handler.HandleListUsers)
+	e.POST("/registration/", handler.HandleRegUser)
+	e.POST("/login/", handler.HandleLoginUser)
+	e.GET("/logout/", handler.HandleLogoutUser)
+	e.GET("/profile/data", handler.HandleGetProfileUserData)
+	e.GET("/profile/picture", handler.HandleEditProfileUserPicture)
+	e.POST("/profile/data", handler.HandleEditProfileUserData)
+	e.POST("/profile/picture", handler.HandleGetProfileUserPicture)
 }
 /*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
