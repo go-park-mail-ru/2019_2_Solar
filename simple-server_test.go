@@ -1,6 +1,9 @@
 package main
 
 import (
+	"2019_2_Solar/pkg/functions"
+	"2019_2_Solar/pkg/handls"
+	"2019_2_Solar/pkg/structs"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,19 +16,19 @@ import (
 
 func TestCreateNewUser1(t *testing.T) {
 
-	hTest := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+	hTest := handls.Handlers{
+		Users:    make([]structs.User, 0),
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "vitaly@gmail.com",
 		Password: "1234",
 		Username: "Vitaly",
 	}
 
-	newUserOK := User{
+	newUserOK := structs.User{
 		ID:       0,
 		Name:     "",
 		Password: "1234",
@@ -33,7 +36,7 @@ func TestCreateNewUser1(t *testing.T) {
 		Username: "Vitaly",
 	}
 
-	newUser := CreateNewUser(&hTest, newUserReg)
+	newUser := functions.CreateNewUser(hTest.Users, newUserReg)
 
 	if newUser != newUserOK {
 		t.Errorf("Test failed")
@@ -42,8 +45,8 @@ func TestCreateNewUser1(t *testing.T) {
 
 func TestCreateNewUser2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Vitaly",
@@ -52,17 +55,17 @@ func TestCreateNewUser2(t *testing.T) {
 				Username: "Vitaly",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "Ivan@gmail.com",
 		Password: "424242",
 		Username: "AmigoMail",
 	}
 
-	newUserOK := User{
+	newUserOK := structs.User{
 		ID:       1,
 		Name:     "",
 		Password: "424242",
@@ -70,7 +73,7 @@ func TestCreateNewUser2(t *testing.T) {
 		Username: "AmigoMail",
 	}
 
-	newUser := CreateNewUser(&hTest, newUserReg)
+	newUser := functions.CreateNewUser(hTest.Users, newUserReg)
 
 	if newUser != newUserOK {
 		t.Errorf("Test failed")
@@ -79,8 +82,8 @@ func TestCreateNewUser2(t *testing.T) {
 
 func TestCreateNewUserSession1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -89,13 +92,15 @@ func TestCreateNewUserSession1(t *testing.T) {
 				Username: "12d5",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
 	sessionsCountOK := 1
 
-	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, newSession, err := functions.CreateNewUserSession(hTest.Sessions, hTest.Users[len(hTest.Users)-1])
+
+	hTest.Sessions = append(hTest.Sessions, newSession)
 
 	if err != nil {
 		t.Errorf("Test failed")
@@ -104,18 +109,18 @@ func TestCreateNewUserSession1(t *testing.T) {
 	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
-	if len(hTest.sessions) < sessionsCountOK {
+	if len(hTest.Sessions) < sessionsCountOK {
 		t.Errorf("Test failed")
 	}
-	if hTest.sessions[len(hTest.sessions)-1].UserID != hTest.users[len(hTest.users)-1].ID {
+	if hTest.Sessions[len(hTest.Sessions)-1].UserID != hTest.Users[len(hTest.Users)-1].ID {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestCreateNewUserSession2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -138,13 +143,15 @@ func TestCreateNewUserSession2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	sessionsCountOK := len(hTest.sessions) + 1
+	sessionsCountOK := len(hTest.Sessions) + 1
 
-	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, newSession, err := functions.CreateNewUserSession(hTest.Sessions, hTest.Users[len(hTest.Users)-1])
+
+	hTest.Sessions = append(hTest.Sessions, newSession)
 
 	if err != nil {
 		t.Errorf("Test failed")
@@ -153,10 +160,10 @@ func TestCreateNewUserSession2(t *testing.T) {
 	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
-	if len(hTest.sessions) < sessionsCountOK {
+	if len(hTest.Sessions) < sessionsCountOK {
 		t.Errorf("Test failed")
 	}
-	if hTest.sessions[len(hTest.sessions)-1].UserID != hTest.users[len(hTest.users)-1].ID {
+	if hTest.Sessions[len(hTest.Sessions)-1].UserID != hTest.Users[len(hTest.Users)-1].ID {
 		t.Errorf("Test failed")
 	}
 
@@ -164,8 +171,8 @@ func TestCreateNewUserSession2(t *testing.T) {
 
 func TestCreateNewUserSession3(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -188,22 +195,24 @@ func TestCreateNewUserSession3(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 12,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	sessionsCountOK := len(hTest.sessions) + 1
+	sessionsCountOK := len(hTest.Sessions) + 1
 
-	cookies, err := CreateNewUserSession(&hTest, hTest.users[len(hTest.users)-1])
+	cookies, newSession, err := functions.CreateNewUserSession(hTest.Sessions, hTest.Users[len(hTest.Users)-1])
+
+	hTest.Sessions = append(hTest.Sessions, newSession)
 
 	if err != nil {
 		t.Errorf("Test failed")
@@ -212,18 +221,18 @@ func TestCreateNewUserSession3(t *testing.T) {
 	if len(cookies) < 1 {
 		t.Errorf("Test failed")
 	}
-	if len(hTest.sessions) < sessionsCountOK {
+	if len(hTest.Sessions) < sessionsCountOK {
 		t.Errorf("Test failed")
 	}
-	if hTest.sessions[len(hTest.sessions)-1].UserID != hTest.users[len(hTest.users)-1].ID {
+	if hTest.Sessions[len(hTest.Sessions)-1].UserID != hTest.Users[len(hTest.Users)-1].ID {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestDeleteOldUserSession1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -246,37 +255,37 @@ func TestDeleteOldUserSession1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 12,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	sessionsCoutOK := len(hTest.sessions) - 1
+	sessionsCoutOK := len(hTest.Sessions) - 1
 
 	value := "5h7x"
 
-	err := DeleteOldUserSession(&hTest, value)
+	err := functions.DeleteOldUserSession(&(hTest.Sessions), value)
 
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	if len(hTest.sessions) != sessionsCoutOK {
+	if len(hTest.Sessions) != sessionsCoutOK {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestDeleteOldUserSession2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -299,11 +308,11 @@ func TestDeleteOldUserSession2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 12,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -311,7 +320,7 @@ func TestDeleteOldUserSession2(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 5,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -319,33 +328,33 @@ func TestDeleteOldUserSession2(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 16,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	sessionsCoutOK := len(hTest.sessions) - 2
+	sessionsCoutOK := len(hTest.Sessions) - 2
 
 	cookieValue1 := "6h7x"
 	cookieValue2 := "5h7x"
 
-	err := DeleteOldUserSession(&hTest, cookieValue1)
+	err := functions.DeleteOldUserSession(&(hTest.Sessions), cookieValue1)
 	if err != nil {
 		t.Errorf("Test failed")
 	}
-	err = DeleteOldUserSession(&hTest, cookieValue2)
+	err = functions.DeleteOldUserSession(&(hTest.Sessions), cookieValue2)
 	if err != nil {
 		t.Errorf("Test failed")
 	}
 
-	if len(hTest.sessions) != sessionsCoutOK {
+	if len(hTest.Sessions) != sessionsCoutOK {
 		t.Errorf("Test failed")
 	}
-	if hTest.sessions[len(hTest.sessions)-1].UserID != 16 {
+	if hTest.Sessions[len(hTest.Sessions)-1].UserID != 16 {
 		t.Errorf("Test failed")
 	}
 }
@@ -368,7 +377,7 @@ func TestSearchCookieSession1(t *testing.T) {
 	r.AddCookie(&cookie1)
 	r.AddCookie(&cookie2)
 
-	sessionKey, err := SearchCookie(r)
+	sessionKey, err := functions.SearchCookie(r)
 
 	if err != nil {
 		t.Errorf("Test failed")
@@ -396,7 +405,7 @@ func TestSearchCookieSession2(t *testing.T) {
 	r.AddCookie(&cookie1)
 	r.AddCookie(&cookie2)
 
-	_, err := SearchCookie(r)
+	_, err := functions.SearchCookie(r)
 
 	if err == nil {
 		t.Errorf("Test failed")
@@ -405,8 +414,8 @@ func TestSearchCookieSession2(t *testing.T) {
 
 func TestRegEmailIsUnique1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -429,17 +438,17 @@ func TestRegEmailIsUnique1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "unique@mul.com",
 		Password: "1001",
 		Username: "jonny",
 	}
 
-	ok := RegEmailIsUnique(&hTest, newUserReg.Username)
+	ok := functions.RegEmailIsUnique(hTest.Users, newUserReg.Username)
 	if !ok {
 		t.Errorf("Test failed")
 	}
@@ -448,8 +457,8 @@ func TestRegEmailIsUnique1(t *testing.T) {
 
 func TestRegEmailIsUnique2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -472,17 +481,17 @@ func TestRegEmailIsUnique2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "ABC45@mail.su", // not unique
 		Password: "1001",
 		Username: "jonny",
 	}
 
-	ok := RegEmailIsUnique(&hTest, newUserReg.Email)
+	ok := functions.RegEmailIsUnique(hTest.Users, newUserReg.Email)
 	if ok {
 		t.Errorf("Test failed")
 	}
@@ -491,8 +500,8 @@ func TestRegEmailIsUnique2(t *testing.T) {
 
 func TestREgUserNameIsUnique1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -515,17 +524,17 @@ func TestREgUserNameIsUnique1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "QUE45@mail.su",
 		Password: "1001",
 		Username: "jonny",
 	}
 
-	ok := RegUsernameIsUnique(&hTest, newUserReg.Username)
+	ok := functions.RegUsernameIsUnique(hTest.Users, newUserReg.Username)
 	if !ok {
 		t.Errorf("Test failed")
 	}
@@ -533,8 +542,8 @@ func TestREgUserNameIsUnique1(t *testing.T) {
 
 func TestREgUserNameIsUnique2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -557,17 +566,17 @@ func TestREgUserNameIsUnique2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserReg := UserReg{
+	newUserReg := structs.UserReg{
 		Email:    "QUE45@mail.su",
 		Password: "1001",
 		Username: "12d8", // not unique
 	}
 
-	ok := RegUsernameIsUnique(&hTest, newUserReg.Username)
+	ok := functions.RegUsernameIsUnique(hTest.Users, newUserReg.Username)
 	if ok {
 		t.Errorf("Test failed")
 	}
@@ -575,8 +584,8 @@ func TestREgUserNameIsUnique2(t *testing.T) {
 
 func TestSearchUserByEmail1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -599,17 +608,17 @@ func TestSearchUserByEmail1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	newUserLogin := UserLogin{
+	newUserLogin := structs.UserLogin{
 		Email:    "ABC45@mail.su",
 		Password: "abcd",
 	}
 
-	value := SearchUserByEmail(hTest.users, &newUserLogin)
-	user, ok := value.(User)
+	value := functions.SearchUserByEmail(hTest.Users, &newUserLogin)
+	user, ok := value.(structs.User)
 	if !ok {
 		t.Errorf("Test failed")
 	}
@@ -620,7 +629,7 @@ func TestSearchUserByEmail1(t *testing.T) {
 
 func TestExtractForamatFile1(t *testing.T) {
 	fileName := "xxx.img"
-	format, err := ExtractFormatFile(fileName)
+	format, err := functions.ExtractFormatFile(fileName)
 	if err != nil || format != ".img" {
 		t.Errorf("Test failed")
 	}
@@ -628,15 +637,15 @@ func TestExtractForamatFile1(t *testing.T) {
 
 func TestExtractForamatFile2(t *testing.T) {
 	fileName := "xxximg"
-	_, err := ExtractFormatFile(fileName)
+	_, err := functions.ExtractFormatFile(fileName)
 	if err == nil {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestUserIndexByID1(t *testing.T) {
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -659,18 +668,18 @@ func TestUserIndexByID1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	if index := GetUserIndexByID(&hTest, 12); index != 1 {
+	if index := functions.GetUserIndexByID(hTest.Users, 12); index != 1 {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestUserIndexByID2(t *testing.T) {
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -693,21 +702,117 @@ func TestUserIndexByID2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	if index := GetUserIndexByID(&hTest, 100); index != -1 {
+	if index := functions.GetUserIndexByID(hTest.Users, 100); index != -1 {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestUsernameCheck1(t *testing.T) {
+	if err := functions.UsernameCheck("Vova"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestUsernameCheck2(t *testing.T) {
+	if err := functions.UsernameCheck("Vova2000_Nitrogen"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestUsernameCheck3(t *testing.T) {
+	if err := functions.UsernameCheck("Папа_может"); err == nil { // incorrect username
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck1(t *testing.T) {
+	if err := functions.EmailCheck("vitalian42@mail.ru"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck2(t *testing.T) {
+	if err := functions.EmailCheck("green23_day@yandex.com"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestEmailCheck3(t *testing.T) {
+	if err := functions.EmailCheck("@yandex.com"); err == nil { // incorrect email
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck1(t *testing.T) {
+	if err := functions.PasswordCheck("!Alarm42!"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck2(t *testing.T) {
+	if err := functions.PasswordCheck("KoT!K"); err == nil { // small length (<8)
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck3(t *testing.T) {
+	if err := functions.PasswordCheck("BigPasswordWithoutSpecialSymbols"); err == nil { // has not special symbol
+		t.Errorf("Test failed")
+	}
+}
+
+func TestPasswordCheck4(t *testing.T) {
+	if err := functions.PasswordCheck("only#down&case"); err == nil { // has not upper case letter
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck1(t *testing.T) {
+	if err := functions.NameCheck("Andrey"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck2(t *testing.T) {
+	if err := functions.NameCheck("Виталий"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestNameCheck3(t *testing.T) {
+	if err := functions.NameCheck("Notrth2"); err == nil { // incorrect name
+		t.Errorf("Test failed")
+	}
+}
+
+func TestSurameCheck1(t *testing.T) {
+	if err := functions.SurnameCheck("Alibaba-Great"); err != nil {
+		t.Errorf("Test failed")
+	}
+}
+
+func TestSurameCheck2(t *testing.T) {
+	if err := functions.SurnameCheck("Alibaba_Greate"); err == nil { // incorrect surname
+		t.Errorf("Test failed")
+	}
+}
+
+func TestStatusCheck1(t *testing.T) {
+	if err := functions.StatusCheck("All is Хорошо. (!№;%$@#)"); err != nil {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestHandleEmpty1(t *testing.T) {
 
-	hTest := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+	hTest := handls.Handlers{
+		Users:    make([]structs.User, 0),
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("PUT", "/", nil)
@@ -727,10 +832,10 @@ func TestHandleEmpty1(t *testing.T) {
 
 func TestHandleEmpty2(t *testing.T) {
 
-	hTest := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+	hTest := handls.Handlers{
+		Users:    make([]structs.User, 0),
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("GET", "/", nil)
@@ -750,30 +855,30 @@ func TestHandleEmpty2(t *testing.T) {
 
 func TestHandleRegUser1(t *testing.T) {
 
-	hTest := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+	hTest := handls.Handlers{
+		Users:    make([]structs.User, 0),
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"email": "vitalian42@mail.ru", "password": "1234", "username": "Vitalian42"}`)
+	bodyReader := strings.NewReader(`{"email": "vitalian42@mail.ru", "password": "Alibaba1234#", "username": "Vitalian42"}`)
 
 	r := httptest.NewRequest("POST", "/registration/", bodyReader)
 	w := httptest.NewRecorder()
 
 	hTest.HandleRegUser(w, r)
 
-	if hTest.users[len(hTest.users)-1].Email != "vitalian42@mail.ru" {
+	if hTest.Users[len(hTest.Users)-1].Email != "vitalian42@mail.ru" {
 		t.Errorf("Test failed")
 	}
 }
 
 func TestHandleRegUser2(t *testing.T) {
 
-	hTest := Handlers{
-		users:    make([]User, 0),
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+	hTest := handls.Handlers{
+		Users:    make([]structs.User, 0),
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
 	bodyReader := strings.NewReader(`{"email": "vitalian42@mail.ru", "password": "1234, "username": "Vitalian42"}`) // incorrect JSONy
@@ -794,8 +899,8 @@ func TestHandleRegUser2(t *testing.T) {
 
 func TestHandleRegUser3(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -818,11 +923,11 @@ func TestHandleRegUser3(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "1234", "username": "Vitalian42"}`) // mot unique email
+	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "NewUniquePass!", "username": "Vitalian42"}`) // mot unique email
 
 	r := httptest.NewRequest("POST", "/registration/", bodyReader)
 	w := httptest.NewRecorder()
@@ -840,8 +945,8 @@ func TestHandleRegUser3(t *testing.T) {
 
 func TestHandleListUsers1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -864,8 +969,8 @@ func TestHandleListUsers1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("GET", "/users/", nil)
@@ -873,14 +978,16 @@ func TestHandleListUsers1(t *testing.T) {
 
 	hTest.HandleListUsers(w, r)
 
-	expectedJSON := `{"body":{"users":[{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su",` +
-		`"age":"","status":"","isactive":""},{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su",` +
-		`"age":"","status":"","isactive":""},{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su",` +
-		`"age":"","status":"","isactive":""}],"info":"OK"}}`
+	expectedJSON := `{"body":{"users":[` +
+		`{"username":"12d6","name":"Bob","surname":"","email":"NEO43@mail.su","age":"","status":"","isactive":""},` +
+		`{"username":"12d7","name":"Bob","surname":"","email":"COM44@mail.su","age":"","status":"","isactive":""},` +
+		`{"username":"12d8","name":"Bob","surname":"","email":"ABC45@mail.su","age":"","status":"","isactive":""}],` +
+		`"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(w.Body)
 	bodyJSON := strings.Trim(string(bytes), "\n")
 	fmt.Println(bodyJSON)
+	fmt.Println(expectedJSON)
 	if bodyJSON != expectedJSON {
 		t.Errorf("Test failed")
 	}
@@ -888,8 +995,8 @@ func TestHandleListUsers1(t *testing.T) {
 
 func TestHandleLoginUser1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -912,8 +1019,8 @@ func TestHandleLoginUser1(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "abcd"}`)
 
@@ -936,8 +1043,8 @@ func TestHandleLoginUser1(t *testing.T) {
 
 func TestHandleLoginUser2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -960,8 +1067,8 @@ func TestHandleLoginUser2(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 	bodyReader := strings.NewReader(`{"email": "COM44@mail.su", "password": "mypass"}`) // incorrect password
 
@@ -983,8 +1090,8 @@ func TestHandleLoginUser2(t *testing.T) {
 
 func TestHandleLoginUser3(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -1007,11 +1114,11 @@ func TestHandleLoginUser3(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 12,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1019,7 +1126,7 @@ func TestHandleLoginUser3(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 5,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1027,13 +1134,13 @@ func TestHandleLoginUser3(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 16,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	bodyReader := strings.NewReader(`{"email": "bob42@mail.su", "password": "abcd"}`)
@@ -1071,8 +1178,8 @@ func TestHandleLoginUser3(t *testing.T) {
 
 func TestHandleLoginUser4(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -1095,8 +1202,8 @@ func TestHandleLoginUser4(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 	bodyReader := strings.NewReader(`{"email": "COM44@mail.su, "password": "mypass"}`) // incorrect password
 
@@ -1118,8 +1225,8 @@ func TestHandleLoginUser4(t *testing.T) {
 
 func TestHandleLoginUser5(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       5,
 				Name:     "Bob",
@@ -1142,8 +1249,8 @@ func TestHandleLoginUser5(t *testing.T) {
 				Username: "12d8",
 			},
 		},
-		sessions: make([]UserSession, 0),
-		mu:       &sync.Mutex{},
+		Sessions: make([]structs.UserSession, 0),
+		Mu:       &sync.Mutex{},
 	}
 	bodyReader := strings.NewReader(`{"email": "NEO43@mail.su", "password": "mypass"}`) // incorrect password
 
@@ -1165,8 +1272,8 @@ func TestHandleLoginUser5(t *testing.T) {
 
 func TestHandleEditProfileUserData1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1189,11 +1296,11 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1201,7 +1308,7 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1209,18 +1316,18 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
-	r := httptest.NewRequest("GET", "/profile/data", bodyReader)
+	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
 	cookie1 := http.Cookie{
 		Name:    "session_id",
 		Value:   "2",
@@ -1251,8 +1358,8 @@ func TestHandleEditProfileUserData1(t *testing.T) {
 
 func TestHandleEditProfileUserData2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1275,11 +1382,11 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1287,7 +1394,7 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1295,16 +1402,16 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "And "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "And "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("GET", "/profile/data", bodyReader) // incorrect json
 	cookie := http.Cookie{
@@ -1337,8 +1444,8 @@ func TestHandleEditProfileUserData2(t *testing.T) {
 
 func TestHandleEditProfileUserData3(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1361,11 +1468,11 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1373,7 +1480,7 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1381,16 +1488,16 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader)
 
@@ -1417,8 +1524,8 @@ func TestHandleEditProfileUserData3(t *testing.T) {
 
 func TestHandleEditProfileUserData4(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1441,11 +1548,11 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1453,7 +1560,7 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1461,16 +1568,16 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Liza@mail.com", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Andrey", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Liza@mail.com", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique email
 	cookie := http.Cookie{
@@ -1503,8 +1610,8 @@ func TestHandleEditProfileUserData4(t *testing.T) {
 
 func TestHandleEditProfileUserData5(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1527,11 +1634,11 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1539,7 +1646,7 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1547,16 +1654,16 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
-	bodyReader := strings.NewReader(`{"username": "Dima", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
+	bodyReader := strings.NewReader(`{"username": "Dima", "name": "Andrey", "surname": "dmitrievich", "password": "MyUniquePassword!", "email": "Andrey@mail.ru", "age": "40", "status": "active", "isactive": "true"}`)
 
 	r := httptest.NewRequest("POST", "/profile/data", bodyReader) // not unique username
 	cookie := http.Cookie{
@@ -1589,8 +1696,8 @@ func TestHandleEditProfileUserData5(t *testing.T) {
 
 func TestHandleGetProfileUserData1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1616,11 +1723,11 @@ func TestHandleGetProfileUserData1(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1628,7 +1735,7 @@ func TestHandleGetProfileUserData1(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1636,13 +1743,13 @@ func TestHandleGetProfileUserData1(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("GET", "/profile/data", nil)
@@ -1677,8 +1784,8 @@ func TestHandleGetProfileUserData1(t *testing.T) {
 
 func TestHandleGetProfileUserData2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1704,11 +1811,11 @@ func TestHandleGetProfileUserData2(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1716,7 +1823,7 @@ func TestHandleGetProfileUserData2(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1724,13 +1831,13 @@ func TestHandleGetProfileUserData2(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("GET", "/profile/data", nil)
@@ -1764,8 +1871,8 @@ func TestHandleGetProfileUserData2(t *testing.T) {
 
 func TestHandleLogoutUser1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1788,11 +1895,11 @@ func TestHandleLogoutUser1(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1800,7 +1907,7 @@ func TestHandleLogoutUser1(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1808,13 +1915,13 @@ func TestHandleLogoutUser1(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("POST", "/logout/", nil)
@@ -1848,8 +1955,8 @@ func TestHandleLogoutUser1(t *testing.T) {
 
 func TestHandleLogoutUser2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1872,11 +1979,11 @@ func TestHandleLogoutUser2(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1884,7 +1991,7 @@ func TestHandleLogoutUser2(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1892,13 +1999,13 @@ func TestHandleLogoutUser2(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("POST", "/logout/", nil)
@@ -1932,8 +2039,8 @@ func TestHandleLogoutUser2(t *testing.T) {
 
 func TestHandleLogoutUser3(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -1956,11 +2063,11 @@ func TestHandleLogoutUser3(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1968,7 +2075,7 @@ func TestHandleLogoutUser3(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -1976,13 +2083,13 @@ func TestHandleLogoutUser3(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("POST", "/logout/", nil)
@@ -2002,8 +2109,8 @@ func TestHandleLogoutUser3(t *testing.T) {
 
 func TestHandleEditProfileUserPicture1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -2026,11 +2133,11 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2038,7 +2145,7 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2046,13 +2153,13 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("POST", "/profile/picture", nil)
@@ -2086,8 +2193,8 @@ func TestHandleEditProfileUserPicture1(t *testing.T) {
 
 func TestHandleEditProfileUserPicture2(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -2110,11 +2217,11 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2122,7 +2229,7 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2130,13 +2237,13 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("POST", "/profile/picture", nil)
@@ -2163,8 +2270,8 @@ func TestHandleEditProfileUserPicture2(t *testing.T) {
 
 func TestHandleGetProfileUserPicture1(t *testing.T) {
 
-	hTest := Handlers{
-		users: []User{
+	hTest := handls.Handlers{
+		Users: []structs.User{
 			{
 				ID:       0,
 				Name:     "Anton",
@@ -2190,11 +2297,11 @@ func TestHandleGetProfileUserPicture1(t *testing.T) {
 				Username: "Liza",
 			},
 		},
-		sessions: []UserSession{
+		Sessions: []structs.UserSession{
 			{
 				ID:     1,
 				UserID: 1,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "5h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2202,7 +2309,7 @@ func TestHandleGetProfileUserPicture1(t *testing.T) {
 			{
 				ID:     2,
 				UserID: 0,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "6h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
@@ -2210,13 +2317,13 @@ func TestHandleGetProfileUserPicture1(t *testing.T) {
 			{
 				ID:     3,
 				UserID: 2,
-				UserCookie: UserCookie{
+				UserCookie: structs.UserCookie{
 					Value:      "7h7x",
 					Expiration: time.Now().Add(1 * time.Hour),
 				},
 			},
 		},
-		mu: &sync.Mutex{},
+		Mu: &sync.Mutex{},
 	}
 
 	r := httptest.NewRequest("GET", "/profile/picture", nil)
