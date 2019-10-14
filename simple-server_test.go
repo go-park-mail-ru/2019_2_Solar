@@ -1,10 +1,10 @@
 package main
 
 import (
-	"2019_2_Solar/pkg/functions"
-	"2019_2_Solar/pkg/handls"
-	"2019_2_Solar/pkg/structs"
 	"fmt"
+	handls "github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery" //"2019_2_Solar/pkg/handls"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
+	structs "github.com/go-park-mail-ru/2019_2_Solar/pkg/models" //"2019_2_Solar/pkg/structs"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

@@ -1,11 +1,11 @@
 package usecase
 
 import (
-	"2019_2_Solar/pkg/consts"
-	"2019_2_Solar/pkg/functions"
-	"2019_2_Solar/pkg/models"
 	"encoding/json"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"log"
 	"net/http"
 	"time"

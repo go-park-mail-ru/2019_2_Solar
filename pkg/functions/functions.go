@@ -1,10 +1,10 @@
 package functions
 
 import (
-	"2019_2_Solar/pkg/consts"
-	"2019_2_Solar/pkg/validation"
 	"crypto/rand"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"log"
 )
 

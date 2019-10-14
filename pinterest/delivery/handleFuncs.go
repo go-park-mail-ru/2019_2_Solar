@@ -1,11 +1,11 @@
 package delivery
 
 import (
-	"2019_2_Solar/pinterest"
-	"2019_2_Solar/pinterest/usecase"
-	"2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/labstack/echo"
 	"log"
-	"net/http"
 	"sync"
 )
 
@@ -16,25 +16,38 @@ type Handlers struct {
 	Mu       *sync.Mutex
 }
 
-var handlers = Handlers{
+var Handler = Handlers{
 	PUsecase: &usecase.PinterestUseCase{},
 	Users:    make([]models.User, 0),
 	Sessions: make([]models.UserSession, 0),
 	Mu:       &sync.Mutex{},
 }
 
-func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{}"))
+func HandleRoot(ctx echo.Context) error {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	ctx.Response().Write([]byte("{123}"))
+	return nil
 }
 
-func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	log.Println(r.URL.Path)
-	handlers.HandleListUsers(w, r)
+func HandleUsers(ctx echo.Context) error {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	log.Println(ctx.Request().URL.Path)
+	Handler.HandleListUsers(ctx.Response(), ctx.Request())
+	return nil
 }
 
-func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+func NewHandlers(e *echo.Echo) {
+	e.GET("/", HandleRoot)
+	e.GET("/users/", HandleUsers)
+	e.POST("/registration/", Handler.HandleRegUser)
+	e.POST("/login/", Handler.HandleLoginUser)
+	e.GET("/logout/", Handler.HandleLogoutUser)
+	e.GET("/profile/data", Handler.HandleGetProfileUserData)
+	e.GET("/profile/picture", Handler.HandleEditProfileUserPicture)
+	e.POST("/profile/data", Handler.HandleEditProfileUserData)
+	e.POST("/profile/picture", Handler.HandleGetProfileUserPicture)
+}
+/*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	log.Println(r.URL.Path)
@@ -103,3 +116,4 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	}
 	handlers.HandleEmpty(w, r)
 }
+*/

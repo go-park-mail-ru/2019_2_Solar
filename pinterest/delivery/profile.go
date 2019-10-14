@@ -1,16 +1,19 @@
 package delivery
 
 import (
-	"2019_2_Solar/pkg/models"
 	"encoding/json"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 )
 
-func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleGetProfileUserData(ctx echo.Context) error {
+	r := ctx.Request()
+	w := ctx.Response()
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
@@ -20,7 +23,7 @@ func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return
+		return nil
 	}
 
 	h.Mu.Lock()
@@ -31,11 +34,14 @@ func (h *Handlers) HandleGetProfileUserData(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
-		return
+		return nil
 	}
+	return nil
 }
 
-func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
+	r := ctx.Request()
+	w := ctx.Response()
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
@@ -47,18 +53,18 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return
+		return nil
 	}
 	h.Mu.Lock()
 	filename := h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)].AvatarDir
 	h.Mu.Unlock()
 	openFile, err := os.Open(filename)
-	defer openFile.Close() //Close after function return
+	defer openFile.Close() //Close after function return nil
 	if err != nil {
 		//File not found, send 404
 		w.WriteHeader(http.StatusNotFound)
 		h.PUsecase.SetResponseError(encoder, "file not found", err)
-		return
+		return nil
 	}
 	//File is found, create and send the correct headers
 	//Get the Content-Type of the file
@@ -81,9 +87,12 @@ func (h *Handlers) HandleGetProfileUserPicture(w http.ResponseWriter, r *http.Re
 	//We read 512 bytes from the file already, so we reset the offset back to 0
 	openFile.Seek(0, 0)
 	io.Copy(w, openFile) //'Copy' the file to the client
+	return nil
 }
 
-func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleEditProfileUserData(ctx echo.Context) error {
+	r := ctx.Request()
+	w := ctx.Response()
 	defer r.Body.Close()
 
 	decoder := json.NewDecoder(r.Body)
@@ -94,13 +103,13 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "incorrect json", err)
-		return
+		return nil
 	}
 
 	if err := h.PUsecase.EditProfileDataCheck(newProfileUser); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, err.Error(), err)
-		return
+		return nil
 	}
 
 	defer h.Mu.Unlock()
@@ -110,26 +119,29 @@ func (h *Handlers) HandleEditProfileUserData(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return
+		return nil
 	}
 	if !h.PUsecase.EditEmailIsUnique(h.Users, newProfileUser.Email, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
-		return
+		return nil
 	}
 	if !h.PUsecase.EditUsernameIsUnique(h.Users, newProfileUser.Username, idUser) {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
-		return
+		return nil
 	}
 
 	h.PUsecase.SaveNewProfileUser(&h.Users[h.PUsecase.GetUserIndexByID(h.Users, idUser)], newProfileUser)
 
 	data := h.PUsecase.SetJsonData(nil, "data successfully saved")
 	encoder.Encode(data)
+	return nil
 }
 
-func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
+	r := ctx.Request()
+	w := ctx.Response()
 	defer r.Body.Close()
 
 	encoder := json.NewEncoder(w)
@@ -140,13 +152,13 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "user not found or not valid cookies", err)
-		return
+		return nil
 	}
 	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "Cannot read profile picture", err)
-		return
+		return nil
 	}
 
 	defer file.Close()
@@ -154,7 +166,7 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "Cannot read profile picture", err)
-		return
+		return nil
 	}
 	fileName := strconv.FormatUint(idUser, 10) + "_picture" + formatFile
 	newFile, err := os.Create(fileName)
@@ -166,9 +178,10 @@ func (h *Handlers) HandleEditProfileUserPicture(w http.ResponseWriter, r *http.R
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, "File recording has failed", err)
-		return
+		return nil
 	}
 
 	data := h.PUsecase.SetJsonData(nil, "profile picture has been successfully saved")
 	encoder.Encode(data)
+	return nil
 }
