@@ -1,10 +1,10 @@
 package delivery
 
 import (
-	"2019_2_Solar/pkg/models"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"net/http"
 	"time"
 )

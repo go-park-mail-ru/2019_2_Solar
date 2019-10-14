@@ -1,9 +1,9 @@
 package delivery
 
 import (
-	"2019_2_Solar/pkg/models"
 	"encoding/json"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"io"
 	"net/http"
 	"os"

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"2019_2_Solar/pinterest/delivery"
-	"2019_2_Solar/pkg/middlewares"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"net/http"
 )
 

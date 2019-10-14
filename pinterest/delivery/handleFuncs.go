@@ -1,9 +1,9 @@
 package delivery
 
 import (
-	"2019_2_Solar/pinterest"
-	"2019_2_Solar/pinterest/usecase"
-	"2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"log"
 	"net/http"
 	"sync"

@@ -1,8 +1,8 @@
 package pinterest
 
 import (
-	"2019_2_Solar/pkg/models"
 	"encoding/json"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"net/http"
 )
 
