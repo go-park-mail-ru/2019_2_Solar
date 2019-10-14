@@ -2,11 +2,8 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	middleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
-	"sync"
 )
 
 func main() {
@@ -16,13 +13,8 @@ func main() {
 	//e.Use(echomiddleware.Logger())
 	//e.Use(middleware.PanicMiddleware)
 	//e.HTTPErrorHandler = middleware.ErrorHandler
-	handlers := delivery.Handlers{
-		PUsecase: &usecase.PinterestUseCase{},
-		Users:    make([]models.User, 0),
-		Sessions: make([]models.UserSession, 0),
-		Mu:       &sync.Mutex{},
-	}
-	NewHandlers(e, handlers)
+
+	delivery.NewHandlers(e)
 
 	//e.Logger.Warnf("start listening on %s", listenAddr)
 	err := e.Start("127.0.0.1:8080")
@@ -43,7 +35,7 @@ func main() {
 		http.ListenAndServe(":8080", nil)*/
 }
 
-func NewHandlers(e *echo.Echo, Handler delivery.Handlers) {
+/*func NewHandlers(e *echo.Echo, Handler delivery.Handlers) {
 	e.GET("/", delivery.HandleRoot)
 	e.GET("/users/", delivery.HandleUsers)
 	e.POST("/registration/", Handler.HandleRegUser)
@@ -54,3 +46,4 @@ func NewHandlers(e *echo.Echo, Handler delivery.Handlers) {
 	e.POST("/profile/data", Handler.HandleEditProfileUserData)
 	e.POST("/profile/picture", Handler.HandleGetProfileUserPicture)
 }
+*/

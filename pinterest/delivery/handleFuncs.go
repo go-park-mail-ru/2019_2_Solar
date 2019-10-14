@@ -16,7 +16,7 @@ type Handlers struct {
 	Mu       *sync.Mutex
 }
 
-var handlers = Handlers{
+var Handler = Handlers{
 	PUsecase: &usecase.PinterestUseCase{},
 	Users:    make([]models.User, 0),
 	Sessions: make([]models.UserSession, 0),
@@ -32,10 +32,21 @@ func HandleRoot(ctx echo.Context) error {
 func HandleUsers(ctx echo.Context) error {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	log.Println(ctx.Request().URL.Path)
-	handlers.HandleListUsers(ctx.Response(), ctx.Request())
+	Handler.HandleListUsers(ctx.Response(), ctx.Request())
 	return nil
 }
 
+func NewHandlers(e *echo.Echo) {
+	e.GET("/", HandleRoot)
+	e.GET("/users/", HandleUsers)
+	e.POST("/registration/", Handler.HandleRegUser)
+	e.POST("/login/", Handler.HandleLoginUser)
+	e.GET("/logout/", Handler.HandleLogoutUser)
+	e.GET("/profile/data", Handler.HandleGetProfileUserData)
+	e.GET("/profile/picture", Handler.HandleEditProfileUserPicture)
+	e.POST("/profile/data", Handler.HandleEditProfileUserData)
+	e.POST("/profile/picture", Handler.HandleGetProfileUserPicture)
+}
 /*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
