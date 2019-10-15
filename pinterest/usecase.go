@@ -10,6 +10,7 @@ type Usecase interface {
 	CreateNewUser(newUser *models.UserReg) models.User
 	CreateNewUserSession(newUserSession models.User) ([]http.Cookie, models.UserSession, error)
 	SaveNewProfileUser(userID uint64, newUser *models.EditUserProfile)
+	SaveUserPictureDir(userID uint64, fileName string)
 
 	DeleteOldUserSession(string) error
 

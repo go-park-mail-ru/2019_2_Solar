@@ -52,6 +52,7 @@ func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
 	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
 
 	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
 		return nil
@@ -63,6 +64,7 @@ func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
 	defer openFile.Close() //Close after function return nil
 	if err != nil {
 		//File not found, send 404
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		h.PUsecase.SetResponseError(encoder, "file not found", err)
 		return nil
@@ -145,6 +147,8 @@ func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
 	w := ctx.Response()
 	defer r.Body.Close()
 
+	w.Header().Set("Content-Type", "application/json")
+
 	encoder := json.NewEncoder(w)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 
@@ -172,8 +176,7 @@ func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
 	fileName := strconv.FormatUint(idUser, 10) + "_picture" + formatFile
 	newFile, err := os.Create(fileName)
 
-	user := h.PUsecase.GetUserByID(idUser)
-	user.AvatarDir = fileName
+	h.PUsecase.SaveUserPictureDir(idUser, fileName)
 
 	defer newFile.Close()
 	_, err = io.Copy(newFile, file)

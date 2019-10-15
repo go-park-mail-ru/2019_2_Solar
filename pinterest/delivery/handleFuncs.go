@@ -21,14 +21,18 @@ func NewHandlers(e *echo.Echo, uc pinterest.Usecase) {
 			}
 
 	e.GET("/", HandleRoot)
+
 	e.GET("/users/", handler.HandleListUsers)
+
 	e.POST("/registration/", handler.HandleRegUser)
 	e.POST("/login/", handler.HandleLoginUser)
-	e.GET("/logout/", handler.HandleLogoutUser)
+	e.POST("/logout/", handler.HandleLogoutUser)
+
 	e.GET("/profile/data", handler.HandleGetProfileUserData)
-	e.GET("/profile/picture", handler.HandleEditProfileUserPicture)
+	e.GET("/profile/picture", handler.HandleGetProfileUserPicture)
+
 	e.POST("/profile/data", handler.HandleEditProfileUserData)
-	e.POST("/profile/picture", handler.HandleGetProfileUserPicture)
+	e.POST("/profile/picture", handler.HandleEditProfileUserPicture)
 }
 /*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
