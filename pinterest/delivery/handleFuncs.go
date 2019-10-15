@@ -1,41 +1,40 @@
-package handls
+package delivery
 
 import (
-	"2019_2_Solar/pkg/structs"
-	"log"
-	"net/http"
-	"sync"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
+	"github.com/labstack/echo"
 )
 
-var handlers = Handlers{
-	Users:    make([]structs.User, 0),
-	Sessions: make([]structs.UserSession, 0),
-	Mu:       &sync.Mutex{},
+type Handlers struct {
+	PUsecase pinterest.Usecase
 }
 
-func CORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		w.Header().Set("Access-Control-Allow-Origin", "http://solar-env.v2zxh2s3me.us-east-2.elasticbeanstalk.com")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		next.ServeHTTP(w, r)
-	})
+func HandleRoot(ctx echo.Context) error {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	ctx.Response().Write([]byte("{123}"))
+	return nil
 }
 
-func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{}"))
-}
+func NewHandlers(e *echo.Echo, uc pinterest.Usecase) {
+	handler := &Handlers{
+		PUsecase: uc,
+			}
 
-func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	log.Println(r.URL.Path)
-	handlers.HandleListUsers(w, r)
-}
+	e.GET("/", HandleRoot)
 
-func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+	e.GET("/users/", handler.HandleListUsers)
+
+	e.POST("/registration/", handler.HandleRegUser)
+	e.POST("/login/", handler.HandleLoginUser)
+	e.POST("/logout/", handler.HandleLogoutUser)
+
+	e.GET("/profile/data", handler.HandleGetProfileUserData)
+	e.GET("/profile/picture", handler.HandleGetProfileUserPicture)
+
+	e.POST("/profile/data", handler.HandleEditProfileUserData)
+	e.POST("/profile/picture", handler.HandleEditProfileUserPicture)
+}
+/*func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	log.Println(r.URL.Path)
@@ -104,3 +103,4 @@ func HandleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	}
 	handlers.HandleEmpty(w, r)
 }
+*/
