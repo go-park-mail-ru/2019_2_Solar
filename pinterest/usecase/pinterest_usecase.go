@@ -325,43 +325,36 @@ func (p *PinterestUsecase) RegDataCheck(newUser *models.UserReg) error {
 func (p *PinterestUsecase) EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {
 		if err := functions.EmailCheck(newProfileUser.Email); err != nil {
-			//SetResponseError(encoder, "incorrect Email", err)
 			return err
 		}
 	}
 	if newProfileUser.Username != "" {
 		if err := functions.UsernameCheck(newProfileUser.Username); err != nil {
-			//SetResponseError(encoder, "incorrect Username", err)
 			return err
 		}
 	}
 	if newProfileUser.Password != "" {
 		if err := functions.PasswordCheck(newProfileUser.Password); err != nil {
-			//SetResponseError(encoder, "incorrect Password", err)
 			return err
 		}
 	}
 	if newProfileUser.Name != "" {
 		if err := functions.NameCheck(newProfileUser.Name); err != nil {
-			//SetResponseError(encoder, "incorrect Name", err)
 			return err
 		}
 	}
 	if newProfileUser.Surname != "" {
 		if err := functions.SurnameCheck(newProfileUser.Surname); err != nil {
-			//SetResponseError(encoder, "incorrect Surname", err)
 			return err
 		}
 	}
 	if newProfileUser.Status != "" {
 		if err := functions.StatusCheck(newProfileUser.Status); err != nil {
-			//SetResponseError(encoder, "incorrect Status", err)
 			return err
 		}
 	}
 	if newProfileUser.Age != "" {
 		if err := functions.AgeCheck(newProfileUser.Age); err != nil {
-			//SetResponseError(encoder, "incorrect Status", err)
 			return err
 		}
 	}

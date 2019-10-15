@@ -77,6 +77,18 @@ func (mr *MockUsecaseMockRecorder) SaveNewProfileUser(userID, newUser interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNewProfileUser", reflect.TypeOf((*MockUsecase)(nil).SaveNewProfileUser), userID, newUser)
 }
 
+// SaveUserPictureDir mocks base method
+func (m *MockUsecase) SaveUserPictureDir(userID uint64, fileName string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SaveUserPictureDir", userID, fileName)
+}
+
+// SaveUserPictureDir indicates an expected call of SaveUserPictureDir
+func (mr *MockUsecaseMockRecorder) SaveUserPictureDir(userID, fileName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUserPictureDir", reflect.TypeOf((*MockUsecase)(nil).SaveUserPictureDir), userID, fileName)
+}
+
 // DeleteOldUserSession mocks base method
 func (m *MockUsecase) DeleteOldUserSession(arg0 string) error {
 	m.ctrl.T.Helper()
@@ -216,6 +228,20 @@ func (m *MockUsecase) SetResponseError(encoder *json.Encoder, msg string, err er
 func (mr *MockUsecaseMockRecorder) SetResponseError(encoder, msg, err interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetResponseError", reflect.TypeOf((*MockUsecase)(nil).SetResponseError), encoder, msg, err)
+}
+
+// GenSessionKey mocks base method
+func (m *MockUsecase) GenSessionKey(length int) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenSessionKey", length)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GenSessionKey indicates an expected call of GenSessionKey
+func (mr *MockUsecaseMockRecorder) GenSessionKey(length interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenSessionKey", reflect.TypeOf((*MockUsecase)(nil).GenSessionKey), length)
 }
 
 // RegEmailIsUnique mocks base method

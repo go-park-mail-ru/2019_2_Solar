@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -162,7 +163,9 @@ func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
 	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "Cannot read profile picture", err)
+		log.Printf("%s: %s", "Cannot read profile picture", err)
+		data := h.PUsecase.SetJsonData(nil, "Cannot read profile picture")
+		encoder.Encode(data)
 		return nil
 	}
 

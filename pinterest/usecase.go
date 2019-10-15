@@ -26,6 +26,7 @@ type Usecase interface {
 
 	SetJsonData(data interface{}, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error)
+	GenSessionKey(length int) string
 
 	RegEmailIsUnique(string) bool
 	RegUsernameIsUnique(username string) bool
