@@ -7,32 +7,37 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var connStr string = "user=postgres password=mypass dbname=productdb sslmode=disable"
+var ConnStr string = "user=postgres password=7396 dbname=testdatabase sslmode=disable"
 
 func init() {
-	DBWorker.connectionString = connStr
+	DBWorker.connectionString = ConnStr
 }
 
 type DataBaseWorker struct {
 	connectionString string
-	dataBase         *sql.DB
+	DataBase         *sql.DB
 }
 
 var DBWorker = DataBaseWorker{
 	connectionString: "",
-	dataBase:         nil,
+	DataBase:         nil,
+}
+
+func (dbw *DataBaseWorker) NewDataBaseWorker (){
+	dbw.connectionString = ConnStr
+	dbw.DataBase = nil
 }
 
 func (dbw *DataBaseWorker) WriteData(executeQuery string) error {
 	var err error = nil
-	if dbw.dataBase == nil {
-		dbw.dataBase, err = sql.Open("postgres", connStr)
+	if dbw.DataBase == nil {
+		dbw.DataBase, err = sql.Open("postgres", ConnStr)
 		if err != nil {
 			return err
 		}
 	}
-	defer dbw.dataBase.Close()
-	result, err := dbw.dataBase.Exec(executeQuery)
+	defer dbw.DataBase.Close()
+	result, err := dbw.DataBase.Exec(executeQuery)
 	if err != nil {
 		return err
 	}
@@ -40,28 +45,58 @@ func (dbw *DataBaseWorker) WriteData(executeQuery string) error {
 	return nil
 }
 
-func (dbw *DataBaseWorker) ReadData(executeQuery string, userSlice *[]models.User) error {
-	var err error = nil
-	if dbw.dataBase == nil {
-		dbw.dataBase, err = sql.Open("postgres", connStr)
-		if err != nil {
-			return err
-		}
-	}
-	defer dbw.dataBase.Close()
-	rows, err := dbw.dataBase.Query(executeQuery)
-	if err != nil {
-		return err
-	}
+type DBReader interface {
+	DBRead(rows *sql.Rows) error
+}
+
+type (
+	UsersSlice       []models.User
+	UserCookiesSlice []models.UserCookie
+)
+
+func (US *UsersSlice) DBRead(rows *sql.Rows) error {
 	for rows.Next() {
 		user := models.User{}
-		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Age, &user.AvatarDir, &user.IsActive, &user.Name,
-			&user.Password, &user.Status, &user.Surname)
+		err := rows.Scan(&user.ID, &user.Username, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Age,
+			&user.Status, &user.AvatarDir, &user.IsActive)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		*userSlice = append(*userSlice, user)
+		*US = append(*US, user)
+	}
+	return nil
+}
+
+func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
+	for rows.Next() {
+		userCookie := models.UserCookie{}
+		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		*USC = append(*USC, userCookie)
+	}
+	return nil
+}
+
+func (dbw *DataBaseWorker) UniversalRead(executeQuery string, readSlice DBReader) error {
+	var err error = nil
+	if dbw.DataBase == nil {
+		dbw.DataBase, err = sql.Open("postgres", ConnStr)
+		if err != nil {
+			return err
+		}
+	}
+	defer dbw.DataBase.Close()
+	rows, err := dbw.DataBase.Query(executeQuery)
+	if err != nil {
+		return err
+	}
+	err = readSlice.DBRead(rows)
+	if err != nil {
+		return err
 	}
 	return nil
 }

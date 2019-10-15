@@ -1,7 +1,8 @@
 package main
-
 import (
+	//"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
+	//"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	middleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
@@ -10,9 +11,13 @@ import (
 )
 
 func main() {
+	//var userSlice repository.UsersSlice
+	//err := repository.DBWorker.UniversalRead(middleware.QueryReadUserByCookie, &userSlice)
+	//fmt.Println(err)
+	//fmt.Println(userSlice)
 	e := echo.New()
 	e.Use(middleware.CORSMiddleware)
-	//e.Use(middleware.AuthenticationMiddleware)
+	e.Use(middleware.AuthenticationMiddleware)
 	//e.Use(echomiddleware.Logger())
 	//e.Use(middleware.PanicMiddleware)
 	//e.HTTPErrorHandler = middleware.ErrorHandler
