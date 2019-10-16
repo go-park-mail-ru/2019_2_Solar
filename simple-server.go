@@ -1,8 +1,6 @@
 package main
 import (
-	//"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
-	//"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	middleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"

@@ -15,10 +15,8 @@ func HandleRoot(ctx echo.Context) error {
 	return nil
 }
 
-func NewHandlers(e *echo.Echo, uc pinterest.Usecase) {
-	handler := &Handlers{
-		PUsecase: uc,
-			}
+func NewHandlers(e *echo.Echo) {
+	handler := Handlers{}
 
 	e.GET("/", HandleRoot)
 

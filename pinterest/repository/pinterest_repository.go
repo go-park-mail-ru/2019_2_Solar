@@ -23,7 +23,7 @@ var DBWorker = DataBaseWorker{
 	DataBase:         nil,
 }
 
-func (dbw *DataBaseWorker) NewDataBaseWorker (){
+func (dbw *DataBaseWorker) NewDataBaseWorker() {
 	dbw.connectionString = ConnStr
 	dbw.DataBase = nil
 }
@@ -52,6 +52,7 @@ type DBReader interface {
 type (
 	UsersSlice       []models.User
 	UserCookiesSlice []models.UserCookie
+	StringSlice      []string
 )
 
 func (US *UsersSlice) DBRead(rows *sql.Rows) error {
@@ -77,6 +78,19 @@ func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
 			continue
 		}
 		*USC = append(*USC, userCookie)
+	}
+	return nil
+}
+
+func (SS *StringSlice) DBRead(rows *sql.Rows) error {
+	for rows.Next() {
+		var str string
+		err := rows.Scan(&str)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		*SS = append(*SS, str)
 	}
 	return nil
 }

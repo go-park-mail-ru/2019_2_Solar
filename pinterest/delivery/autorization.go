@@ -5,25 +5,27 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions/checkFunction"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 func (h *Handlers) HandleRegUser(ctx echo.Context) error {
 	defer func() {
-		err:= ctx.Request().Body.Close()
-		if err!= nil {
+		if err := ctx.Request().Body.Close(); err != nil {
 			panic(err)
 		}
 	}()
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	DBWorker := repository.DataBaseWorker{}
-	DBWorker.NewDataBaseWorker()
 
-	fmt.Println(ctx.Get("User"))
+	//fmt.Println(ctx.Get("User"))
 	if ctx.Get("User") != nil {
 		return nil
 	}
@@ -34,108 +36,100 @@ func (h *Handlers) HandleRegUser(ctx echo.Context) error {
 	newUserReg := new(models.UserReg)
 	err := decoder.Decode(newUserReg)
 	if err != nil {
-		h.PUsecase.SetResponseError(encoder, "incorrect json", err)
-		return nil
+		usecase.SetResponseError(encoder, "incorrect json", err)
+		return err
 	}
 
-	if err := h.PUsecase.RegDataCheck(newUserReg); err != nil {
+	if err := checkFunction.RegDataCheck(newUserReg); err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, err.Error(), err)
-		return nil
+		usecase.SetResponseError(encoder, err.Error(), err)
+		return err
 	}
 
-	if !h.PUsecase.RegEmailIsUnique(newUserReg.Email) {
-		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
-		return nil
-	}
-	if !h.PUsecase.RegUsernameIsUnique(newUserReg.Username) {
-		h.PUsecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
-		return nil
+	if check, err := checkFunction.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
+		usecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
+		return err
 	}
 
-	newUser := h.PUsecase.CreateNewUser(newUserReg)
-
-	cookies, _, err := h.PUsecase.CreateNewUserSession(newUser)
+	if check, err := checkFunction.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
+		usecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
+		return err
+	}
+	DBWorker := repository.DataBaseWorker{}
+	DBWorker.NewDataBaseWorker()
+	err = DBWorker.WriteData(repository.CombineInsertRegistrationQuery(newUserReg.Username, newUserReg.Email, newUserReg.Password))
+	if err != nil {
+		return err
+	}
+	var str repository.StringSlice
+	err = DBWorker.UniversalRead(consts.FindEmailSQLQuery+"'"+newUserReg.Email+"'", &str)
+	if err != nil || len(str) > 1 {
+		return err
+	}
+	cookies, err := functions.CreateNewUserSession(str[0])
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
-		return nil
+		usecase.SetResponseError(encoder, "error while generating sessionValue", err)
+		return err
 	}
-	if len(cookies) < 1 {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
-		return nil
-	}
-	http.SetCookie(ctx.Response(), &cookies[0])
-
-	data := h.PUsecase.SetJsonData(newUser, "OK")
+	http.SetCookie(ctx.Response(), &cookies)
+	data := usecase.SetJsonData(newUserReg, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
-		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
-		return nil
+		usecase.SetResponseError(encoder, "bad user struct", err)
+		return err
 	}
 	return nil
 }
 
 func (h *Handlers) HandleLoginUser(ctx echo.Context) error {
-	defer ctx.Request().Body.Close()
-
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			panic(err)
+		}
+	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
 
+	fmt.Println(ctx.Get("User"))
+	if ctx.Get("User") != nil {
+		return nil
+	}
 	decoder := json.NewDecoder(ctx.Request().Body)
-	encoder := json.NewEncoder(ctx.Response())
+	//encoder := json.NewEncoder(ctx.Response())
 
 	newUserLogin := new(models.UserLogin)
 	err := decoder.Decode(newUserLogin)
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "incorrect json", err)
+		//h.PUsecase.SetResponseError(encoder, "incorrect json", err)
 		return nil
 	}
-
-	value := h.PUsecase.SearchUserByEmail(newUserLogin)
-	user, ok := value.(models.User)
-	if !ok {
+	var User repository.UsersSlice
+	DBWorker := repository.DataBaseWorker{}
+	DBWorker.NewDataBaseWorker()
+	err = DBWorker.UniversalRead(consts.QueryReadUserByEmail+"'"+newUserLogin.Email+"'", &User)
+	if err != nil || len(User) != 1 {
+		return err
+	}
+	if User[0].Password != newUserLogin.Password { //Добавить функцию хеша от пароля
 		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "incorrect combination of Email and Password", errors.New("incorrect Email"))
-		return nil
-	}
-	if user.Password != newUserLogin.Password {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "incorrect combination of Email and Password", errors.New("incorrect Password"))
+		//h.PUsecase.SetResponseError(encoder, "incorrect combination of Email and Password", errors.New("incorrect Password"))
 		return nil
 	}
 
-	//Если пришли валидные куки, значит новую сессию не создаём
-	idUser, err := h.PUsecase.SearchIdUserByCookie(ctx.Request())
-	fmt.Println(idUser)
-	if err == nil {
-		data := h.PUsecase.SetJsonData(user, "Successfully log in yet")
-		encoder.Encode(data)
-		return nil
-	}
-
-	cookies, _, err := h.PUsecase.CreateNewUserSession(user)
+	cookies, err := functions.CreateNewUserSession(strconv.Itoa(int(User[0].ID)))
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
-		return nil
+		//functions.SetResponseError(encoder, "error while generating sessionValue", err)
+		return err
 	}
-	if len(cookies) < 1 {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", errors.New("incorrect while create session"))
-		return nil
-	}
-	http.SetCookie(ctx.Response(), &cookies[0])
-
-	data := h.PUsecase.SetJsonData(user, "OK")
-
-	err = encoder.Encode(data)
-	if err != nil {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
-		return nil
-	}
+	http.SetCookie(ctx.Response(), &cookies)
+	//data := h.PUsecase.SetJsonData(newUserReg, "OK")
+	/*	err = encoder.Encode(data)
+		if err != nil {
+			//h.PUsecase.SetResponseError(encoder, "bad user struct", err)
+			return err
+		}*/
 	return nil
 }
 
