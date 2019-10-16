@@ -4,16 +4,29 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
 )
 
-func (h* Handlers) HandleRegUser(ctx echo.Context) error {
-	defer ctx.Request().Body.Close()
+func (h *Handlers) HandleRegUser(ctx echo.Context) error {
+	defer func() {
+		err:= ctx.Request().Body.Close()
+		if err!= nil {
+			panic(err)
+		}
+	}()
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
+	DBWorker := repository.DataBaseWorker{}
+	DBWorker.NewDataBaseWorker()
+
+	fmt.Println(ctx.Get("User"))
+	if ctx.Get("User") != nil {
+		return nil
+	}
 
 	encoder := json.NewEncoder(ctx.Response())
 	decoder := json.NewDecoder(ctx.Request().Body)
@@ -64,7 +77,7 @@ func (h* Handlers) HandleRegUser(ctx echo.Context) error {
 	return nil
 }
 
-func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
+func (h *Handlers) HandleLoginUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -126,7 +139,7 @@ func (h* Handlers) HandleLoginUser(ctx echo.Context) error {
 	return nil
 }
 
-func (h* Handlers) HandleLogoutUser(ctx echo.Context) error {
+func (h *Handlers) HandleLogoutUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
