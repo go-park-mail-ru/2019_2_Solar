@@ -7,8 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions/checkFunction"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"net/http"
@@ -16,10 +14,10 @@ import (
 	"time"
 )
 
-func (h *Handlers) HandleRegUser(ctx echo.Context) error {
+func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	defer func() {
 		if err := ctx.Request().Body.Close(); err != nil {
-			panic(err)
+			Err = err
 		}
 	}()
 
@@ -40,33 +38,29 @@ func (h *Handlers) HandleRegUser(ctx echo.Context) error {
 		return err
 	}
 
-	if err := checkFunction.RegDataCheck(newUserReg); err != nil {
+	if err := h.PUsecase.RegDataCheck(newUserReg); err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
 		usecase.SetResponseError(encoder, err.Error(), err)
 		return err
 	}
 
-	if check, err := checkFunction.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
+	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
 		usecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return err
 	}
 
-	if check, err := checkFunction.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
+	if check, err := h.PUsecase.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
 		usecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
 		return err
 	}
-	DBWorker := repository.DataBaseWorker{}
-	DBWorker.NewDataBaseWorker()
-	err = DBWorker.WriteData(repository.CombineInsertRegistrationQuery(newUserReg.Username, newUserReg.Email, newUserReg.Password))
-	if err != nil {
-		return err
-	}
+	h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
+
 	var str repository.StringSlice
 	err = DBWorker.UniversalRead(consts.FindEmailSQLQuery+"'"+newUserReg.Email+"'", &str)
 	if err != nil || len(str) > 1 {
 		return err
 	}
-	cookies, err := functions.CreateNewUserSession(str[0])
+	cookies, err := h.PUsecase.CreateNewUserSession(str[0])
 	if err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
 		usecase.SetResponseError(encoder, "error while generating sessionValue", err)
@@ -82,7 +76,7 @@ func (h *Handlers) HandleRegUser(ctx echo.Context) error {
 	return nil
 }
 
-func (h *Handlers) HandleLoginUser(ctx echo.Context) error {
+func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	defer func() {
 		if err := ctx.Request().Body.Close(); err != nil {
 			panic(err)
@@ -133,7 +127,7 @@ func (h *Handlers) HandleLoginUser(ctx echo.Context) error {
 	return nil
 }
 
-func (h *Handlers) HandleLogoutUser(ctx echo.Context) error {
+func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) error {
 	defer ctx.Request().Body.Close()
 
 	ctx.Response().Header().Set("Content-Type", "application/json")

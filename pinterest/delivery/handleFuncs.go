@@ -1,34 +1,23 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/labstack/echo"
 )
 
-type Handlers struct {
-	PUsecase pinterest.Usecase
-}
+func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterface) {
+	h.PUsecase = IUsecase
+	e.GET("/", h.HandleEmpty)
 
-func HandleRoot(ctx echo.Context) error {
-	ctx.Response().Header().Set("Content-Type", "application/json")
-	ctx.Response().Write([]byte("{123}"))
-	return nil
-}
+	e.GET("/users/", h.HandleListUsers)
 
-func NewHandlers(e *echo.Echo) {
-	handler := Handlers{}
+	e.POST("/registration/", h.HandleRegUser)
+	e.POST("/login/", h.HandleLoginUser)
+	e.POST("/logout/", h.HandleLogoutUser)
 
-	e.GET("/", HandleRoot)
+	e.GET("/profile/data", h.HandleGetProfileUserData)
+	e.GET("/profile/picture", h.HandleGetProfileUserPicture)
 
-	e.GET("/users/", handler.HandleListUsers)
-
-	e.POST("/registration/", handler.HandleRegUser)
-	e.POST("/login/", handler.HandleLoginUser)
-	e.POST("/logout/", handler.HandleLogoutUser)
-
-	e.GET("/profile/data", handler.HandleGetProfileUserData)
-	e.GET("/profile/picture", handler.HandleGetProfileUserPicture)
-
-	e.POST("/profile/data", handler.HandleEditProfileUserData)
-	e.POST("/profile/picture", handler.HandleEditProfileUserPicture)
+	e.POST("/profile/data", h.HandleEditProfileUserData)
+	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
 }

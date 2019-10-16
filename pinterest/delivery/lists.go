@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *Handlers) HandleListUsers(ctx echo.Context) error {
+func (h *HandlersStruct) HandleListUsers(ctx echo.Context) error {
 	w := ctx.Response()
 
 	w.Header().Set("Content-Type", "application/json")

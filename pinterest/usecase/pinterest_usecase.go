@@ -1,16 +1,10 @@
 package usecase
 
 import (
-)
-
-
-import (
-	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"log"
 	"net/http"
 )
 
@@ -105,34 +99,6 @@ func GetUserByID(id uint64) models.User {
 	return p.Users[id]
 }
 
-func SetJsonData(data interface{}, infMsg string) models.OutJSON {
-	user, ok := data.(models.User)
-	if ok {
-		outJSON := models.OutJSON{
-			BodyJSON: models.DataJSON{
-				UserJSON: user,
-				InfoJSON: infMsg,
-			},
-		}
-		return outJSON
-	}
-	if users, ok := data.([]models.User); ok {
-
-		outJSON := models.OutJSON{
-			BodyJSON: models.DataJSON{
-				UsersJSON: users,
-				InfoJSON:  infMsg,
-			},
-		}
-		return outJSON
-	}
-	outJSON := models.OutJSON{
-		BodyJSON: models.DataJSON{
-			InfoJSON: infMsg,
-		},
-	}
-	return outJSON
-}
 
 func SearchIdUserByCookie(r *http.Request) (uint64, error) {
 	p.Mu.Lock()
@@ -188,40 +154,7 @@ func ExtractFormatFile(FileName string) (string, error) {
 	return "", errors.New("invalid file name")
 }
 
-func SetResponseError(encoder *json.Encoder, msg string, err error) {
-	log.Printf("%s: %s", msg, err)
-	data := SetJsonData(nil, msg)
-	encoder.Encode(data)
-}
 
-func GenSessionKey(length int) string {
-	result := make([]byte, length)
-	bufferSize := int(float64(length) * 1.3)
-	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
-		if j%bufferSize == 0 {
-			randomBytes = functions.SecureRandomBytes(bufferSize)
-		}
-		if idx := int(randomBytes[j%length] & consts.LetterIdxMask); idx < len(consts.LetterBytes) {
-			result[i] = consts.LetterBytes[idx]
-			i++
-		}
-	}
-
-	return string(result)
-}
-
-func RegDataCheck(newUser *models.UserReg) error {
-	if err := functions.EmailCheck(newUser.Email); err != nil {
-		return err
-	}
-	if err := functions.UsernameCheck(newUser.Username); err != nil {
-		return err
-	}
-	if err := functions.PasswordCheck(newUser.Password); err != nil {
-		return err
-	}
-	return nil
-}
 
 func EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {

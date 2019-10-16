@@ -9,35 +9,23 @@ import (
 
 var ConnStr string = "user=postgres password=7396 dbname=testdatabase sslmode=disable"
 
-func init() {
-	DBWorker.connectionString = ConnStr
-}
-
-type DataBaseWorker struct {
-	connectionString string
-	DataBase         *sql.DB
-}
-
-var DBWorker = DataBaseWorker{
-	connectionString: "",
-	DataBase:         nil,
-}
-
-func (dbw *DataBaseWorker) NewDataBaseWorker() {
-	dbw.connectionString = ConnStr
-	dbw.DataBase = nil
-}
-
-func (dbw *DataBaseWorker) WriteData(executeQuery string) error {
+func (RS *RepositoryStruct) NewDataBaseWorker() error {
+	RS.connectionString = ConnStr
 	var err error = nil
-	if dbw.DataBase == nil {
-		dbw.DataBase, err = sql.Open("postgres", ConnStr)
-		if err != nil {
-			return err
-		}
+	RS.DataBase, err = sql.Open("postgres", ConnStr)
+	if err != nil {
+		return err
 	}
-	defer dbw.DataBase.Close()
-	result, err := dbw.DataBase.Exec(executeQuery)
+	RS.DataBase.SetMaxOpenConns(10)
+	err = RS.DataBase.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{}) error {
+	result, err := RS.DataBase.Exec(executeQuery, params...)
 	if err != nil {
 		return err
 	}
@@ -56,6 +44,7 @@ type (
 )
 
 func (US *UsersSlice) DBRead(rows *sql.Rows) error {
+	defer rows.Close()
 	for rows.Next() {
 		user := models.User{}
 		err := rows.Scan(&user.ID, &user.Username, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Age,
@@ -70,6 +59,7 @@ func (US *UsersSlice) DBRead(rows *sql.Rows) error {
 }
 
 func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
+	defer rows.Close()
 	for rows.Next() {
 		userCookie := models.UserCookie{}
 		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
@@ -83,6 +73,7 @@ func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
 }
 
 func (SS *StringSlice) DBRead(rows *sql.Rows) error {
+	defer rows.Close()
 	for rows.Next() {
 		var str string
 		err := rows.Scan(&str)
@@ -95,16 +86,8 @@ func (SS *StringSlice) DBRead(rows *sql.Rows) error {
 	return nil
 }
 
-func (dbw *DataBaseWorker) UniversalRead(executeQuery string, readSlice DBReader) error {
-	var err error = nil
-	if dbw.DataBase == nil {
-		dbw.DataBase, err = sql.Open("postgres", ConnStr)
-		if err != nil {
-			return err
-		}
-	}
-	defer dbw.DataBase.Close()
-	rows, err := dbw.DataBase.Query(executeQuery)
+func (RS *RepositoryStruct) UniversalRead(executeQuery string, readSlice DBReader, params []interface{}) error {
+	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err
 	}

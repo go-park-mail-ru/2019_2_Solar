@@ -1,29 +1,32 @@
-package functions
+package usecase
 
 import (
-	"crypto/rand"
-	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
-	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
-func CreateNewUserSession(userId string) (http.Cookie, error) {
+func (USC *UsecaseStruct) NewUseCase(mu *sync.Mutex, IRepository repository.RepositoryInterface) {
+	USC.Mu = mu
+	USC.PRepository = IRepository
+}
 
-	sessionKeyValue := GenSessionKey(12)
+func (USC *UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error) {
+
+	sessionKeyValue := USC.GenSessionKey(12)
 	cookieSessionKey := http.Cookie{
 		Name:    "session_key",
 		Value:   sessionKeyValue,
 		Path:    "/",
 		Expires: time.Now().Add(1 * time.Hour),
 	}
-
-	DBWorker := repository.DataBaseWorker{}
-	DBWorker.NewDataBaseWorker()
-	err := DBWorker.WriteData(repository.CombineInsertSessionQuery(userId, cookieSessionKey.Value, cookieSessionKey.Expires.String()))
+	var params []interface{}
+	params = append(params, userId)
+	params = append(params, cookieSessionKey.Value)
+	params = append(params, cookieSessionKey.Expires)
+	err := USC.PRepository.WriteData(consts.InsertSessionQuery, params)
 	if err != nil {
 		return cookieSessionKey, err
 	}
@@ -31,7 +34,7 @@ func CreateNewUserSession(userId string) (http.Cookie, error) {
 	return cookieSessionKey, nil
 }
 
-func GenSessionKey(length int) string {
+func (USC *UsecaseStruct) GenSessionKey(length int) string {
 	result := make([]byte, length)
 	bufferSize := int(float64(length) * 1.3)
 	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
@@ -48,7 +51,7 @@ func GenSessionKey(length int) string {
 }
 
 // SecureRandomBytes returns the requested number of bytes using crypto/rand
-func SecureRandomBytes(length int) []byte {
+func (USC *UsecaseStruct) SecureRandomBytes(length int) []byte {
 	var randomBytes = make([]byte, length)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
@@ -57,3 +60,14 @@ func SecureRandomBytes(length int) []byte {
 	return randomBytes
 }
 
+func (USC *UsecaseStruct) InsertNewUser(username, email, password string) error {
+	var params []interface{}
+	params = append(params, username)
+	params = append(params, email)
+	params = append(params, password)
+	err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-func (h *Handlers) HandleGetProfileUserData(ctx echo.Context) error {
+func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 
@@ -41,7 +41,7 @@ func (h *Handlers) HandleGetProfileUserData(ctx echo.Context) error {
 	return nil
 }
 
-func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
+func (h *HandlersStruct) HandleGetProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 
@@ -93,7 +93,7 @@ func (h *Handlers) HandleGetProfileUserPicture(ctx echo.Context) error {
 	return nil
 }
 
-func (h *Handlers) HandleEditProfileUserData(ctx echo.Context) error {
+func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 
@@ -142,7 +142,7 @@ func (h *Handlers) HandleEditProfileUserData(ctx echo.Context) error {
 	return nil
 }
 
-func (h *Handlers) HandleEditProfileUserPicture(ctx echo.Context) error {
+func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 	defer r.Body.Close()
