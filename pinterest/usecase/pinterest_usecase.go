@@ -1,9 +1,7 @@
 package usecase
 
-import (
+/*import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"net/http"
 )
@@ -200,4 +198,4 @@ func EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
 		}
 	}
 	return nil
-}
+}*/

@@ -14,15 +14,21 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return next(ctx)
 		}
-
+		DBWorker := repository.RepositoryStruct{}
+		err = DBWorker.NewDataBaseWorker()
+		if err != nil {
+			return err
+		}
 		var User repository.UsersSlice
-		err = repository.DBWorker.UniversalRead(consts.QueryReadUserByCookie+"'"+cookie.Value+"'", &User)
+		var params []interface{}
+		params = append(params, cookie.Value)
+		err = DBWorker.UniversalRead(consts.ReadUserByCookieValueSQLQuery, &User, params)
 		if err != nil || len(User) != 1 {
 			return err
 		}
 
 		var Cookie repository.UserCookiesSlice
-		err = repository.DBWorker.UniversalRead(consts.QueryCookiesExpiration+"'"+cookie.Value+"'", &Cookie)
+		err = DBWorker.UniversalRead(consts.ReadCookiesExpirationByCookieValueSQLQuery, &Cookie, params)
 		if err != nil || len(Cookie) != 1 {
 			return err
 		}

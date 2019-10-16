@@ -1,5 +1,5 @@
 package delivery
-
+/*
 import (
 	"encoding/json"
 	"github.com/labstack/echo"
@@ -23,3 +23,4 @@ func (h *HandlersStruct) HandleListUsers(ctx echo.Context) error {
 	}
 	return nil
 }
+*/

@@ -1,8 +1,10 @@
 package usecase
 
 import (
+	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"net/http"
 	"sync"
 )
 
@@ -12,15 +14,15 @@ type UsecaseStruct struct {
 }
 
 type UsecaseInterface interface {
+	SetJsonData(data interface{}, infMsg string) models.OutJSON
+	SetResponseError(encoder *json.Encoder, msg string, err error)
+
+	ReadUserStructByEmail(email string) (models.User, error)
+	ReadUserIdByEmail(email string) (string, error)
+
 	RegDataValidationCheck(newUser *models.UserReg) error
-	UsernameCheck(username string) error
-	EmailCheck(email string) error
-	PasswordCheck(password string) error
-	NameCheck(name string) error
-	SurnameCheck(surname string) error
-	AgeCheck(age string) error
-	StatusCheck(status string) error
 	RegEmailIsUnique(email string) (bool, error)
 	RegUsernameIsUnique(username string) (bool, error)
-	InsertNewUser(username, email, password string)
+	InsertNewUser(username, email, password string) (string, error)
+	CreateNewUserSession(userId string) (http.Cookie, error)
 }

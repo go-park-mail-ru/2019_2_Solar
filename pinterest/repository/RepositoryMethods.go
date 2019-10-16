@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	_ "github.com/lib/pq"
+	"strconv"
 )
 
 var ConnStr string = "user=postgres password=7396 dbname=testdatabase sslmode=disable"
@@ -24,13 +25,13 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{}) error {
-	result, err := RS.DataBase.Exec(executeQuery, params...)
+func (RS RepositoryStruct) WriteData(executeQuery string, params []interface{}) (string, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println(result.LastInsertId())
-	return nil
+	return strconv.Itoa(int(id)), nil
 }
 
 type DBReader interface {

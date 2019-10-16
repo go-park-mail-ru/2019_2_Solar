@@ -26,15 +26,15 @@ func main() {
 	var mutex sync.Mutex
 	rep := repository.RepositoryStruct{}
 	err := rep.NewDataBaseWorker()
-	if err == nil {
+	if err != nil {
 		return
 	}
 	useCase := usecase.UsecaseStruct{}
-	useCase.NewUseCase(&mutex, rep)
-	handlers.NewHandlers(e, useCase)
+	useCase.NewUseCase(&mutex, &rep)
+	handlers.NewHandlers(e, &useCase)
 
 	//e.Logger.Warnf("start listening on %s", listenAddr)
-	err := e.Start("127.0.0.1:8080")
+	err = e.Start("127.0.0.1:8080")
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}

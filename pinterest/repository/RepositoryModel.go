@@ -8,6 +8,6 @@ type RepositoryStruct struct {
 }
 
 type RepositoryInterface interface {
-	WriteData(executeQuery string, params []interface{}) error
+	WriteData(executeQuery string, params []interface{}) (string, error)
 	UniversalRead(executeQuery string, readSlice DBReader, params []interface{}) error
 }
