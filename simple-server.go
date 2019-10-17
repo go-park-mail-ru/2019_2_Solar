@@ -4,23 +4,21 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
-	middleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	customMiddlewares "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"sync"
 )
 
 func main() {
-	//var userSlice repository.UsersSlice
-	//err := repository.DBWorker.DBDataRead(middleware.QueryReadUserByCookie, &userSlice)
-	//fmt.Println(err)
-	//fmt.Println(userSlice)
 	e := echo.New()
-	e.Use(middleware.CORSMiddleware)
-	//e.Use(middleware.PanicMiddleware)
-	e.Use(middleware.AccessLogMiddleware)
-
-	e.Use(middleware.AuthenticationMiddleware)
-	//e.HTTPErrorHandler = middleware.ErrorHandler
+	e.Use(customMiddlewares.CORSMiddleware)
+	e.Use(customMiddlewares.PanicMiddleware)
+	//e.Use(customMiddleware.AccessLogMiddleware)
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
+	e.Use(customMiddlewares.AuthenticationMiddleware)
+	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
 
 	handlers := delivery.HandlersStruct{}
 	var mutex sync.Mutex
@@ -32,9 +30,8 @@ func main() {
 	useCase := usecase.UsecaseStruct{}
 	useCase.NewUseCase(&mutex, &rep)
 	handlers.NewHandlers(e, &useCase)
-
-	//e.Logger.Warnf("start listening on %s", listenAddr)
-	err = e.Start("127.0.0.1:8080")
+	e.Logger.Warnf("start listening on %s", consts.HostAddress)
+	err = e.Start(consts.HostAddress)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}

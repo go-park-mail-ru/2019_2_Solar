@@ -3,7 +3,6 @@ package delivery
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"net/http"
@@ -19,7 +18,6 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
 
-	//fmt.Println(ctx.Get("User"))
 	if ctx.Get("User") != nil {
 		return nil
 	}
@@ -33,7 +31,6 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		h.PUsecase.SetResponseError(encoder, "incorrect json", err)
 		return err
 	}
-	fmt.Println(newUserReg.Password)
 	if err := h.PUsecase.RegDataValidationCheck(newUserReg); err != nil {
 		ctx.Response().WriteHeader(http.StatusBadRequest)
 		h.PUsecase.SetResponseError(encoder, err.Error(), err)
@@ -41,7 +38,6 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	}
 
 	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
-		fmt.Println(err)
 		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
 		return err
 	}
@@ -62,7 +58,6 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		return err
 	}
 	ctx.SetCookie(&cookies)
-	//http.SetCookie(ctx.Response(), &cookies)
 	data := h.PUsecase.SetJsonData(newUserReg, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
@@ -81,7 +76,6 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 
-	fmt.Println(ctx.Get("User"))
 	if user := ctx.Get("User"); user != nil {
 		data := h.PUsecase.SetJsonData(user.(models.User), "OK")
 		err := encoder.Encode(data)

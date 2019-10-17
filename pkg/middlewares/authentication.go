@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/labstack/echo"
@@ -10,12 +9,10 @@ import (
 
 func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		fmt.Println("  ", ctx.Request().URL.Path)
 		cookie, err := ctx.Cookie("session_key")
 		if err != nil {
 			return next(ctx)
 		}
-		fmt.Println(cookie.Expires.String())
 		DBWorker := repository.RepositoryStruct{}
 		err = DBWorker.NewDataBaseWorker()
 		if err != nil {
