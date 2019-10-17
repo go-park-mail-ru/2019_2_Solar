@@ -17,7 +17,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.CORSMiddleware)
 	//e.Use(middleware.PanicMiddleware)
-	//e.Use(echomiddleware.Logger())
+	e.Use(middleware.AccessLogMiddleware)
 
 	e.Use(middleware.AuthenticationMiddleware)
 	//e.HTTPErrorHandler = middleware.ErrorHandler
