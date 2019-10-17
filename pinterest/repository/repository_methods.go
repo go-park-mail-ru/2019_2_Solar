@@ -8,11 +8,12 @@ import (
 	"strconv"
 )
 
-var ConnStr string = "user=postgres password=7396 dbname=testdatabase sslmode=disable"
+var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
 func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	RS.connectionString = ConnStr
 	var err error = nil
+
 	RS.DataBase, err = sql.Open("postgres", ConnStr)
 	if err != nil {
 		return err
@@ -47,13 +48,26 @@ type (
 func (US *UsersSlice) DBRead(rows *sql.Rows) error {
 	defer rows.Close()
 	for rows.Next() {
-		user := models.User{}
-		err := rows.Scan(&user.ID, &user.Username, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Age,
-			&user.Status, &user.AvatarDir, &user.IsActive)
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
+		user := models.User{
+			ID:        dbuser.ID,
+			Username:  dbuser.Username,
+			Name:      dbuser.Name.String,
+			Surname:   dbuser.Surname.String,
+			Password:  dbuser.Password,
+			Email:     dbuser.Email,
+			Age:       uint(dbuser.Age.Int32),
+			Status:    dbuser.Status.String,
+			AvatarDir: dbuser.AvatarDir.String,
+			IsActive:  dbuser.IsActive,
+		}
+
 		*US = append(*US, user)
 	}
 	return nil
@@ -63,11 +77,13 @@ func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
 	defer rows.Close()
 	for rows.Next() {
 		userCookie := models.UserCookie{}
+		//var expirationString string
 		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
+		//userCookie.Expiration = time.Parse(expirationString)//expirationString
 		*USC = append(*USC, userCookie)
 	}
 	return nil
@@ -87,7 +103,7 @@ func (SS *StringSlice) DBRead(rows *sql.Rows) error {
 	return nil
 }
 
-func (RS *RepositoryStruct) UniversalRead(executeQuery string, readSlice DBReader, params []interface{}) error {
+func (RS *RepositoryStruct) DBDataRead(executeQuery string, readSlice DBReader, params []interface{}) error {
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err

@@ -61,7 +61,8 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
 		return err
 	}
-	http.SetCookie(ctx.Response(), &cookies)
+	ctx.SetCookie(&cookies)
+	//http.SetCookie(ctx.Response(), &cookies)
 	data := h.PUsecase.SetJsonData(newUserReg, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
@@ -78,13 +79,19 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
 
 	fmt.Println(ctx.Get("User"))
-	if ctx.Get("User") != nil {
+	if user := ctx.Get("User"); user != nil {
+		data := h.PUsecase.SetJsonData(user.(models.User), "OK")
+		err := encoder.Encode(data)
+		if err != nil {
+			h.PUsecase.SetResponseError(encoder, "bad user struct", err)
+			return err
+		}
 		return nil
 	}
 	decoder := json.NewDecoder(ctx.Request().Body)
-	encoder := json.NewEncoder(ctx.Response())
 
 	newUserLogin := new(models.UserLogin)
 	err := decoder.Decode(newUserLogin)
@@ -110,13 +117,13 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		h.PUsecase.SetResponseError(encoder, "error while generating sessionValue", err)
 		return err
 	}
-	http.SetCookie(ctx.Response(), &cookies)
+	ctx.SetCookie(&cookies)
 	data := h.PUsecase.SetJsonData(User, "OK")
-		err = encoder.Encode(data)
-		if err != nil {
-			h.PUsecase.SetResponseError(encoder, "bad user struct", err)
-			return err
-		}
+	err = encoder.Encode(data)
+	if err != nil {
+		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
+		return err
+	}
 	return nil
 }
 

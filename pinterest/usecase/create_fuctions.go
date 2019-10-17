@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"crypto/rand"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"net/http"
@@ -19,21 +20,21 @@ func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error
 	if err != nil {
 		return http.Cookie{}, err
 	}
-	cookieSessionKey := http.Cookie{
-		Name:    "session_key",
-		Value:   sessionKeyValue,
-		Path:    "/",
-		Expires: time.Now().Add(1 * time.Hour),
-	}
+	cookieSessionKey := new(http.Cookie)
+	cookieSessionKey.Name = "session_key"
+	cookieSessionKey.Value = sessionKeyValue
+	cookieSessionKey.Path = "/"
+	cookieSessionKey.Expires = time.Now().Add(1 * time.Hour)
 	var params []interface{}
 	params = append(params, userId)
 	params = append(params, cookieSessionKey.Value)
 	params = append(params, cookieSessionKey.Expires)
+	fmt.Printf(cookieSessionKey.Expires.Format(time.RFC3339))
 	_, err = USC.PRepository.WriteData(consts.InsertSessionQuery, params)
 	if err != nil {
-		return cookieSessionKey, err
+		return *cookieSessionKey, err
 	}
-	return cookieSessionKey, nil
+	return *cookieSessionKey, nil
 }
 
 func GenSessionKey(length int) (string, error) {

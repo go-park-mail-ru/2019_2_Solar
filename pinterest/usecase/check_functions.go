@@ -84,7 +84,7 @@ func (USC *UsecaseStruct) RegEmailIsUnique(email string) (bool, error) {
 	var str repository.StringSlice
 	var params []interface{}
 	params = append(params, email)
-	err := USC.PRepository.UniversalRead(consts.ReadUserIdByEmailSQLQuery, &str, params)
+	err := USC.PRepository.DBDataRead(consts.ReadUserIdByEmailSQLQuery, &str, params)
 	if err != nil || len(str) > 1 {
 		return false, err
 	}
@@ -95,7 +95,7 @@ func (USC *UsecaseStruct) RegUsernameIsUnique(username string) (bool, error) {
 	var str repository.StringSlice
 	var params []interface{}
 	params = append(params, username)
-	err := USC.PRepository.UniversalRead(consts.ReadUserIdByUsernameSQLQuery, &str, params)
+	err := USC.PRepository.DBDataRead(consts.ReadUserIdByUsernameSQLQuery, &str, params)
 	if err != nil || len(str) > 1 {
 		return false, err
 	}

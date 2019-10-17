@@ -7,6 +7,7 @@ import (
 )
 
 func (h *HandlersStruct) HandleEmpty(ctx echo.Context) error {
+	ctx.Response()
 	defer ctx.Request().Body.Close()
 	encoder := json.NewEncoder(ctx.Response())
 	data := h.PUsecase.SetJsonData(nil, "Empty handler has been done")

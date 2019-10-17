@@ -11,7 +11,7 @@ import (
 
 func main() {
 	//var userSlice repository.UsersSlice
-	//err := repository.DBWorker.UniversalRead(middleware.QueryReadUserByCookie, &userSlice)
+	//err := repository.DBWorker.DBDataRead(middleware.QueryReadUserByCookie, &userSlice)
 	//fmt.Println(err)
 	//fmt.Println(userSlice)
 	e := echo.New()
