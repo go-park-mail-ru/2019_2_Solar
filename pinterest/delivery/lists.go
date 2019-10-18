@@ -1,12 +1,12 @@
 package delivery
-
+/*
 import (
 	"encoding/json"
 	"github.com/labstack/echo"
 	"net/http"
 )
 
-func (h *Handlers) HandleListUsers(ctx echo.Context) error {
+func (h *HandlersStruct) HandleListUsers(ctx echo.Context) error {
 	w := ctx.Response()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -23,3 +23,4 @@ func (h *Handlers) HandleListUsers(ctx echo.Context) error {
 	}
 	return nil
 }
+*/

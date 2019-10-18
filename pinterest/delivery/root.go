@@ -2,15 +2,16 @@ package delivery
 
 import (
 	"encoding/json"
+	"github.com/labstack/echo"
 	"log"
-	"net/http"
 )
 
-func (h *Handlers) HandleEmpty(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	encoder := json.NewEncoder(w)
+func (h *HandlersStruct) HandleEmpty(ctx echo.Context) error {
+	ctx.Response()
+	defer ctx.Request().Body.Close()
+	encoder := json.NewEncoder(ctx.Response())
 	data := h.PUsecase.SetJsonData(nil, "Empty handler has been done")
 	encoder.Encode(data)
 	log.Printf("Empty handler has been done")
+	return nil
 }
