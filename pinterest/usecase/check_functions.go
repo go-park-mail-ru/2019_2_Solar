@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
@@ -81,10 +80,10 @@ func StatusCheck(status string) error {
 }
 
 func (USC *UsecaseStruct) RegEmailIsUnique(email string) (bool, error) {
-	var str repository.StringSlice
+	var str []string
 	var params []interface{}
 	params = append(params, email)
-	err := USC.PRepository.DBDataRead(consts.ReadUserIdByEmailSQLQuery, &str, params)
+	str, err := USC.PRepository.DBReadDataString(consts.ReadUserIdByEmailSQLQuery, params)
 	if err != nil || len(str) > 1 {
 		return false, err
 	}
@@ -92,10 +91,10 @@ func (USC *UsecaseStruct) RegEmailIsUnique(email string) (bool, error) {
 }
 
 func (USC *UsecaseStruct) RegUsernameIsUnique(username string) (bool, error) {
-	var str repository.StringSlice
+	var str []string
 	var params []interface{}
 	params = append(params, username)
-	err := USC.PRepository.DBDataRead(consts.ReadUserIdByUsernameSQLQuery, &str, params)
+	str, err := USC.PRepository.DBReadDataString(consts.ReadUserIdByEmailSQLQuery, params)
 	if err != nil || len(str) > 1 {
 		return false, err
 	}

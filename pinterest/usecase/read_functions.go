@@ -2,17 +2,16 @@ package usecase
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
 func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
-	var str repository.StringSlice
+	var str []string
 	var params []interface{}
 	params = append(params, email)
 	var err error = errors.New("several users")
-	err = USC.PRepository.DBDataRead(consts.ReadUserIdByEmailSQLQuery, &str, params)
+	str, err = USC.PRepository.DBReadDataString(consts.ReadUserIdByEmailSQLQuery, params)
 	if err != nil || len(str) != 1 {
 		return "", err
 	}
@@ -20,11 +19,11 @@ func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
 }
 
 func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error) {
-	var userSlice repository.UsersSlice
+	var userSlice []models.User
 	var params []interface{}
 	params = append(params, email)
 	var err error = errors.New("several users")
-	err = USC.PRepository.DBDataRead(consts.ReadUserByEmailSQLQuery, &userSlice, params)
+	userSlice, err = USC.PRepository.DBReadDataUser(consts.ReadUserByEmailSQLQuery, params)
 	if err != nil || len(userSlice) != 1 {
 		return models.User{}, err
 	}
