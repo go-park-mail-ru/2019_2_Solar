@@ -44,10 +44,10 @@ type User struct {
 	Surname   string `json:"surname"`
 	Password  string `json:"-"`
 	Email     string `json:"email"`
-	Age       string `json:"age"`
+	Age       uint   `json:"age"`
 	Status    string `json:"status"`
 	AvatarDir string `json:"-"`
-	IsActive  string `json:"isactive"`
+	IsActive  bool   `json:"isactive"`
 }
 
 type DataJSON struct {
