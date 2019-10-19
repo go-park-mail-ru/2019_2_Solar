@@ -1,99 +1,40 @@
 package delivery
 
-/*import (
+import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 
 	"github.com/labstack/echo"
-	"io"
+/*	"io"
 	"net/http"
 	"os"
-	"strconv"
+	"strconv"*/
 )
 
-func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) error {
-	r := ctx.Request()
-	w := ctx.Response()
-
-	defer r.Body.Close()
-
-	w.Header().Set("Content-Type", "application/json")
-
-	encoder := json.NewEncoder(w)
-
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
-
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return nil
+func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	fmt.Println(ctx.Path())
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	user := ctx.Get("User")
+	if user == nil {
+		return errors.New("not authorized")
 	}
-	user := h.PUsecase.GetUserByID(idUser)
-	data := h.PUsecase.SetJsonData(user, "OK")
-
-	err = encoder.Encode(data)
+	data := h.PUsecase.SetJsonData(user.(models.User), "OK")
+	err := encoder.Encode(data)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
-		return nil
+		return err
 	}
 	return nil
 }
 
-func (h *HandlersStruct) HandleGetProfileUserPicture(ctx echo.Context) error {
-	r := ctx.Request()
-	w := ctx.Response()
-
-	defer r.Body.Close()
-
-	encoder := json.NewEncoder(w)
-
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
-
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return nil
-	}
-	user := h.PUsecase.GetUserByID(idUser)
-	filename := user.AvatarDir
-
-	openFile, err := os.Open(filename)
-	defer openFile.Close() //Close after function return nil
-	if err != nil {
-		//File not found, send 404
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		h.PUsecase.SetResponseError(encoder, "file not found", err)
-		return nil
-	}
-	//File is found, create and send the correct headers
-	//Get the Content-Type of the file
-	//Create a buffer to store the header of the file in
-	FileHeader := make([]byte, 512)
-	//Copy the headers into the FileHeader buffer
-	openFile.Read(FileHeader)
-	//Get content type of file
-	FileContentType := http.DetectContentType(FileHeader)
-
-	//Get the file size
-	FileStat, _ := openFile.Stat()                     //Get info from file
-	FileSize := strconv.FormatInt(FileStat.Size(), 10) //Get file size as a string
-
-	//Send the headers
-	w.Header().Set("Content-Disposition", "attachment; filename="+filename)
-	w.Header().Set("Content-Type", FileContentType)
-	w.Header().Set("Content-Length", FileSize)
-	//Send the file
-	//We read 512 bytes from the file already, so we reset the offset back to 0
-	openFile.Seek(0, 0)
-	io.Copy(w, openFile) //'Copy' the file to the client
-	return nil
-}
-
-func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) error {
+/*func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 
@@ -189,5 +130,56 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
 	data := h.PUsecase.SetJsonData(nil, "profile picture has been successfully saved")
 	encoder.Encode(data)
 	return nil
-}
-*/
+}*/
+
+/*func (h *HandlersStruct) HandleGetProfileUserPicture(ctx echo.Context) error {
+	r := ctx.Request()
+	w := ctx.Response()
+
+	defer r.Body.Close()
+
+	encoder := json.NewEncoder(w)
+
+	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
+		return nil
+	}
+	user := h.PUsecase.GetUserByID(idUser)
+	filename := user.AvatarDir
+
+	openFile, err := os.Open(filename)
+	defer openFile.Close() //Close after function return nil
+	if err != nil {
+		//File not found, send 404
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		h.PUsecase.SetResponseError(encoder, "file not found", err)
+		return nil
+	}
+	//File is found, create and send the correct headers
+	//Get the Content-Type of the file
+	//Create a buffer to store the header of the file in
+	FileHeader := make([]byte, 512)
+	//Copy the headers into the FileHeader buffer
+	openFile.Read(FileHeader)
+	//Get content type of file
+	FileContentType := http.DetectContentType(FileHeader)
+
+	//Get the file size
+	FileStat, _ := openFile.Stat()                     //Get info from file
+	FileSize := strconv.FormatInt(FileStat.Size(), 10) //Get file size as a string
+
+	//Send the headers
+	w.Header().Set("Content-Disposition", "attachment; filename="+filename)
+	w.Header().Set("Content-Type", FileContentType)
+	w.Header().Set("Content-Length", FileSize)
+	//Send the file
+	//We read 512 bytes from the file already, so we reset the offset back to 0
+	openFile.Seek(0, 0)
+	io.Copy(w, openFile) //'Copy' the file to the client
+	return nil
+}*/
