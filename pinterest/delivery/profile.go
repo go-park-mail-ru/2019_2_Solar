@@ -3,14 +3,9 @@ package delivery
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-
 	"github.com/labstack/echo"
-/*	"io"
 	"net/http"
-	"os"
-	"strconv"*/
 )
 
 func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
@@ -19,7 +14,6 @@ func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) 
 			Err = err
 		}
 	}()
-	fmt.Println(ctx.Path())
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 	user := ctx.Get("User")
@@ -34,46 +28,33 @@ func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) 
 	return nil
 }
 
-/*func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) error {
-	r := ctx.Request()
-	w := ctx.Response()
+func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	encoder := json.NewEncoder(ctx.Response())
+	decoder := json.NewDecoder(ctx.Request().Body)
 
-	defer r.Body.Close()
+	newUserProfile := new(models.EditUserProfile)
 
-	w.Header().Set("Content-Type", "application/json")
-
-	decoder := json.NewDecoder(r.Body)
-	encoder := json.NewEncoder(w)
-
-	newProfileUser := new(models.EditUserProfile)
-	err := decoder.Decode(newProfileUser)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "incorrect json", err)
-		return nil
+	if err := decoder.Decode(newUserProfile); err != nil {
+		return err
 	}
 
-	if err := h.PUsecase.EditProfileDataCheck(newProfileUser); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, err.Error(), err)
-		return nil
+	if err := h.PUsecase.EditProfileDataValidationCheck(newUserProfile); err != nil {
+		return err
 	}
-
-	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
-		return nil
-	}
-	if !h.PUsecase.EditEmailIsUnique(newProfileUser.Email, idUser) {
-		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "not unique Email", errors.New("not unique Email"))
-		return nil
-	}
-	if !h.PUsecase.EditUsernameIsUnique(newProfileUser.Username, idUser) {
-		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "not unique Username", errors.New("not unique Username"))
-		return nil
+	if check, err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil || !check {
+		return err
 	}
 
 	h.PUsecase.SaveNewProfileUser(idUser, newProfileUser)
@@ -83,7 +64,7 @@ func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) 
 	return nil
 }
 
-func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
+/*func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 	defer r.Body.Close()

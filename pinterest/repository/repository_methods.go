@@ -62,7 +62,6 @@ func (RS *RepositoryStruct) DBReadDataUser(executeQuery string, params []interfa
 			AvatarDir: dbuser.AvatarDir.String,
 			IsActive:  dbuser.IsActive,
 		}
-
 		usersSlice = append(usersSlice, user)
 	}
 	return usersSlice, nil

@@ -30,14 +30,14 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.RegDataValidationCheck(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-
+	//ОБЪЕДЕНИТЬ ФУНКЦИИ ПРОВЕРКИ УНИКАЛЬНОСТИ (2 sql запроса слишком жирно)
 	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
 		return err
 	}
-
 	if check, err := h.PUsecase.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
 		return err
 	}
+
 	newUserId, err := h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
 	if err != nil {
 		return err

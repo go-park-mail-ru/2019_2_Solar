@@ -101,7 +101,7 @@ func (USC *UsecaseStruct) RegUsernameIsUnique(username string) (bool, error) {
 	return true, nil
 }
 
-func (USC *UsecaseStruct) EditProfileDataCheck(newProfileUser *models.EditUserProfile) error {
+func (USC *UsecaseStruct) EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {
 		if err := EmailCheck(newProfileUser.Email); err != nil {
 			return err
@@ -138,4 +138,30 @@ func (USC *UsecaseStruct) EditProfileDataCheck(newProfileUser *models.EditUserPr
 		}
 	}
 	return nil
+}
+
+func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error) {
+	if newUsername == username && newEmail == email {
+		return true, nil
+	}
+	var userSlice []models.User
+	var params []interface{}
+	params = append(params, newUsername)
+	params = append(params, newEmail)
+	userSlice, err := USC.PRepository.DBReadDataUser(consts.ReadUserIdByUsernameEmailSQLQuery, params)
+	if err != nil {
+		return false, err
+	}
+	for _, user := range userSlice {
+		if user.ID == userId {
+			continue
+		}
+		if user.Username == newUsername {
+			return false, errors.New("username is not unique")
+		}
+		if user.Email == newEmail {
+			return false, errors.New("email is not unique")
+		}
+	}
+	return true, nil
 }

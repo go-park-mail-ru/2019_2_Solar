@@ -31,33 +31,6 @@ func SearchCookie(r *http.Request) (*http.Cookie, error) {
 	return key, err
 }
 
-func EditEmailIsUnique(email string, idUser uint64) bool {
-	p.Mu.Lock()
-	defer p.Mu.Unlock()
-
-	for _, user := range p.Users {
-		if user.Email == email {
-			if user.ID != idUser {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func EditUsernameIsUnique(username string, idUser uint64) bool {
-	p.Mu.Lock()
-	defer p.Mu.Unlock()
-
-	for _, user := range p.Users {
-		if user.Username == username {
-			if user.ID != idUser {
-				return false
-			}
-		}
-	}
-	return true
-}
 
 func SearchUserByEmail(newUserLogin *models.UserLogin) interface{} {
 	p.Mu.Lock()
