@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -81,9 +82,34 @@ func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string
 	return lastId, nil
 }
 
-func (USC *UsecaseStruct) EditUser(user models.EditUserProfile, userId uint64) (int, error) {
+func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
 	var params []interface{}
-	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, userId)
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
+	if newUser.Name != "" {
+		user.Name = newUser.Name
+	}
+	if newUser.Surname != "" {
+		user.Surname = newUser.Surname
+	}
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+	if newUser.Age != "" {
+		age, err := strconv.Atoi(newUser.Age)
+		if err != nil {
+			return 0, err
+		}
+		user.Age =uint(age)
+	}
+	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
 	editUsers, err := USC.PRepository.Update(consts.UpdateUserByID, params)
 	if err != nil {
 		return 0, err

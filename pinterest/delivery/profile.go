@@ -60,8 +60,12 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return err
 	}
 	//Что если изменилось больше 1 строки?
-	if _, err := h.PUsecase.EditUser(*newUserProfile, user.ID); err != nil {
+	editStrings, err := h.PUsecase.SetUser(*newUserProfile, user);
+	if err != nil {
 		return err
+	}
+	if editStrings != 1 {
+		return errors.New("several notes edit")
 	}
 
 	data := h.PUsecase.SetJsonData(nil, "data successfully saved")

@@ -29,7 +29,7 @@ type UsecaseInterface interface {
 	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
 
 	SetUserAvatarDir(idUser, fileName string) (int, error)
-	EditUser(user models.EditUserProfile, userId uint64) (int, error)
+	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
 
