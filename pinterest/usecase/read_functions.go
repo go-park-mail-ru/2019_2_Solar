@@ -11,7 +11,7 @@ func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	str, err = USC.PRepository.DBReadDataString(consts.ReadUserIdByEmailSQLQuery, params)
+	str, err = USC.PRepository.ReadOneCol(consts.ReadUserIdByEmailSQLQuery, params)
 	if err != nil {
 		return "", err
 	}
@@ -26,7 +26,7 @@ func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	userSlice, err = USC.PRepository.DBReadDataUser(consts.ReadUserByEmailSQLQuery, params)
+	userSlice, err = USC.PRepository.ReadUser(consts.ReadUserByEmailSQLQuery, params)
 	if err != nil {
 		return models.User{}, err
 	}
@@ -39,7 +39,7 @@ func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error
 func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
 	var err error
 
-	users, err := USC.PRepository.DBReadDataUser(consts.SelectAllUsers, nil)
+	users, err := USC.PRepository.ReadUser(consts.SelectAllUsers, nil)
 	if err != nil {
 		return users, err
 	}

@@ -26,7 +26,7 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS *RepositoryStruct) DBWriteData(executeQuery string, params []interface{}) (string, error) {
+func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{}) (string, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {
@@ -35,7 +35,7 @@ func (RS *RepositoryStruct) DBWriteData(executeQuery string, params []interface{
 	return strconv.Itoa(int(id)), nil
 }
 
-func (RS *RepositoryStruct) DBReadDataUser(executeQuery string, params []interface{}) ([]models.User, error) {
+func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) ([]models.User, error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -67,7 +67,7 @@ func (RS *RepositoryStruct) DBReadDataUser(executeQuery string, params []interfa
 	return usersSlice, nil
 }
 
-func (RS *RepositoryStruct) DBReadDataUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
+func (RS *RepositoryStruct) ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -86,7 +86,7 @@ func (RS *RepositoryStruct) DBReadDataUserCookies(executeQuery string, params []
 	return userCookiesSlice, nil
 }
 
-func (RS *RepositoryStruct) DBReadDataString(executeQuery string, params []interface{}) ([]string, error) {
+func (RS *RepositoryStruct) ReadOneCol(executeQuery string, params []interface{}) ([]string, error) {
 	stringSlice := make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -105,7 +105,7 @@ func (RS *RepositoryStruct) DBReadDataString(executeQuery string, params []inter
 	return stringSlice, nil
 }
 
-func (RS *RepositoryStruct) DELETE_SESSION(executeQuery string, params []interface{}) error {
+func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interface{}) error {
 	_, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err

@@ -29,7 +29,7 @@ func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error
 	params = append(params, userId)
 	params = append(params, cookieSessionKey.Value)
 	params = append(params, cookieSessionKey.Expires)
-	_, err = USC.PRepository.DBWriteData(consts.InsertSessionQuery, params)
+	_, err = USC.PRepository.WriteData(consts.InsertSessionQuery, params)
 	if err != nil {
 		return *cookieSessionKey, err
 	}
@@ -69,7 +69,7 @@ func SecureRandomBytes(length int) ([]byte, error) {
 func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
-	lastId, err := USC.PRepository.DBWriteData(consts.InsertRegistrationQuery, params)
+	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
 	if err != nil {
 		return "", err
 	}
@@ -81,7 +81,7 @@ func (USC UsecaseStruct)UpdateUser(user models.User, userId uint64) (string, err
 	params = append(params, user.Username)
 	params = append(params, user.Email)
 	params = append(params, user.Password)
-	lastId, err := USC.PRepository.DBWriteData(consts.InsertRegistrationQuery, params)
+	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
 	if err != nil {
 		return "", err
 	}

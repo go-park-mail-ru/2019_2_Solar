@@ -11,10 +11,10 @@ type RepositoryStruct struct {
 }
 
 type RepositoryInterface interface {
-	DBWriteData(executeQuery string, params []interface{}) (string, error)
-	DBReadDataUser(executeQuery string, params []interface{}) ([]models.User, error)
-	DBReadDataUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
-	DBReadDataString(executeQuery string, params []interface{}) ([]string, error)
+	WriteData(executeQuery string, params []interface{}) (string, error)
+	ReadUser(executeQuery string, params []interface{}) ([]models.User, error)
+	ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
+	ReadOneCol(executeQuery string, params []interface{}) ([]string, error)
 
-	DELETE_SESSION(executeQuery string, params []interface{}) (error)
+	DeleteSession(executeQuery string, params []interface{}) (error)
 }
