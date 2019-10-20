@@ -20,14 +20,13 @@ func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) 
 		return errors.New("not authorized")
 	}
 	data := h.PUsecase.SetJsonData(user.(models.User), "OK")
-	err := encoder.Encode(data)
-	if err != nil {
+
+	if err := encoder.Encode(data); err != nil {
 		return err
 	}
 	return nil
 }
 
-/*
 func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error) {
 	defer func() {
 		if err := ctx.Request().Body.Close(); err != nil {
@@ -41,7 +40,7 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	encoder := json.NewEncoder(ctx.Response())
+
 	decoder := json.NewDecoder(ctx.Request().Body)
 
 	newUserProfile := new(models.EditUserProfile)
@@ -56,14 +55,18 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 	if check, err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil || !check {
 		return err
 	}
-
-	h.PUsecase.SaveNewProfileUser(idUser, newProfileUser)
+	//Что если изменилось больше 1 строки?
+	if _, err := h.PUsecase.EditUser(*newUserProfile, user.ID); err != nil {
+		return err
+	}
 
 	data := h.PUsecase.SetJsonData(nil, "data successfully saved")
-	encoder.Encode(data)
+
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
 	return nil
 }
-*/
 
 /*func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()

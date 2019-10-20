@@ -76,11 +76,9 @@ func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string
 	return lastId, nil
 }
 
-func (USC UsecaseStruct)UpdateUser(user models.User, userId uint64) (string, error) {
+func (USC UsecaseStruct)EditUser(user models.EditUserProfile, userId uint64) (string, error) {
 	var params []interface{}
-	params = append(params, user.Username)
-	params = append(params, user.Email)
-	params = append(params, user.Password)
+	params = append(params, user.Username, user.Email, user.Password)
 	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
 	if err != nil {
 		return "", err

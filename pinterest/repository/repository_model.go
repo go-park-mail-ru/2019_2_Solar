@@ -11,6 +11,7 @@ type RepositoryStruct struct {
 }
 
 type RepositoryInterface interface {
+	Update(executeQuery string, params []interface{}) (int, error)
 	WriteData(executeQuery string, params []interface{}) (string, error)
 	ReadUser(executeQuery string, params []interface{}) ([]models.User, error)
 	ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)

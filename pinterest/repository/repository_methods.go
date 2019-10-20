@@ -35,6 +35,18 @@ func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{})
 	return strconv.Itoa(int(id)), nil
 }
 
+func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (int, error) {
+	result, err := RS.DataBase.Exec(executeQuery, params...)
+	if err != nil {
+		return 0, err
+	}
+	rowsEdit, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsEdit), nil
+}
+
 func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) ([]models.User, error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)

@@ -28,7 +28,7 @@ type UsecaseInterface interface {
 	EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error
 	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error)
 
-	UpdateUser(user models.User, userId uint64) (string, error)
+	EditUser(user models.EditUserProfile, userId uint64) (string, error)
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
 
