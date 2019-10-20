@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
@@ -32,10 +33,20 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	}
 	//ОБЪЕДЕНИТЬ ФУНКЦИИ ПРОВЕРКИ УНИКАЛЬНОСТИ (2 sql запроса слишком жирно)
 	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
-		return err
+		data := h.PUsecase.SetJsonData(newUserReg, "Not unique username")
+		err = encoder.Encode(data)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 	if check, err := h.PUsecase.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
-		return err
+		data := h.PUsecase.SetJsonData(newUserReg, "Not unique email")
+		err = encoder.Encode(data)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	newUserId, err := h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
@@ -103,32 +114,33 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	return nil
 }
 
-/*func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) error {
-	defer ctx.Request().Body.Close()
-
+func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) error {
+	var err error
+	defer func() {
+		if bodyCloseError := ctx.Request().Body.Close(); bodyCloseError != nil {
+			err = bodyCloseError
+		}
+	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
-
 	encoder := json.NewEncoder(ctx.Response())
 
-	sessionKey, err := h.PUsecase.SearchCookie(ctx.Request())
-	if err == http.ErrNoCookie {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "Cookie has not found", err)
-		return nil
+	sessionKey, err := ctx.Request().Cookie("session_key")
+	if err != nil {
+		return err
 	}
 
 	err = h.PUsecase.DeleteOldUserSession(sessionKey.Value)
-
 	if err != nil {
-		ctx.Response().WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "Session has not found", err)
-		return nil
+		return err
 	}
 	sessionKey.Path = "/"
 	sessionKey.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(ctx.Response(), sessionKey)
 
 	data := h.PUsecase.SetJsonData(nil, "Session has been successfully deleted")
-	encoder.Encode(data)
+	err = encoder.Encode(data)
+	if err != nil {
+		return err
+	}
 	return nil
-}*/
+}
