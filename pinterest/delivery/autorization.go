@@ -31,22 +31,9 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.RegDataValidationCheck(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	//ОБЪЕДЕНИТЬ ФУНКЦИИ ПРОВЕРКИ УНИКАЛЬНОСТИ (2 sql запроса слишком жирно)
-	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
-		data := h.PUsecase.SetJsonData(newUserReg, "Not unique username")
-		err = encoder.Encode(data)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if check, err := h.PUsecase.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
-		data := h.PUsecase.SetJsonData(newUserReg, "Not unique email")
-		err = encoder.Encode(data)
-		if err != nil {
-			return err
-		}
-		return nil
+
+	if err := h.PUsecase.RegUsernameEmailIsUnique(newUserReg.Username, newUserReg.Email); err != nil {
+		return err
 	}
 
 	newUserId, err := h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)

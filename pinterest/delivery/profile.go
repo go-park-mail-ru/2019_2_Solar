@@ -56,7 +56,7 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 	if err := h.PUsecase.EditProfileDataValidationCheck(newUserProfile); err != nil {
 		return err
 	}
-	if check, err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil || !check {
+	if err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil {
 		return err
 	}
 	//Что если изменилось больше 1 строки?

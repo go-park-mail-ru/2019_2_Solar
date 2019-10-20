@@ -60,21 +60,21 @@ func NameCheck(name string) error {
 	if len(name) >= 1 && len(name) <= 30 && validation.NameIsCorrect.MatchString(name) {
 		return nil
 	}
-	return errors.New("Incorrct name")
+	return errors.New("incorrect name")
 }
 
 func SurnameCheck(surname string) error {
 	if len(surname) >= 1 && len(surname) <= 30 && validation.SurnameIsCorrect.MatchString(surname) {
 		return nil
 	}
-	return errors.New("Incorrect surname")
+	return errors.New("incorrect surname")
 }
 
 func AgeCheck(age string) error {
 	if validation.AgeIsCorrect.MatchString(age) {
 		return nil
 	}
-	return errors.New("Incorrect age")
+	return errors.New("incorrect age")
 }
 
 func StatusCheck(status string) error {
@@ -84,26 +84,23 @@ func StatusCheck(status string) error {
 	return errors.New("incorrect status")
 }
 
-func (USC *UsecaseStruct) RegEmailIsUnique(email string) (bool, error) {
-	var str []string
+func (USC *UsecaseStruct) RegUsernameEmailIsUnique(username, email string) error {
+	var userSlice []models.User
 	var params []interface{}
-	params = append(params, email)
-	str, err := USC.PRepository.ReadOneCol(consts.ReadUserIdByEmailSQLQuery, params)
-	if err != nil || len(str) > 1 {
-		return false, err
+	params = append(params, username, email)
+	userSlice, err := USC.PRepository.ReadUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
+	if err != nil {
+		return err
 	}
-	return true, nil
-}
-
-func (USC *UsecaseStruct) RegUsernameIsUnique(username string) (bool, error) {
-	var str []string
-	var params []interface{}
-	params = append(params, username)
-	str, err := USC.PRepository.ReadOneCol(consts.SelectUserUsernameByUsername, params)
-	if err != nil || len(str) > 1 {
-		return false, err
+	for _, user := range userSlice {
+		if user.Username == username {
+			return errors.New("username is not unique")
+		}
+		if user.Email == email {
+			return errors.New("email is not unique")
+		}
 	}
-	return true, nil
+	return nil
 }
 
 func (USC *UsecaseStruct) EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error {
@@ -145,28 +142,27 @@ func (USC *UsecaseStruct) EditProfileDataValidationCheck(newProfileUser *models.
 	return nil
 }
 
-func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error) {
+func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error {
 	if newUsername == username && newEmail == email {
-		return true, nil
+		return nil
 	}
 	var userSlice []models.User
 	var params []interface{}
-	params = append(params, newUsername)
-	params = append(params, newEmail)
-	userSlice, err := USC.PRepository.ReadUser(consts.ReadUserIdByUsernameEmailSQLQuery, params)
+	params = append(params, newUsername, newEmail)
+	userSlice, err := USC.PRepository.ReadUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
-		return false, err
+		return err
 	}
 	for _, user := range userSlice {
 		if user.ID == userId {
 			continue
 		}
 		if user.Username == newUsername {
-			return false, errors.New("username is not unique")
+			return errors.New("username is not unique")
 		}
 		if user.Email == newEmail {
-			return false, errors.New("email is not unique")
+			return errors.New("email is not unique")
 		}
 	}
-	return true, nil
+	return nil
 }

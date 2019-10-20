@@ -23,11 +23,10 @@ type UsecaseInterface interface {
 	GetAllUsers() ([]models.User, error)
 
 	RegDataValidationCheck(newUser *models.UserReg) error
-	RegEmailIsUnique(email string) (bool, error)
-	RegUsernameIsUnique(username string) (bool, error)
+	RegUsernameEmailIsUnique(username, email string) error
 
 	EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error
-	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error)
+	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
 
 	SetUserAvatarDir(idUser, fileName string) (int, error)
 	EditUser(user models.EditUserProfile, userId uint64) (int, error)
