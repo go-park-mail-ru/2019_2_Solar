@@ -46,13 +46,17 @@ func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (i
 	return int(rowsEdit), nil
 }
 
-func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error) {
+func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interface{}) (Sl []models.User, Err error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return usersSlice, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
 	for rows.Next() {
 		dbuser := models.DBUser{}
 		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
@@ -77,13 +81,17 @@ func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interfa
 	return usersSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error) {
+func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
 	userUniqueSlice := make([]models.UserUnique, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return userUniqueSlice, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
 	for rows.Next() {
 		user := models.UserUnique{}
 		err := rows.Scan(&user.Id, &user.Username, &user.Email)
@@ -95,13 +103,17 @@ func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, param
 	return userUniqueSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
+func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return userCookiesSlice, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
 	for rows.Next() {
 		userCookie := models.UserCookie{}
 		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
@@ -113,13 +125,17 @@ func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []inte
 	return userCookiesSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectOneCol(executeQuery string, params []interface{}) ([]string, error) {
+func (RS *RepositoryStruct) SelectOneCol(executeQuery string, params []interface{}) (Sl []string, Err error) {
 	stringSlice := make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return stringSlice, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
 	for rows.Next() {
 		var str string
 		err := rows.Scan(&str)
