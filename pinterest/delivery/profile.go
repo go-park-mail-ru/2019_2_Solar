@@ -1,48 +1,120 @@
 package delivery
 
-/*import (
+import (
 	"encoding/json"
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-
 	"github.com/labstack/echo"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
 )
 
-func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) error {
+func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	user := ctx.Get("User")
+	if user == nil {
+		return errors.New("not authorized")
+	}
+	data := h.PUsecase.SetJsonData(user.(models.User), "OK")
+	err := encoder.Encode(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	encoder := json.NewEncoder(ctx.Response())
+	decoder := json.NewDecoder(ctx.Request().Body)
+
+	newUserProfile := new(models.EditUserProfile)
+
+	if err := decoder.Decode(newUserProfile); err != nil {
+		return err
+	}
+
+	if err := h.PUsecase.EditProfileDataValidationCheck(newUserProfile); err != nil {
+		return err
+	}
+	if check, err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil || !check {
+		return err
+	}
+
+	h.PUsecase.SaveNewProfileUser(idUser, newProfileUser)
+
+	data := h.PUsecase.SetJsonData(nil, "data successfully saved")
+	encoder.Encode(data)
+	return nil
+}
+*/
+
+/*func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
-
 	defer r.Body.Close()
 
 	w.Header().Set("Content-Type", "application/json")
 
 	encoder := json.NewEncoder(w)
+	r.ParseMultipartForm(5 * 1024 * 1025)
 
 	idUser, err := h.PUsecase.SearchIdUserByCookie(r)
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		h.PUsecase.SetResponseError(encoder, "invalid cookie or user", err)
+		h.PUsecase.SetResponseError(encoder, "user not found or not valid cookies", err)
 		return nil
 	}
-	user := h.PUsecase.GetUserByID(idUser)
-	data := h.PUsecase.SetJsonData(user, "OK")
-
-	err = encoder.Encode(data)
+	file, header, err := r.FormFile("profilePicture")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		h.PUsecase.SetResponseError(encoder, "bad user struct", err)
+		h.PUsecase.SetResponseError(encoder, "Cannot read profile picture", err)
 		return nil
 	}
-	return nil
-}
 
-func (h *HandlersStruct) HandleGetProfileUserPicture(ctx echo.Context) error {
+	defer file.Close()
+	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		h.PUsecase.SetResponseError(encoder, "Cannot read profile picture", err)
+		return nil
+	}
+	fileName := strconv.FormatUint(idUser, 10) + "_picture" + formatFile
+	newFile, err := os.Create(fileName)
+
+	h.PUsecase.SaveUserPictureDir(idUser, fileName)
+
+	defer newFile.Close()
+	_, err = io.Copy(newFile, file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		h.PUsecase.SetResponseError(encoder, "File recording has failed", err)
+		return nil
+	}
+
+	data := h.PUsecase.SetJsonData(nil, "profile picture has been successfully saved")
+	encoder.Encode(data)
+	return nil
+}*/
+
+/*func (h *HandlersStruct) HandleGetProfileUserPicture(ctx echo.Context) error {
 	r := ctx.Request()
 	w := ctx.Response()
 

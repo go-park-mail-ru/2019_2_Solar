@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"time"
 )
@@ -13,21 +14,21 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return next(ctx)
 		}
-		DBWorker := repository.RepositoryStruct{}
-		err = DBWorker.NewDataBaseWorker()
+		dbWorker := repository.RepositoryStruct{}
+		err = dbWorker.NewDataBaseWorker()
 		if err != nil {
 			return err
 		}
-		var User repository.UsersSlice
+		var user []models.User
 		var params []interface{}
 		params = append(params, cookie.Value)
-		err = DBWorker.DBDataRead(consts.ReadUserByCookieValueSQLQuery, &User, params)
-		if err != nil || len(User) != 1 {
+		user, err = dbWorker.DBReadDataUser(consts.ReadUserByCookieValueSQLQuery, params)
+		if err != nil || len(user) != 1 {
 			return err
 		}
 
-		var userCookie repository.UserCookiesSlice
-		err = DBWorker.DBDataRead(consts.ReadCookiesExpirationByCookieValueSQLQuery, &userCookie, params)
+		var userCookie []models.UserCookie
+		userCookie, err = dbWorker.DBReadDataUserCookies(consts.ReadCookiesExpirationByCookieValueSQLQuery, params)
 		if err != nil || len(userCookie) != 1 {
 			return err
 		}
@@ -35,7 +36,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			//delete Coockie!!!!
 			return next(ctx)
 		}
-		ctx.Set("User", User[0])
+		ctx.Set("User", user[0])
 		ctx.Set("Cookie", userCookie[0])
 		return next(ctx)
 	}

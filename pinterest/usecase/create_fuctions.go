@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"net/http"
 	"sync"
 	"time"
@@ -28,7 +29,7 @@ func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error
 	params = append(params, userId)
 	params = append(params, cookieSessionKey.Value)
 	params = append(params, cookieSessionKey.Expires)
-	_, err = USC.PRepository.WriteData(consts.InsertSessionQuery, params)
+	_, err = USC.PRepository.DBWriteData(consts.InsertSessionQuery, params)
 	if err != nil {
 		return *cookieSessionKey, err
 	}
@@ -70,7 +71,19 @@ func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string
 	params = append(params, username)
 	params = append(params, email)
 	params = append(params, password)
-	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	lastId, err := USC.PRepository.DBWriteData(consts.InsertRegistrationQuery, params)
+	if err != nil {
+		return "", err
+	}
+	return lastId, nil
+}
+
+func (USC UsecaseStruct)UpdateUser(user models.User, userId uint64) (string, error) {
+	var params []interface{}
+	params = append(params, username)
+	params = append(params, email)
+	params = append(params, password)
+	lastId, err := USC.PRepository.DBWriteData(consts.InsertRegistrationQuery, params)
 	if err != nil {
 		return "", err
 	}

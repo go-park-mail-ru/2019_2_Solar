@@ -10,7 +10,7 @@ import (
 
 type UsecaseStruct struct {
 	PRepository repository.RepositoryInterface
-	Mu *sync.Mutex
+	Mu          *sync.Mutex
 }
 
 type UsecaseInterface interface {
@@ -23,6 +23,11 @@ type UsecaseInterface interface {
 	RegDataValidationCheck(newUser *models.UserReg) error
 	RegEmailIsUnique(email string) (bool, error)
 	RegUsernameIsUnique(username string) (bool, error)
+
+	EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error
+	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error)
+
+	UpdateUser(user models.User, userId uint64) (string, error)
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
 }

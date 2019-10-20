@@ -14,9 +14,9 @@ import (
 func main() {
 	e := echo.New()
 	e.Use(customMiddlewares.CORSMiddleware)
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
 	e.Use(customMiddlewares.PanicMiddleware)
 	//e.Use(customMiddleware.AccessLogMiddleware)
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
 	e.Use(customMiddlewares.AuthenticationMiddleware)
 	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
 
