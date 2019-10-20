@@ -26,7 +26,7 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS RepositoryStruct) WriteData(executeQuery string, params []interface{}) (string, error) {
+func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{}) (string, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {
@@ -35,17 +35,12 @@ func (RS RepositoryStruct) WriteData(executeQuery string, params []interface{}) 
 	return strconv.Itoa(int(id)), nil
 }
 
-type DBReader interface {
-	DBRead(rows *sql.Rows) error
-}
-
-type (
-	UsersSlice       []models.User
-	UserCookiesSlice []models.UserCookie
-	StringSlice      []string
-)
-
-func (US *UsersSlice) DBRead(rows *sql.Rows) error {
+func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) ([]models.User, error) {
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return usersSlice, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		dbuser := models.DBUser{}
@@ -55,7 +50,7 @@ func (US *UsersSlice) DBRead(rows *sql.Rows) error {
 			fmt.Println(err)
 			continue
 		}
-		user := models.User{
+		user := models.User {
 			ID:        dbuser.ID,
 			Username:  dbuser.Username,
 			Name:      dbuser.Name.String,
@@ -67,29 +62,36 @@ func (US *UsersSlice) DBRead(rows *sql.Rows) error {
 			AvatarDir: dbuser.AvatarDir.String,
 			IsActive:  dbuser.IsActive,
 		}
-
-		*US = append(*US, user)
+		usersSlice = append(usersSlice, user)
 	}
-	return nil
+	return usersSlice, nil
 }
 
-func (USC *UserCookiesSlice) DBRead(rows *sql.Rows) error {
+func (RS *RepositoryStruct) ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
+	userCookiesSlice := make([]models.UserCookie, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return userCookiesSlice, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		userCookie := models.UserCookie{}
-		//var expirationString string
 		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		//userCookie.Expiration = time.Parse(expirationString)//expirationString
-		*USC = append(*USC, userCookie)
+		userCookiesSlice = append(userCookiesSlice, userCookie)
 	}
-	return nil
+	return userCookiesSlice, nil
 }
 
-func (SS *StringSlice) DBRead(rows *sql.Rows) error {
+func (RS *RepositoryStruct) ReadOneCol(executeQuery string, params []interface{}) ([]string, error) {
+	stringSlice := make([]string, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return stringSlice, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		var str string
@@ -98,17 +100,13 @@ func (SS *StringSlice) DBRead(rows *sql.Rows) error {
 			fmt.Println(err)
 			continue
 		}
-		*SS = append(*SS, str)
+		stringSlice = append(stringSlice, str)
 	}
-	return nil
+	return stringSlice, nil
 }
 
-func (RS *RepositoryStruct) DBDataRead(executeQuery string, readSlice DBReader, params []interface{}) error {
-	rows, err := RS.DataBase.Query(executeQuery, params...)
-	if err != nil {
-		return err
-	}
-	err = readSlice.DBRead(rows)
+func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interface{}) error {
+	_, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err
 	}

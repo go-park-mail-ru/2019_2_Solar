@@ -1,21 +1,20 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
+
 func PanicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) error {
+	return func(ctx echo.Context) (err error) {
 		defer func() {
-			if err := recover(); err != nil {
-				fmt.Println("recovered", err)
-				http.Error(ctx.Response(), "Internal server error", 500)
+			if panicErr := recover(); panicErr != nil {
+				ctx.Logger().Error("recovered ", panicErr)
+				err = &echo.HTTPError{Code: 500, Message: "Internal server error"}
 			}
 		}()
-		err := next(ctx)
+		err = next(ctx)
 		return err
 	}
 }
@@ -27,20 +26,15 @@ func CustomHTTPErrorHandler(err error, ctx echo.Context) {
 		jsonError = ctx.JSON(err.(*echo.HTTPError).Code, struct {
 			Body string
 		}{Body: err.(*echo.HTTPError).Message.(string)})
+	case nil:
+		return
 	default:
-		ctx.Logger().Error(err)
+		ctx.Logger().Warn(err)
+		jsonError = ctx.JSON(400, struct {
+			Body struct{ Info string }
+		}{Body: struct{ Info string }{Info: err.Error()}})
 	}
 	if jsonError != nil {
-
+		ctx.Logger().Error("Server cant repay response")
 	}
-	/*
-		code := http.StatusInternalServerError
-		if he, ok := err.(*echo.HTTPError); ok {
-			code = he.Code
-		}
-		errorPage := fmt.Sprintf("%d.html", code)
-		if err := ctx.File(errorPage); err != nil {
-			ctx.Logger().Error(err)
-		}
-		ctx.Logger().Error(err)*/
 }

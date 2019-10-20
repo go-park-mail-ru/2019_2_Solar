@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"net/http"
 	"sync"
 	"time"
@@ -67,9 +68,19 @@ func SecureRandomBytes(length int) ([]byte, error) {
 
 func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string, error) {
 	var params []interface{}
-	params = append(params, username)
-	params = append(params, email)
-	params = append(params, password)
+	params = append(params, username, email, password)
+	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	if err != nil {
+		return "", err
+	}
+	return lastId, nil
+}
+
+func (USC UsecaseStruct)UpdateUser(user models.User, userId uint64) (string, error) {
+	var params []interface{}
+	params = append(params, user.Username)
+	params = append(params, user.Email)
+	params = append(params, user.Password)
 	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
 	if err != nil {
 		return "", err

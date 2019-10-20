@@ -2,31 +2,46 @@ package usecase
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
 func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
-	var str repository.StringSlice
+	var str []string
 	var params []interface{}
 	params = append(params, email)
-	var err error = errors.New("several users")
-	err = USC.PRepository.DBDataRead(consts.ReadUserIdByEmailSQLQuery, &str, params)
-	if err != nil || len(str) != 1 {
+	var err error
+	str, err = USC.PRepository.ReadOneCol(consts.ReadUserIdByEmailSQLQuery, params)
+	if err != nil {
 		return "", err
+	}
+	if len(str) != 1 {
+		return "", errors.New("several users")
 	}
 	return str[0], nil
 }
 
 func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error) {
-	var userSlice repository.UsersSlice
+	var userSlice []models.User
 	var params []interface{}
 	params = append(params, email)
-	var err error = errors.New("several users")
-	err = USC.PRepository.DBDataRead(consts.ReadUserByEmailSQLQuery, &userSlice, params)
-	if err != nil || len(userSlice) != 1 {
+	var err error
+	userSlice, err = USC.PRepository.ReadUser(consts.ReadUserByEmailSQLQuery, params)
+	if err != nil {
 		return models.User{}, err
 	}
+	if len(userSlice) != 1 {
+		return models.User{}, errors.New("several users")
+	}
 	return userSlice[0], nil
+}
+
+func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
+	var err error
+
+	users, err := USC.PRepository.ReadUser(consts.SelectAllUsers, nil)
+	if err != nil {
+		return users, err
+	}
+	return users, nil
 }

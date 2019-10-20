@@ -9,13 +9,14 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 	h.PUsecase = IUsecase
 	e.GET("/", h.HandleEmpty)
 
-	//e.GET("/users/", h.HandleListUsers)
+	e.GET("/users/", h.HandleListUsers)
+	e.GET("/users/:email", h.HandleGetUserByEmail)
 
 	e.POST("/registration/", h.HandleRegUser)
 	e.POST("/login/", h.HandleLoginUser)
-	//e.POST("/logout/", h.HandleLogoutUser)
+	e.POST("/logout/", h.HandleLogoutUser)
 
-	//e.GET("/profile/data", h.HandleGetProfileUserData)
+	e.GET("/profile/data", h.HandleGetProfileUserData)
 	//e.GET("/profile/picture", h.HandleGetProfileUserPicture)
 
 	//e.POST("/profile/data", h.HandleEditProfileUserData)
