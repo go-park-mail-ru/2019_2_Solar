@@ -17,7 +17,7 @@ func (h *HandlersStruct) HandleGetUserByEmail(ctx echo.Context) (Err error) {
 
 	email := ctx.Param("email")
 	if email == "" {
-		return errors.New("Incorrect email")
+		return errors.New("incorrect email")
 	}
 
 	userProfile, err := h.PUsecase.ReadUserStructByEmail(email)
