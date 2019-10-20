@@ -34,7 +34,6 @@ type EditUserProfile struct {
 	Email    string `json:"email"`
 	Age      string `json:"age"`
 	Status   string `json:"status"`
-	IsActive string `json:"isactive"`
 }
 
 type User struct {

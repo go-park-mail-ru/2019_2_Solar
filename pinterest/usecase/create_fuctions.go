@@ -1,11 +1,16 @@
 package usecase
 
 import (
+	"crypto/md5"
 	"crypto/rand"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/labstack/echo"
+	"io"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -76,12 +81,54 @@ func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string
 	return lastId, nil
 }
 
-func (USC UsecaseStruct)EditUser(user models.EditUserProfile, userId uint64) (string, error) {
+func (USC *UsecaseStruct) EditUser(user models.EditUserProfile, userId uint64) (int, error) {
 	var params []interface{}
-	params = append(params, user.Username, user.Email, user.Password)
-	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, userId)
+	editUsers, err := USC.PRepository.Update(consts.UpdateUserByID, params)
 	if err != nil {
+		return 0, err
+	}
+	return editUsers, nil
+}
+
+func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
+	var params []interface{}
+	params = append(params, fileName, idUser)
+	editUsers, err := USC.PRepository.Update(consts.UpdateUserAvatarDirByID, params)
+	if err != nil {
+		return 0, err
+	}
+	return editUsers, nil
+}
+
+func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
+	hasher := md5.New()
+	if _, err := io.Copy(hasher, fileByte); err != nil {
 		return "", err
 	}
-	return lastId, nil
+	fileHash := string(hasher.Sum(nil))
+	fileHash = fmt.Sprintf("%x", fileHash)
+	return fileHash, nil
+}
+
+func (USC *UsecaseStruct) CreateDir(folder string) error {
+	if err := os.MkdirAll(folder, 0777); err != nil {
+		return err
+	}
+	return nil
+}
+func (USC *UsecaseStruct) CreatePictureFile(fileName string, fileByte io.Reader) (Err error) {
+	newFile, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := newFile.Close(); err != nil {
+			Err = err
+		}
+	}()
+	if _, err = io.Copy(newFile, fileByte); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	return nil
 }

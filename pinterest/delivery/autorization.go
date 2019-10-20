@@ -76,7 +76,6 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
-
 	if user := ctx.Get("User"); user != nil {
 		data := h.PUsecase.SetJsonData(user.(models.User), "OK")
 		err := encoder.Encode(data)
@@ -86,10 +85,8 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		return nil
 	}
 	decoder := json.NewDecoder(ctx.Request().Body)
-
 	newUserLogin := new(models.UserLogin)
-	err = decoder.Decode(newUserLogin)
-	if err != nil {
+	if err := decoder.Decode(newUserLogin); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	var User models.User

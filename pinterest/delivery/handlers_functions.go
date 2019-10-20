@@ -20,5 +20,5 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 	//e.GET("/profile/picture", h.HandleGetProfileUserPicture)
 
 	e.POST("/profile/data", h.HandleEditProfileUserData)
-	//e.POST("/profile/picture", h.HandleEditProfileUserPicture)
+	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
 }
