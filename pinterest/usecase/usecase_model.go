@@ -33,7 +33,7 @@ type UsecaseInterface interface {
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
 
-	//SearchCookie(r *http.Request) (*http.Cookie, error)
+
 	ExtractFormatFile(fileName string) (string, error)
 	DeleteOldUserSession(sessionKey string) error
 	CalculateMD5FromFile (fileByte io.Reader) (string, error)
