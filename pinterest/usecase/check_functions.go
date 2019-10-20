@@ -34,21 +34,26 @@ func EmailCheck(email string) error {
 	return errors.New("Incorrect email")
 }
 
-//Упростить
 func PasswordCheck(password string) error {
-	if len(password) >= 8 && len(password) <= 30 && validation.PasswordIsCorrect.MatchString(password) {
-		if validation.PasswordHasAperCaseChar.MatchString(password) {
-			if validation.PasswordHasDownCaseChar.MatchString(password) {
-				if validation.PasswordHasSpecChar.MatchString(password) {
-					return nil
-				}
-				return errors.New("Password has not special symbol")
-			}
-			return errors.New("Password has not symbol in down case")
-		}
-		return errors.New("Password has not symbol in upper case")
+	if len(password) <8 {
+		return errors.New("too short password")
 	}
-	return errors.New("Incorrect password")
+	if len(password) >30 {
+		return errors.New("too long password")
+	}
+	if !validation.PasswordHasAperCaseChar.MatchString(password) {
+		return errors.New("password has not symbol in upper case")
+	}
+	if !validation.PasswordHasDownCaseChar.MatchString(password) {
+		return errors.New("password has not symbol in down case")
+	}
+	if !validation.PasswordHasSpecChar.MatchString(password) {
+		return errors.New("password has not special symbol")
+	}
+	if !validation.PasswordIsCorrect.MatchString(password) {
+		return errors.New("incorrect password")
+	}
+	return nil
 }
 
 func NameCheck(name string) error {
