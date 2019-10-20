@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	_ "github.com/lib/pq"
 	"strconv"
@@ -26,7 +25,7 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS *RepositoryStruct) WriteData(executeQuery string, params []interface{}) (string, error) {
+func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (string, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {
@@ -47,7 +46,7 @@ func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (i
 	return int(rowsEdit), nil
 }
 
-func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) ([]models.User, error) {
+func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -59,10 +58,9 @@ func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) 
 		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
 			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			return usersSlice, err
 		}
-		user := models.User {
+		user := models.User{
 			ID:        dbuser.ID,
 			Username:  dbuser.Username,
 			Name:      dbuser.Name.String,
@@ -79,7 +77,25 @@ func (RS *RepositoryStruct) ReadUser(executeQuery string, params []interface{}) 
 	return usersSlice, nil
 }
 
-func (RS *RepositoryStruct) ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
+func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error) {
+	userUniqueSlice := make([]models.UserUnique, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return userUniqueSlice, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		user := models.UserUnique{}
+		err := rows.Scan(&user.Id, &user.Username, &user.Email)
+		if err != nil {
+			return userUniqueSlice, err
+		}
+		userUniqueSlice = append(userUniqueSlice, user)
+	}
+	return userUniqueSlice, nil
+}
+
+func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -90,15 +106,14 @@ func (RS *RepositoryStruct) ReadUserCookies(executeQuery string, params []interf
 		userCookie := models.UserCookie{}
 		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			return userCookiesSlice, err
 		}
 		userCookiesSlice = append(userCookiesSlice, userCookie)
 	}
 	return userCookiesSlice, nil
 }
 
-func (RS *RepositoryStruct) ReadOneCol(executeQuery string, params []interface{}) ([]string, error) {
+func (RS *RepositoryStruct) SelectOneCol(executeQuery string, params []interface{}) ([]string, error) {
 	stringSlice := make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -109,8 +124,7 @@ func (RS *RepositoryStruct) ReadOneCol(executeQuery string, params []interface{}
 		var str string
 		err := rows.Scan(&str)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			return stringSlice, err
 		}
 		stringSlice = append(stringSlice, str)
 	}

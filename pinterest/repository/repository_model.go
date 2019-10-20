@@ -12,10 +12,10 @@ type RepositoryStruct struct {
 
 type RepositoryInterface interface {
 	Update(executeQuery string, params []interface{}) (int, error)
-	WriteData(executeQuery string, params []interface{}) (string, error)
-	ReadUser(executeQuery string, params []interface{}) ([]models.User, error)
-	ReadUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
-	ReadOneCol(executeQuery string, params []interface{}) ([]string, error)
-
-	DeleteSession(executeQuery string, params []interface{}) (error)
+	Insert(executeQuery string, params []interface{}) (string, error)
+	SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error)
+	SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
+	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
+	SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
+	DeleteSession(executeQuery string, params []interface{}) error
 }

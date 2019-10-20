@@ -85,10 +85,10 @@ func StatusCheck(status string) error {
 }
 
 func (USC *UsecaseStruct) RegUsernameEmailIsUnique(username, email string) error {
-	var userSlice []models.User
+	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
-	userSlice, err := USC.PRepository.ReadUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}
@@ -146,15 +146,15 @@ func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, usern
 	if newUsername == username && newEmail == email {
 		return nil
 	}
-	var userSlice []models.User
+	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, newUsername, newEmail)
-	userSlice, err := USC.PRepository.ReadUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}
 	for _, user := range userSlice {
-		if user.ID == userId {
+		if user.Id == userId {
 			continue
 		}
 		if user.Username == newUsername {
