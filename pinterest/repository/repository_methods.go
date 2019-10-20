@@ -104,3 +104,11 @@ func (RS *RepositoryStruct) DBReadDataString(executeQuery string, params []inter
 	}
 	return stringSlice, nil
 }
+
+func (RS *RepositoryStruct) DELETE_SESSION(executeQuery string, params []interface{}) error {
+	_, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return err
+	}
+	return nil
+}

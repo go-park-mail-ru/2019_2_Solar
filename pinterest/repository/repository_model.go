@@ -15,4 +15,6 @@ type RepositoryInterface interface {
 	DBReadDataUser(executeQuery string, params []interface{}) ([]models.User, error)
 	DBReadDataUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
 	DBReadDataString(executeQuery string, params []interface{}) ([]string, error)
+
+	DELETE_SESSION(executeQuery string, params []interface{}) (error)
 }
