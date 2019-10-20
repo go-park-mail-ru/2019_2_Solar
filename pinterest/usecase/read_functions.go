@@ -35,3 +35,13 @@ func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error
 	}
 	return userSlice[0], nil
 }
+
+func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
+	var err error
+
+	users, err := USC.PRepository.DBReadDataUser(consts.SelectAllUsers, nil)
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}

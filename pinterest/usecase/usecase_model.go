@@ -19,6 +19,7 @@ type UsecaseInterface interface {
 
 	ReadUserStructByEmail(email string) (models.User, error)
 	ReadUserIdByEmail(email string) (string, error)
+	GetAllUsers() ([]models.User, error)
 
 	RegDataValidationCheck(newUser *models.UserReg) error
 	RegEmailIsUnique(email string) (bool, error)
@@ -30,4 +31,8 @@ type UsecaseInterface interface {
 	UpdateUser(user models.User, userId uint64) (string, error)
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
+
+	//SearchCookie(r *http.Request) (*http.Cookie, error)
+
+	DeleteOldUserSession(sessionKey string) error
 }

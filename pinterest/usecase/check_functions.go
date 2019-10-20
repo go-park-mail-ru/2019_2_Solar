@@ -94,7 +94,7 @@ func (USC *UsecaseStruct) RegUsernameIsUnique(username string) (bool, error) {
 	var str []string
 	var params []interface{}
 	params = append(params, username)
-	str, err := USC.PRepository.DBReadDataString(consts.ReadUserIdByEmailSQLQuery, params)
+	str, err := USC.PRepository.DBReadDataString(consts.SelectUserUsernameByUsername, params)
 	if err != nil || len(str) > 1 {
 		return false, err
 	}
