@@ -40,7 +40,7 @@ func TestPinterestUsecase_InsertNewUser(t *testing.T) {
 		var params []interface{}
 		params = append(params, user.Username, user.Email, user.Password)
 
-		repo.EXPECT().WriteData(consts.InsertRegistrationQuery, params).Return("1", nil)
+		repo.EXPECT().Insert(consts.INSERTRegistration, params).Return("1", nil)
 
 		newUserId, err := us.InsertNewUser(user.Username, user.Email, user.Password)
 
@@ -68,7 +68,7 @@ func TestPinterestUsecase_CreateNewUserSession(t *testing.T) {
 
 	}
 	t.Run("success", func(t *testing.T) {
-		repo.EXPECT().WriteData(consts.InsertSessionQuery, gomock.Any()).Return("1", nil)
+		repo.EXPECT().Insert(consts.INSERTSession, gomock.Any()).Return("1", nil)
 		cookie, err := us.CreateNewUserSession(strconv.Itoa(int(user.ID)))
 
 		assert.NoError(t, err)
@@ -146,12 +146,11 @@ func TestPinterestUsecase_EditUsernameEmailIsUnique(t *testing.T) {
 		var params []interface{}
 		params = append(params, newUsername, newEmail)
 
-		repo.EXPECT().ReadUser(consts.ReadUserIdByUsernameEmailSQLQuery, params).Return(nil, nil)
+		repo.EXPECT().SelectFullUser(consts.SELECTUserIdUsernameEmailByUsernameOrEmail, params).Return(nil, nil)
 
-		isUnique, err := us.EditUsernameEmailIsUnique(newUsername, newEmail, user.Username, user.Email, user.ID)
+		err := us.EditUsernameEmailIsUnique(newUsername, newEmail, user.Username, user.Email, user.ID)
 
 		assert.NoError(t, err)
-		assert.True(t, isUnique)
 	})
 }
 /*
@@ -272,7 +271,6 @@ func TestPinterestUsecase_EditProfileDataValidationCheck(t *testing.T) {
 			Email:    "email@mail.su",
 			Age:      "42",
 			Status:   "Ok",
-			IsActive: "True",
 		}
 
 		err := us.EditProfileDataValidationCheck(&newProfile)
@@ -327,7 +325,7 @@ func TestPinterestUsecase_GetAllUsers(t *testing.T) {
 		var params []interface{}
 		params = append(params, newUsername, newEmail)
 
-		repo.EXPECT().ReadUser(consts.SelectAllUsers, nil).Return(expectedUsers, nil)
+		repo.EXPECT().SelectFullUser(consts.SELECTAllUsers, nil).Return(expectedUsers, nil)
 
 		users, err := us.GetAllUsers()
 
@@ -383,7 +381,7 @@ func TestPinterestUsecase_GetUserByID(t *testing.T) {
 		var params []interface{}
 		params = append(params, email)
 
-		repo.EXPECT().ReadUser(consts.ReadUserByEmailSQLQuery, params).Return(expectedUsers, nil)
+		repo.EXPECT().SelectFullUser(consts.SELECTUserByEmail, params).Return(expectedUsers, nil)
 
 		user, err := us.ReadUserStructByEmail(email)
 
@@ -405,22 +403,32 @@ func TestPinterestUsecase_UpdateUser(t *testing.T) {
 	us.NewUseCase(&mutex, repo)
 
 	t.Run("success", func(t *testing.T) {
-		newProfile := models.User{
-			ID: 3,
-			Username: "Bogdan",
-			Email:    "something3@mail.ru",
+		newProfile := models.EditUserProfile{
+			Username: "Alcost",
+			Name:     "Alcost",
+			Surname:  "Filcost",
+			Password: "123ewrEW#",
+			Email:    "email@mail.su",
+			Age:      "42",
+			Status:   "Ok",
+		}
+		user := models.User{
+			ID:       0,
+			Username: "Vitaly",
+			Email:    "something@mail.ru",
 			Password: "123QWErty!",
 		}
+
 		var params []interface{}
 		params = append(params, newProfile.Username, newProfile.Email, newProfile.Password)
 
-		repo.EXPECT().WriteData(consts.InsertRegistrationQuery, params).Return("3", nil)
+		repo.EXPECT().Insert(consts.INSERTRegistration, params).Return("0", nil)
 
-		id, err := us.UpdateUser(newProfile, newProfile.ID)
+		id, err := us.SetUser(newProfile, user)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, id)
-		assert.Equal(t, id, strconv.Itoa(int(newProfile.ID)))
+		assert.Equal(t, id, strconv.Itoa(int(user.ID)))
 	})
 }
 

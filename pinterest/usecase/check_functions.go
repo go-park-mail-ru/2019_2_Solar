@@ -88,7 +88,7 @@ func (USC *UsecaseStruct) RegUsernameEmailIsUnique(username, email string) error
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
-	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SELECTUserIdUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, usern
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, newUsername, newEmail)
-	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SelectUserIdUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SELECTUserIdUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}

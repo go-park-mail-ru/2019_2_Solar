@@ -8,7 +8,7 @@ func (USC *UsecaseStruct) DeleteOldUserSession(sessionKey string) error {
 	var params []interface{}
 	params = append(params, sessionKey)
 
-	err := USC.PRepository.DeleteSession(consts.DeleteSessionByKey, params)
+	err := USC.PRepository.DeleteSession(consts.DELETESessionByKey, params)
 	if err != nil {
 		return err
 	}

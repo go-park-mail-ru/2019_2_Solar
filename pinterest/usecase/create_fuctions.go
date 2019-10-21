@@ -35,7 +35,7 @@ func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error
 	params = append(params, userId)
 	params = append(params, cookieSessionKey.Value)
 	params = append(params, cookieSessionKey.Expires)
-	_, err = USC.PRepository.Insert(consts.InsertSession, params)
+	_, err = USC.PRepository.Insert(consts.INSERTSession, params)
 	if err != nil {
 		return *cookieSessionKey, err
 	}
@@ -75,7 +75,7 @@ func SecureRandomBytes(length int) ([]byte, error) {
 func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
-	lastId, err := USC.PRepository.Insert(consts.InsertRegistration, params)
+	lastId, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
 	if err != nil {
 		return "", err
 	}
@@ -110,7 +110,7 @@ func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.Us
 		user.Age =uint(age)
 	}
 	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
-	editUsers, err := USC.PRepository.Update(consts.UpdateUserByID, params)
+	editUsers, err := USC.PRepository.Update(consts.UPDATEUserByID, params)
 	if err != nil {
 		return 0, err
 	}
@@ -120,7 +120,7 @@ func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.Us
 func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
 	var params []interface{}
 	params = append(params, fileName, idUser)
-	editUsers, err := USC.PRepository.Update(consts.UpdateUserAvatarDirByID, params)
+	editUsers, err := USC.PRepository.Update(consts.UPDATEUserAvatarDirByID, params)
 	if err != nil {
 		return 0, err
 	}

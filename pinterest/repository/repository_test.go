@@ -44,7 +44,7 @@ func TestRepositoryStruct_WriteData(t *testing.T) {
 	}
 	var params []interface{}
 	params = append(params, username, email, password)
-	id, err := repo.WriteData(consts.InsertRegistrationQuery, params)
+	id, err := repo.Insert(consts.InsertRegistration, params)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -95,7 +95,7 @@ func TestRepositoryStruct_ReadUser(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, email)
-	user, err := repo.ReadUser(consts.ReadUserByEmailSQLQuery, params)
+	user, err := repo.SelectFullUser(consts.SelectUserByEmail, params)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -141,7 +141,7 @@ func TestRepositoryStruct_ReadUserCookies(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, CookieValue)
-	cookie, err := repo.ReadUserCookies(consts.ReadCookiesExpirationByCookieValueSQLQuery, params)
+	cookie, err := repo.SelectUserCookies(consts.SelectCookiesExpirationByCookieValue, params)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -188,7 +188,7 @@ func TestRepositoryStruct_ReadOneCol(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, email)
-	id, err := repo.ReadOneCol(consts.ReadUserIdByEmailSQLQuery, params)
+	id, err := repo.SelectOneCol(consts.SelectUserIdByEmail, params)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
