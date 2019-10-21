@@ -7,7 +7,7 @@ const (
 	SelectUserUsernameByUsername = "SELECT u.username from sunrise.users as u where u.username = $1"
 	SelectAllUsers = "SELECT * from sunrise.users"
 
-	InsertRegistrationQuery           = "INSERT INTO sunrise.users (username, email, hashpassword)	values ($1,$2,$3) RETURNING id"
+	InsertRegistrationQuery           = "INSERT INTO sunrise.users (username, email, hashpassword) values ($1,$2,$3) RETURNING id"
 	InsertSessionQuery                = "INSERT INTO sunrise.usersessions (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	ReadUserByCookieValueSQLQuery = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
