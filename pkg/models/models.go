@@ -21,6 +21,12 @@ type UserReg struct {
 	Username string `json:"username"`
 }
 
+type UserUnique struct {
+	Id       uint64
+	Email    string
+	Username string
+}
+
 type UserLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -34,7 +40,6 @@ type EditUserProfile struct {
 	Email    string `json:"email"`
 	Age      string `json:"age"`
 	Status   string `json:"status"`
-	IsActive string `json:"isactive"`
 }
 
 type User struct {

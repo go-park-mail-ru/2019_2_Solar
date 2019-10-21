@@ -31,22 +31,9 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.RegDataValidationCheck(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	//ОБЪЕДЕНИТЬ ФУНКЦИИ ПРОВЕРКИ УНИКАЛЬНОСТИ (2 sql запроса слишком жирно)
-	if check, err := h.PUsecase.RegUsernameIsUnique(newUserReg.Username); err != nil || !check {
-		data := h.PUsecase.SetJsonData(newUserReg, "Not unique username")
-		err = encoder.Encode(data)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if check, err := h.PUsecase.RegEmailIsUnique(newUserReg.Email); err != nil || !check {
-		data := h.PUsecase.SetJsonData(newUserReg, "Not unique email")
-		err = encoder.Encode(data)
-		if err != nil {
-			return err
-		}
-		return nil
+
+	if err := h.PUsecase.RegUsernameEmailIsUnique(newUserReg.Username, newUserReg.Email); err != nil {
+		return err
 	}
 
 	newUserId, err := h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
@@ -76,7 +63,6 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
-
 	if user := ctx.Get("User"); user != nil {
 		data := h.PUsecase.SetJsonData(user.(models.User), "OK")
 		err := encoder.Encode(data)
@@ -86,10 +72,8 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		return nil
 	}
 	decoder := json.NewDecoder(ctx.Request().Body)
-
 	newUserLogin := new(models.UserLogin)
-	err = decoder.Decode(newUserLogin)
-	if err != nil {
+	if err := decoder.Decode(newUserLogin); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	var User models.User

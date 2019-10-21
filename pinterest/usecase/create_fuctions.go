@@ -1,11 +1,17 @@
 package usecase
 
 import (
+	"crypto/md5"
 	"crypto/rand"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/labstack/echo"
+	"io"
 	"net/http"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -29,7 +35,7 @@ func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error
 	params = append(params, userId)
 	params = append(params, cookieSessionKey.Value)
 	params = append(params, cookieSessionKey.Expires)
-	_, err = USC.PRepository.WriteData(consts.InsertSessionQuery, params)
+	_, err = USC.PRepository.Insert(consts.InsertSession, params)
 	if err != nil {
 		return *cookieSessionKey, err
 	}
@@ -69,21 +75,86 @@ func SecureRandomBytes(length int) ([]byte, error) {
 func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
-	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	lastId, err := USC.PRepository.Insert(consts.InsertRegistration, params)
 	if err != nil {
 		return "", err
 	}
 	return lastId, nil
 }
 
-func (USC UsecaseStruct)UpdateUser(user models.User, userId uint64) (string, error) {
+func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
 	var params []interface{}
-	params = append(params, user.Username)
-	params = append(params, user.Email)
-	params = append(params, user.Password)
-	lastId, err := USC.PRepository.WriteData(consts.InsertRegistrationQuery, params)
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
+	if newUser.Name != "" {
+		user.Name = newUser.Name
+	}
+	if newUser.Surname != "" {
+		user.Surname = newUser.Surname
+	}
+	if newUser.Username != "" {
+		user.Username = newUser.Username
+	}
+	if newUser.Password != "" {
+		user.Password = newUser.Password
+	}
+	if newUser.Email != "" {
+		user.Email = newUser.Email
+	}
+	if newUser.Age != "" {
+		age, err := strconv.Atoi(newUser.Age)
+		if err != nil {
+			return 0, err
+		}
+		user.Age =uint(age)
+	}
+	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
+	editUsers, err := USC.PRepository.Update(consts.UpdateUserByID, params)
 	if err != nil {
+		return 0, err
+	}
+	return editUsers, nil
+}
+
+func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
+	var params []interface{}
+	params = append(params, fileName, idUser)
+	editUsers, err := USC.PRepository.Update(consts.UpdateUserAvatarDirByID, params)
+	if err != nil {
+		return 0, err
+	}
+	return editUsers, nil
+}
+
+func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
+	hasher := md5.New()
+	if _, err := io.Copy(hasher, fileByte); err != nil {
 		return "", err
 	}
-	return lastId, nil
+	fileHash := string(hasher.Sum(nil))
+	fileHash = fmt.Sprintf("%x", fileHash)
+	return fileHash, nil
+}
+
+func (USC *UsecaseStruct) CreateDir(folder string) error {
+	if err := os.MkdirAll(folder, 0777); err != nil {
+		return err
+	}
+	return nil
+}
+func (USC *UsecaseStruct) CreatePictureFile(fileName string, fileByte io.Reader) (Err error) {
+	newFile, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := newFile.Close(); err != nil {
+			Err = err
+		}
+	}()
+	if _, err = io.Copy(newFile, fileByte); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	return nil
 }

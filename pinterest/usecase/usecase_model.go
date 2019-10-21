@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"io"
 	"net/http"
 	"sync"
 )
@@ -22,17 +23,20 @@ type UsecaseInterface interface {
 	GetAllUsers() ([]models.User, error)
 
 	RegDataValidationCheck(newUser *models.UserReg) error
-	RegEmailIsUnique(email string) (bool, error)
-	RegUsernameIsUnique(username string) (bool, error)
+	RegUsernameEmailIsUnique(username, email string) error
 
 	EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error
-	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) (bool, error)
+	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
 
-	UpdateUser(user models.User, userId uint64) (string, error)
+	SetUserAvatarDir(idUser, fileName string) (int, error)
+	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
 	InsertNewUser(username, email, password string) (string, error)
 	CreateNewUserSession(userId string) (http.Cookie, error)
 
-	//SearchCookie(r *http.Request) (*http.Cookie, error)
 
+	ExtractFormatFile(fileName string) (string, error)
 	DeleteOldUserSession(sessionKey string) error
+	CalculateMD5FromFile (fileByte io.Reader) (string, error)
+	CreateDir(folder string) error
+	CreatePictureFile(fileName string, fileByte io.Reader) (Err error)
 }
