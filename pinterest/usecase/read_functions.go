@@ -6,7 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
+func (USC UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
 	var str []string
 	var params []interface{}
 	params = append(params, email)
@@ -21,7 +21,7 @@ func (USC UsecaseStruct) ReadUserIdByEmail(email string) (string, error) {
 	return str[0], nil
 }
 
-func (USC UsecaseStruct) ReadUserStructByEmail(email string) (models.User, error) {
+func (USC UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
 	var userSlice []models.User
 	var params []interface{}
 	params = append(params, email)

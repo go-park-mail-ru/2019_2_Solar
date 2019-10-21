@@ -18,25 +18,25 @@ type UsecaseInterface interface {
 	SetJsonData(data interface{}, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error)
 
-	ReadUserStructByEmail(email string) (models.User, error)
-	ReadUserIdByEmail(email string) (string, error)
+	GetUserByEmail(email string) (models.User, error)
+	GetUserIdByEmail(email string) (string, error)
 	GetAllUsers() ([]models.User, error)
 
-	RegDataValidationCheck(newUser *models.UserReg) error
-	RegUsernameEmailIsUnique(username, email string) error
+	CheckRegData(newUser *models.UserReg) error
+	CheckRegUsernameEmailIsUnique(username, email string) error
 
-	EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error
-	EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
+	CheckProfileData(newProfileUser *models.EditUserProfile) error
+	CheckUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
 
 	SetUserAvatarDir(idUser, fileName string) (int, error)
 	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
-	InsertNewUser(username, email, password string) (string, error)
-	CreateNewUserSession(userId string) (http.Cookie, error)
+	AddNewUser(username, email, password string) (string, error)
+	AddNewUserSession(userId string) (http.Cookie, error)
 
 
 	ExtractFormatFile(fileName string) (string, error)
-	DeleteOldUserSession(sessionKey string) error
+	RemoveOldUserSession(sessionKey string) error
 	CalculateMD5FromFile (fileByte io.Reader) (string, error)
-	CreateDir(folder string) error
-	CreatePictureFile(fileName string, fileByte io.Reader) (Err error)
+	AddDir(folder string) error
+	AddPictureFile(fileName string, fileByte io.Reader) (Err error)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 )
 
-func (USC *UsecaseStruct) RegDataValidationCheck(newUser *models.UserReg) error {
+func (USC *UsecaseStruct) CheckRegData(newUser *models.UserReg) error {
 	if err := EmailCheck(newUser.Email); err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func StatusCheck(status string) error {
 	return errors.New("incorrect status")
 }
 
-func (USC *UsecaseStruct) RegUsernameEmailIsUnique(username, email string) error {
+func (USC *UsecaseStruct) CheckRegUsernameEmailIsUnique(username, email string) error {
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
@@ -103,7 +103,7 @@ func (USC *UsecaseStruct) RegUsernameEmailIsUnique(username, email string) error
 	return nil
 }
 
-func (USC *UsecaseStruct) EditProfileDataValidationCheck(newProfileUser *models.EditUserProfile) error {
+func (USC *UsecaseStruct) CheckProfileData(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {
 		if err := EmailCheck(newProfileUser.Email); err != nil {
 			return err
@@ -142,7 +142,7 @@ func (USC *UsecaseStruct) EditProfileDataValidationCheck(newProfileUser *models.
 	return nil
 }
 
-func (USC *UsecaseStruct) EditUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error {
+func (USC *UsecaseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error {
 	if newUsername == username && newEmail == email {
 		return nil
 	}

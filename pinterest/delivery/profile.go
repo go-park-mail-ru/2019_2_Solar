@@ -53,10 +53,10 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return err
 	}
 
-	if err := h.PUsecase.EditProfileDataValidationCheck(newUserProfile); err != nil {
+	if err := h.PUsecase.CheckProfileData(newUserProfile); err != nil {
 		return err
 	}
-	if err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil {
+	if err := h.PUsecase.CheckUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil {
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	if err != nil {
 		return err
 	}
-	if err = h.PUsecase.CreateDir("static/picture/" + fileHash[:2]); err != nil {
+	if err = h.PUsecase.AddDir("static/picture/" + fileHash[:2]); err != nil {
 		return err
 	}
 	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
@@ -115,7 +115,7 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 		return err
 	}
 	fileName := "static/picture/" + fileHash[:2] + "/" + fileHash + formatFile
-	if err = h.PUsecase.CreatePictureFile(fileName, &buf); err != nil {
+	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
 		return
 	}
 	if _, err := h.PUsecase.SetUserAvatarDir(strconv.Itoa(int(user.ID)), fileName); err != nil {

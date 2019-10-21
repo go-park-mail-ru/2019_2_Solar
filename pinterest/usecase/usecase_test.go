@@ -42,7 +42,7 @@ func TestPinterestUsecase_InsertNewUser(t *testing.T) {
 
 		repo.EXPECT().Insert(consts.INSERTRegistration, params).Return("1", nil)
 
-		newUserId, err := us.InsertNewUser(user.Username, user.Email, user.Password)
+		newUserId, err := us.AddNewUser(user.Username, user.Email, user.Password)
 
 		assert.NotNil(t, newUserId)
 		assert.Equal(t, newUserId, "1")
@@ -69,7 +69,7 @@ func TestPinterestUsecase_CreateNewUserSession(t *testing.T) {
 	}
 	t.Run("success", func(t *testing.T) {
 		repo.EXPECT().Insert(consts.INSERTSession, gomock.Any()).Return("1", nil)
-		cookie, err := us.CreateNewUserSession(strconv.Itoa(int(user.ID)))
+		cookie, err := us.AddNewUserSession(strconv.Itoa(int(user.ID)))
 
 		assert.NoError(t, err)
 		assert.NotNil(t, cookie)
@@ -101,9 +101,9 @@ func TestPinterestUsecase_DeleteOldUserSession(t *testing.T) {
 		var params []interface{}
 		params = append(params, sessionKey)
 
-		repo.EXPECT().DeleteSession(consts.DeleteSessionByKey, params).Return(nil)
+		repo.EXPECT().DeleteSession(consts.DELETESessionByKey, params).Return(nil)
 
-		err := us.DeleteOldUserSession(sessionKey)
+		err := us.RemoveOldUserSession(sessionKey)
 
 		assert.NoError(t, err)
 	})
@@ -113,9 +113,9 @@ func TestPinterestUsecase_DeleteOldUserSession(t *testing.T) {
 		var params []interface{}
 		params = append(params, sessionKey)
 
-		repo.EXPECT().DeleteSession(consts.DeleteSessionByKey, params).Return(errors.New("incorrect key"))
+		repo.EXPECT().DeleteSession(consts.DELETESessionByKey, params).Return(errors.New("incorrect key"))
 
-		err := us.DeleteOldUserSession(sessionKey)
+		err := us.RemoveOldUserSession(sessionKey)
 
 		assert.Error(t, err)
 	})
@@ -148,7 +148,7 @@ func TestPinterestUsecase_EditUsernameEmailIsUnique(t *testing.T) {
 
 		repo.EXPECT().SelectFullUser(consts.SELECTUserIdUsernameEmailByUsernameOrEmail, params).Return(nil, nil)
 
-		err := us.EditUsernameEmailIsUnique(newUsername, newEmail, user.Username, user.Email, user.ID)
+		err := us.CheckUsernameEmailIsUnique(newUsername, newEmail, user.Username, user.Email, user.ID)
 
 		assert.NoError(t, err)
 	})
@@ -273,7 +273,7 @@ func TestPinterestUsecase_EditProfileDataValidationCheck(t *testing.T) {
 			Status:   "Ok",
 		}
 
-		err := us.EditProfileDataValidationCheck(&newProfile)
+		err := us.CheckProfileData(&newProfile)
 
 		assert.NoError(t, err)
 	})
@@ -383,7 +383,7 @@ func TestPinterestUsecase_GetUserByID(t *testing.T) {
 
 		repo.EXPECT().SelectFullUser(consts.SELECTUserByEmail, params).Return(expectedUsers, nil)
 
-		user, err := us.ReadUserStructByEmail(email)
+		user, err := us.GetUserByEmail(email)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, user)

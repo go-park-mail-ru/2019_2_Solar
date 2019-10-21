@@ -21,7 +21,7 @@ func (USC *UsecaseStruct) NewUseCase(mu *sync.Mutex, IRepository repository.Repo
 	USC.PRepository = IRepository
 }
 
-func (USC UsecaseStruct) CreateNewUserSession(userId string) (http.Cookie, error) {
+func (USC UsecaseStruct) AddNewUserSession(userId string) (http.Cookie, error) {
 	sessionKeyValue, err := GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
@@ -72,7 +72,7 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC UsecaseStruct) InsertNewUser(username, email, password string) (string, error) {
+func (USC UsecaseStruct) AddNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
 	lastId, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
@@ -137,13 +137,13 @@ func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, erro
 	return fileHash, nil
 }
 
-func (USC *UsecaseStruct) CreateDir(folder string) error {
+func (USC *UsecaseStruct) AddDir(folder string) error {
 	if err := os.MkdirAll(folder, 0777); err != nil {
 		return err
 	}
 	return nil
 }
-func (USC *UsecaseStruct) CreatePictureFile(fileName string, fileByte io.Reader) (Err error) {
+func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err error) {
 	newFile, err := os.Create(fileName)
 	if err != nil {
 		return err

@@ -28,20 +28,20 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	if err := h.PUsecase.RegDataValidationCheck(newUserReg); err != nil {
+	if err := h.PUsecase.CheckRegData(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
-	if err := h.PUsecase.RegUsernameEmailIsUnique(newUserReg.Username, newUserReg.Email); err != nil {
+	if err := h.PUsecase.CheckRegUsernameEmailIsUnique(newUserReg.Username, newUserReg.Email); err != nil {
 		return err
 	}
 
-	newUserId, err := h.PUsecase.InsertNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
+	newUserId, err := h.PUsecase.AddNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
 	if err != nil {
 		return err
 	}
 
-	cookies, err := h.PUsecase.CreateNewUserSession(newUserId)
+	cookies, err := h.PUsecase.AddNewUserSession(newUserId)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
@@ -77,7 +77,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	var User models.User
-	User, err = h.PUsecase.ReadUserStructByEmail(newUserLogin.Email)
+	User, err = h.PUsecase.GetUserByEmail(newUserLogin.Email)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
-	cookies, err := h.PUsecase.CreateNewUserSession(strconv.Itoa(int(User.ID)))
+	cookies, err := h.PUsecase.AddNewUserSession(strconv.Itoa(int(User.ID)))
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
@@ -113,7 +113,7 @@ func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) error {
 		return err
 	}
 
-	err = h.PUsecase.DeleteOldUserSession(sessionKey.Value)
+	err = h.PUsecase.RemoveOldUserSession(sessionKey.Value)
 	if err != nil {
 		return err
 	}
