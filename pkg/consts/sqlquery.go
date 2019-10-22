@@ -19,4 +19,7 @@ const (
 		" U.avatardir, U.isactive from sunrise.Users as U where U.email = $1"
 
 	DELETESessionByKey = "DELETE FROM sunrise.usersessions as s WHERE s.cookiesvalue = $1"
+
+	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
+	INSERTCategory = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
 )

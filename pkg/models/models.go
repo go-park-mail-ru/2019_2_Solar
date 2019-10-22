@@ -65,3 +65,24 @@ type DataJSON struct {
 type OutJSON struct {
 	BodyJSON interface{} `json:"body"`
 }
+
+type NewPin struct {
+	Title string `json:"title"`
+	Description string `json:"description"`
+}
+
+type NewBoard struct {
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Category string `json:"category"`
+}
+
+type Board struct {
+	ID			uint64`json:"id"`
+	OwnerID 	uint64 `json:"owner_id"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
+	Category 	string `json:"category"`
+	CreatedTime time.Time `json:"created_time"`
+	IsDeleted 	bool `json:"is_deleted"`
+}

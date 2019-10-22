@@ -17,4 +17,7 @@ var (
 	SurnameIsCorrect = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
 	StatusIsCorrect  = regexp.MustCompile(`^.*$`)
 	AgeIsCorrect     = regexp.MustCompile(`^[0-9]{1,3}$`)
+
+	BoardTitle = regexp.MustCompile(`^.{3,50}$`)
+	BoardDescription = regexp.MustCompile(`^.{0,300}$`)
 )

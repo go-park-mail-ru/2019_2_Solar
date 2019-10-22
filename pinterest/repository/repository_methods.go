@@ -34,6 +34,15 @@ func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (s
 	return strconv.Itoa(int(id)), nil
 }
 
+func (RS *RepositoryStruct) InsertCategory(executeQuery string, params []interface{}) (string, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
+	if err != nil {
+		return "", err
+	}
+	return strconv.Itoa(int(id)), nil
+}
+
 func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (int, error) {
 	result, err := RS.DataBase.Exec(executeQuery, params...)
 	if err != nil {
@@ -153,4 +162,27 @@ func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interfac
 		return err
 	}
 	return nil
+}
+
+func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interface{}) (categories []string, Err error) {
+	categories = make([]string, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return categories, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	var category *string
+	for rows.Next() {
+		err := rows.Scan(&category)
+		if err != nil {
+			return categories, err
+		}
+
+		categories = append(categories, *category)
+	}
+	return categories, nil
 }

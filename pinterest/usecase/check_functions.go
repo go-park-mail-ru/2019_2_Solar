@@ -84,6 +84,33 @@ func StatusCheck(status string) error {
 	return errors.New("incorrect status")
 }
 
+func CheckBoardTitle(title string) error {
+	if validation.BoardTitle.MatchString(title) {
+		return nil
+	}
+	return errors.New("incorrect title")
+}
+
+func CheckBoardDescription(description string) error {
+	if validation.BoardDescription.MatchString(description) {
+		return nil
+	}
+	return  errors.New("incorrect description")
+}
+
+func (USC *UsecaseStruct) CheckBoardCategory(category string) error {
+	var params []interface{}
+	params = append(params, category)
+	categories, err := USC.PRepository.SelectCategory(consts.SELECTCategoryByName, params)
+	if err != nil {
+		return err
+	}
+	if len(categories) != 1 {
+		return errors.New("incorrect category")
+	}
+	return nil
+}
+
 func (USC *UsecaseStruct) CheckRegUsernameEmailIsUnique(username, email string) error {
 	var userSlice []models.UserUnique
 	var params []interface{}
@@ -99,6 +126,19 @@ func (USC *UsecaseStruct) CheckRegUsernameEmailIsUnique(username, email string) 
 		if user.Email == email {
 			return errors.New("email is not unique")
 		}
+	}
+	return nil
+}
+
+func (USC *UsecaseStruct) CheckBoardData(newBoard models.NewBoard) error {
+	if err := CheckBoardTitle(newBoard.Title); err != nil {
+		return err
+	}
+	if err := CheckBoardDescription(newBoard.Description); err != nil {
+		return  err
+	}
+	if err := USC.CheckBoardCategory(newBoard.Category); err != nil {
+		return err
 	}
 	return nil
 }
