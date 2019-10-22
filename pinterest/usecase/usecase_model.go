@@ -29,6 +29,7 @@ type UsecaseInterface interface {
 	CheckUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error
 
 	CheckBoardData(newBoard models.NewBoard) error
+	CheckPinData(newPin models.NewPin) error
 
 	SetUserAvatarDir(idUser, fileName string) (int, error)
 	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
@@ -37,6 +38,7 @@ type UsecaseInterface interface {
 	AddNewUserSession(userId string) (http.Cookie, error)
 
 	AddBoard(newBoard models.Board) (uint64, error)
+	AddPin(newPin models.Pin) (uint64, error)
 
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error

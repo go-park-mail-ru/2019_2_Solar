@@ -34,7 +34,16 @@ func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (s
 	return strconv.Itoa(int(id)), nil
 }
 
-func (RS *RepositoryStruct) InsertCategory(executeQuery string, params []interface{}) (string, error) {
+func (RS *RepositoryStruct) InsertBoard(executeQuery string, params []interface{}) (string, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
+	if err != nil {
+		return "", err
+	}
+	return strconv.Itoa(int(id)), nil
+}
+
+func (RS *RepositoryStruct) InsertPin(executeQuery string, params []interface{}) (string, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {

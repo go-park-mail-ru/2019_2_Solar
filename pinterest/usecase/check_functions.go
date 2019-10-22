@@ -98,6 +98,20 @@ func CheckBoardDescription(description string) error {
 	return  errors.New("incorrect description")
 }
 
+func CheckPinTitle(title string) error {
+	if validation.PinTitle.MatchString(title) {
+		return nil
+	}
+	return errors.New("incorrect title")
+}
+
+func CheckPinDescription(description string) error {
+	if validation.PinDescription.MatchString(description) {
+		return nil
+	}
+	return  errors.New("incorrect description")
+}
+
 func (USC *UsecaseStruct) CheckBoardCategory(category string) error {
 	var params []interface{}
 	params = append(params, category)
@@ -142,6 +156,16 @@ func (USC *UsecaseStruct) CheckBoardData(newBoard models.NewBoard) error {
 	}
 	return nil
 }
+
+ func (USC *UsecaseStruct) CheckPinData(newPin models.NewPin) error {
+	 if err := CheckPinTitle(newPin.Title); err != nil {
+		 return err
+	 }
+	 if err := CheckPinDescription(newPin.Description); err != nil {
+		 return  err
+	 }
+	 return nil
+ }
 
 func (USC *UsecaseStruct) CheckProfileData(newProfileUser *models.EditUserProfile) error {
 	if newProfileUser.Email != "" {

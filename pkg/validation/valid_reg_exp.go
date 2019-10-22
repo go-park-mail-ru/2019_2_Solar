@@ -20,4 +20,7 @@ var (
 
 	BoardTitle = regexp.MustCompile(`^.{3,50}$`)
 	BoardDescription = regexp.MustCompile(`^.{0,300}$`)
+
+	PinTitle = regexp.MustCompile(`^.{3,30}$`)
+	PinDescription = regexp.MustCompile(`^.{0,200}$`)
 )

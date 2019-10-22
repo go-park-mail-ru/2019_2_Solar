@@ -66,11 +66,6 @@ type OutJSON struct {
 	BodyJSON interface{} `json:"body"`
 }
 
-type NewPin struct {
-	Title string `json:"title"`
-	Description string `json:"description"`
-}
-
 type NewBoard struct {
 	Title string `json:"title"`
 	Description string `json:"description"`
@@ -78,11 +73,30 @@ type NewBoard struct {
 }
 
 type Board struct {
-	ID			uint64`json:"id"`
+	ID			uint64 `json:"id"`
 	OwnerID 	uint64 `json:"owner_id"`
 	Title 		string `json:"title"`
 	Description string `json:"description"`
 	Category 	string `json:"category"`
+	CreatedTime time.Time `json:"created_time"`
+	IsDeleted 	bool `json:"is_deleted"`
+}
+
+type NewPin struct {
+	BoardID		uint64 `json:"board_id"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
+	PinDir 		string `json:"pin_dir"`
+}
+
+type Pin struct {
+	ID			uint64 `json:"id"`
+	OwnerID 	uint64 `json:"owner_id"`
+	AuthorID	uint64 `json:"author_id"`
+	BoardID		uint64 `json:"board_id"`
+	PinDir		string `json:"pin_dir"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
 	CreatedTime time.Time `json:"created_time"`
 	IsDeleted 	bool `json:"is_deleted"`
 }

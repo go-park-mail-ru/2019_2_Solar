@@ -162,7 +162,21 @@ func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (E
 func (USC *UsecaseStruct) AddBoard(Board models.Board) (uint64, error) {
 	var params []interface{}
 	params = append(params, Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
-	lastId, err := USC.PRepository.InsertCategory(consts.INSERTCategory, params)
+	lastId, err := USC.PRepository.InsertBoard(consts.INSERTBoard, params)
+	if err != nil {
+		return 0, err
+	}
+	id, err := strconv.Atoi(lastId)
+	if err != nil {
+		return 0, nil
+	}
+	return uint64(id), nil
+}
+
+func (USC *UsecaseStruct) AddPin(Pin models.Pin) (uint64, error) {
+	var params []interface{}
+	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
+	lastId, err := USC.PRepository.InsertPin(consts.INSERTPin, params)
 	if err != nil {
 		return 0, err
 	}

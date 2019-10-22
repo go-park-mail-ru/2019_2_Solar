@@ -20,5 +20,6 @@ type RepositoryInterface interface {
 	DeleteSession(executeQuery string, params []interface{}) error
 
 	SelectCategory(executeQuery string, params []interface{}) ([]string, error)
-	InsertCategory(executeQuery string, params []interface{}) (string, error)
+	InsertBoard(executeQuery string, params []interface{}) (string, error)
+	InsertPin(executeQuery string, params []interface{}) (string, error)
 }

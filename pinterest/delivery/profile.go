@@ -116,7 +116,7 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	}
 	fileName := "static/ava/" + fileHash[:2] + "/" + fileHash + formatFile
 	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
-		return
+		return err
 	}
 	if _, err := h.PUsecase.SetUserAvatarDir(strconv.Itoa(int(user.ID)), fileName); err != nil {
 		return err
