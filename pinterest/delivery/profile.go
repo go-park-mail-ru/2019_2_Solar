@@ -107,14 +107,14 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	if err != nil {
 		return err
 	}
-	if err = h.PUsecase.AddDir("static/picture/" + fileHash[:2]); err != nil {
+	if err = h.PUsecase.AddDir("static/ava/" + fileHash[:2]); err != nil {
 		return err
 	}
 	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
 	if err != nil {
 		return err
 	}
-	fileName := "static/picture/" + fileHash[:2] + "/" + fileHash + formatFile
+	fileName := "static/ava/" + fileHash[:2] + "/" + fileHash + formatFile
 	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
 		return
 	}

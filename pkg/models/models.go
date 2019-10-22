@@ -51,9 +51,10 @@ type User struct {
 	Email     string `json:"email"`
 	Age       uint   `json:"age"`
 	Status    string `json:"status"`
-	AvatarDir string `json:"-"`
-	IsActive  bool   `json:"isactive"`
+	AvatarDir string `json:"avatar_dir"`
+	IsActive  bool   `json:"is_active"`
 }
+
 
 type DataJSON struct {
 	UserJSON  interface{} `json:"user,omitempty"`
