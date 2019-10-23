@@ -100,3 +100,16 @@ type Pin struct {
 	CreatedTime time.Time `json:"created_time"`
 	IsDeleted 	bool `json:"is_deleted"`
 }
+
+type NewNotice struct {
+	Message string `json:"message"`
+}
+
+type Notice struct {
+	ID uint64 `json:"id"`
+	UserID uint64 `json:"user_id"`
+	ReceiverID uint64 `json:"receiver_id"`
+	Message string `json:"message"`
+	CreatedTime time.Time `json:"created_time"`
+	IsRead 	bool `json:"is_read"`
+}

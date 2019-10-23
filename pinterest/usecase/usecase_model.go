@@ -44,6 +44,8 @@ type UsecaseInterface interface {
 	GetPin(pinID uint64) (models.Pin, error)
 	GetPins(boardID uint64) ([]models.Pin, error)
 
+	AddNotice(newNotice models.Notice) (uint64, error)
+
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error
 	CalculateMD5FromFile (fileByte io.Reader) (string, error)

@@ -186,3 +186,17 @@ func (USC *UsecaseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	}
 	return uint64(id), nil
 }
+
+func (USC *UsecaseStruct) AddNotice(Notice models.Notice) (uint64, error) {
+	var params []interface{}
+	params = append(params, Notice.UserID, Notice.ReceiverID, Notice.Message, Notice.CreatedTime)
+	lastId, err := USC.PRepository.Insert(consts.INSERTNotice, params)
+	if err != nil {
+		return 0, err
+	}
+	id, err := strconv.Atoi(lastId)
+	if err != nil {
+		return 0, nil
+	}
+	return uint64(id), nil
+}

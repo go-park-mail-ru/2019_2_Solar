@@ -27,4 +27,6 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 
 	e.POST("/pin", h.HandleCreatePin)
 	e.GET( "/pin/:id", h.HandleGetPin)
+
+	e.POST( "/notice/:receiver_id", h.HandleCreateNotice)
 }
