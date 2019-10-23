@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -25,13 +26,43 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 
-	decoder := json.NewDecoder(ctx.Request().Body)
+	file, header, err := ctx.Request().FormFile("pinPicture")
+	if err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
 
+	jsonPin := ctx.Request().FormValue("pin")
 	newPin := new(models.NewPin)
 
-	if err := decoder.Decode(newPin); err != nil {
+	if err := json.Unmarshal([]byte(jsonPin), newPin); err != nil {
 		return err
 	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	var buf bytes.Buffer
+	tee := io.TeeReader(file, &buf)
+	fileHash, err := h.PUsecase.CalculateMD5FromFile(tee)
+	if err != nil {
+		return err
+	}
+	if err = h.PUsecase.AddDir("static/pin/" + fileHash[:2]); err != nil {
+		return err
+	}
+	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
+	if err != nil {
+		return err
+	}
+	fileName := "static/pin/" + fileHash[:2] + "/" + fileHash + formatFile
+	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
+		return err
+	}
+
+	newPin.PinDir = fileName
 
 	if err := h.PUsecase.CheckPinData(*newPin); err != nil {
 		return err
@@ -69,7 +100,7 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 	return nil
 }
 
-func (h *HandlersStruct) HandleCreatePinPicture(ctx echo.Context) (Err error) {
+func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	defer func() {
 		if err := ctx.Request().Body.Close(); err != nil {
 			Err = err
@@ -81,45 +112,31 @@ func (h *HandlersStruct) HandleCreatePinPicture(ctx echo.Context) (Err error) {
 	if getUser == nil {
 		return errors.New("not authorized")
 	}
+	//user := getUser.(models.User)
 
-	file, header, err := ctx.Request().FormFile("pinPicture")
-	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	id := ctx.Param("id")
+	if id == "" {
+		return errors.New("incorrect id")
 	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			Err = err
-		}
-	}()
-
-	var buf bytes.Buffer
-	tee := io.TeeReader(file, &buf)
-	fileHash, err := h.PUsecase.CalculateMD5FromFile(tee)
+	pinID, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 	}
-	if err = h.PUsecase.AddDir("static/pin/" + fileHash[:2]); err != nil {
-		return err
-	}
-	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
+
+	pin, err := h.PUsecase.GetPin(uint64(pinID))
 	if err != nil {
-		return err
-	}
-	fileName := "static/pin/" + fileHash[:2] + "/" + fileHash + formatFile
-	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
 		return err
 	}
 
 	data := struct {
 		Body struct {
-			PinDir string `json:"pin_dir"`
+			Pin models.Pin `json:"pin"`
 			Info string `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
-		PinDir string `json:"pin_dir"`
+		Pin models.Pin `json:"pin"`
 		Info string `json:"info"`
-	}{Info: "pin picture has been successfully saved", PinDir: fileName}}
+	}{Info: "OK", Pin: pin}}
 
 	if err := encoder.Encode(data); err != nil {
 		return err

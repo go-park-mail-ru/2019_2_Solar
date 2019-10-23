@@ -45,3 +45,15 @@ func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
 	}
 	return users, nil
 }
+
+func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
+	var err error
+	var params []interface{}
+	params = append(params, pinID)
+
+	pin, err := USC.PRepository.SelectPin(consts.SELECTPinById, params)
+	if err != nil {
+		return pin, err
+	}
+	return pin, nil
+}

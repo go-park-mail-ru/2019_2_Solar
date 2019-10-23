@@ -195,3 +195,27 @@ func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interfa
 	}
 	return categories, nil
 }
+
+func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{}) (Pin models.Pin, Err error) {
+	var pin models.Pin
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return pin, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	scanPin := models.Pin{}
+	for rows.Next() {
+		err := rows.Scan(&scanPin.ID, &scanPin.OwnerID, &scanPin.AuthorID, &scanPin.BoardID, &scanPin.Title,
+			&scanPin.Description, &scanPin.PinDir, &scanPin.CreatedTime, &scanPin.IsDeleted)
+		if err != nil {
+			return pin, err
+		}
+		pin = scanPin
+	}
+	return pin, nil
+}
