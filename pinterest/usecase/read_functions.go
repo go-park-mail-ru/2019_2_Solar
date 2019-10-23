@@ -53,7 +53,31 @@ func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
 
 	pin, err := USC.PRepository.SelectPin(consts.SELECTPinById, params)
 	if err != nil {
-		return pin, err
+		return pin[0], err
 	}
-	return pin, nil
+	return pin[0], nil
+}
+
+func (USC *UsecaseStruct) GetBoard(boardID uint64) (models.Board, error) {
+	var err error
+	var params []interface{}
+	params = append(params, boardID)
+
+	board, err := USC.PRepository.SelectBoard(consts.SELECTBoardById, params)
+	if err != nil {
+		return board, err
+	}
+	return board, nil
+}
+
+func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
+	var err error
+	var params []interface{}
+	params = append(params, boardID)
+
+	pins, err := USC.PRepository.SelectPin(consts.SELECTPinsByBoardId, params)
+	if err != nil {
+		return []models.Pin{}, err
+	}
+	return pins, nil
 }

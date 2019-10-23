@@ -38,9 +38,11 @@ type UsecaseInterface interface {
 	AddNewUserSession(userId string) (http.Cookie, error)
 
 	AddBoard(newBoard models.Board) (uint64, error)
+	GetBoard(boardID uint64) (models.Board, error)
 
 	AddPin(newPin models.Pin) (uint64, error)
 	GetPin(pinID uint64) (models.Pin, error)
+	GetPins(boardID uint64) ([]models.Pin, error)
 
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error

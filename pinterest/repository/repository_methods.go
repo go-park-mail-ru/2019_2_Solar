@@ -196,11 +196,11 @@ func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interfa
 	return categories, nil
 }
 
-func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{}) (Pin models.Pin, Err error) {
-	var pin models.Pin
+func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{}) (Pins []models.Pin, Err error) {
+	pins := make([]models.Pin, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
-		return pin, err
+		return pins, err
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
@@ -208,14 +208,38 @@ func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{})
 		}
 	}()
 
-	scanPin := models.Pin{}
 	for rows.Next() {
+		scanPin := models.Pin{}
 		err := rows.Scan(&scanPin.ID, &scanPin.OwnerID, &scanPin.AuthorID, &scanPin.BoardID, &scanPin.Title,
 			&scanPin.Description, &scanPin.PinDir, &scanPin.CreatedTime, &scanPin.IsDeleted)
 		if err != nil {
-			return pin, err
+			return pins, err
 		}
-		pin = scanPin
+		pins = append(pins, scanPin)
 	}
-	return pin, nil
+	return pins, nil
+}
+
+func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{}) (Board models.Board, Err error) {
+	var board models.Board
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return board, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	scanBoard := models.Board{}
+	for rows.Next() {
+		err := rows.Scan(&scanBoard.ID, &scanBoard.OwnerID, &scanBoard.Title,
+			&scanBoard.Description, &scanBoard.Category,  &scanBoard.CreatedTime, &scanBoard.IsDeleted)
+		if err != nil {
+			return board, err
+		}
+		board = scanBoard
+	}
+	return board, nil
 }

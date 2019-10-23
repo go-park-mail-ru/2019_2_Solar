@@ -21,6 +21,8 @@ type RepositoryInterface interface {
 
 	SelectCategory(executeQuery string, params []interface{}) ([]string, error)
 	InsertBoard(executeQuery string, params []interface{}) (string, error)
+	SelectBoard(executeQuery string, params []interface{}) (models.Board, error)
+
 	InsertPin(executeQuery string, params []interface{}) (string, error)
-	SelectPin(executeQuery string, params []interface{}) (models.Pin, error)
+	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
 }

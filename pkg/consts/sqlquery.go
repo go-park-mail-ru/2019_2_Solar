@@ -22,8 +22,12 @@ const (
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
 	INSERTBoard = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
+	SELECTBoardById = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
+		"FROM sunrise.board as b WHERE b.id = $1"
 
 	INSERTPin = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"
 	SELECTPinById = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.id = $1"
+	SELECTPinsByBoardId = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
+		"FROM sunrise.pin as p WHERE p.board_id = $1"
 )

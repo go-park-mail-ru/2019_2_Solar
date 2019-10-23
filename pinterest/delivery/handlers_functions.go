@@ -23,7 +23,7 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
 
 	e.POST("/board", h.HandleCreateBoard)
-	//e.GET( "/board/:id", h.HandleGetPin)
+	e.GET( "/board/:id", h.HandleGetBoard)
 
 	e.POST("/pin", h.HandleCreatePin)
 	e.GET( "/pin/:id", h.HandleGetPin)
