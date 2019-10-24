@@ -34,24 +34,6 @@ func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (s
 	return strconv.FormatUint(id, 10), nil
 }
 
-func (RS *RepositoryStruct) InsertBoard(executeQuery string, params []interface{}) (string, error) {
-	var id uint64
-	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
-	if err != nil {
-		return "", err
-	}
-	return strconv.FormatUint(id, 10), nil
-}
-
-func (RS *RepositoryStruct) InsertPin(executeQuery string, params []interface{}) (string, error) {
-	var id uint64
-	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
-	if err != nil {
-		return "", err
-	}
-	return strconv.FormatUint(id, 10), nil
-}
-
 func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (int, error) {
 	result, err := RS.DataBase.Exec(executeQuery, params...)
 	if err != nil {
