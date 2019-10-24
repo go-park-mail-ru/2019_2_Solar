@@ -31,7 +31,7 @@ func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (s
 	if err != nil {
 		return "", err
 	}
-	return strconv.Itoa(int(id)), nil
+	return strconv.FormatUint(id, 10), nil
 }
 
 func (RS *RepositoryStruct) InsertBoard(executeQuery string, params []interface{}) (string, error) {
@@ -40,7 +40,7 @@ func (RS *RepositoryStruct) InsertBoard(executeQuery string, params []interface{
 	if err != nil {
 		return "", err
 	}
-	return strconv.Itoa(int(id)), nil
+	return strconv.FormatUint(id, 10), nil
 }
 
 func (RS *RepositoryStruct) InsertPin(executeQuery string, params []interface{}) (string, error) {
@@ -49,7 +49,7 @@ func (RS *RepositoryStruct) InsertPin(executeQuery string, params []interface{})
 	if err != nil {
 		return "", err
 	}
-	return strconv.Itoa(int(id)), nil
+	return strconv.FormatUint(id, 10), nil
 }
 
 func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (int, error) {
