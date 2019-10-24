@@ -2,9 +2,9 @@ package delivery
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,8 +12,8 @@ import (
 
 func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -54,11 +54,11 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	return nil
 }
 
-func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
+func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	var err error
 	defer func() {
-		if bodyCloseError := ctx.Request().Body.Close(); bodyCloseError != nil {
-			err = bodyCloseError
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -98,11 +98,11 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) error {
 	return nil
 }
 
-func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) error {
+func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) (Err error) {
 	var err error
 	defer func() {
-		if bodyCloseError := ctx.Request().Body.Close(); bodyCloseError != nil {
-			err = bodyCloseError
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")

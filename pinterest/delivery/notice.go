@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"strconv"
@@ -11,8 +11,8 @@ import (
 
 func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")

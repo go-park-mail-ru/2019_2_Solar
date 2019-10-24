@@ -3,7 +3,7 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"io"
@@ -13,8 +13,8 @@ import (
 
 func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -78,8 +78,8 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 
 func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")

@@ -2,14 +2,14 @@ package delivery
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/labstack/echo"
 )
 
 func (h *HandlersStruct) HandleGetUserByEmail(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
