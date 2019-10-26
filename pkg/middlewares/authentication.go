@@ -22,13 +22,13 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		var user []models.User
 		var params []interface{}
 		params = append(params, cookie.Value)
-		user, err = dbWorker.SelectFullUser(consts.SelectUserByCookieValue, params)
+		user, err = dbWorker.SelectFullUser(consts.SELECTUserByCookieValue, params)
 		if err != nil || len(user) != 1 {
 			return err
 		}
 
 		var userCookie []models.UserCookie
-		userCookie, err = dbWorker.SelectUserCookies(consts.SelectCookiesExpirationByCookieValue, params)
+		userCookie, err = dbWorker.SelectUserCookies(consts.SELECTCookiesExpirationByCookieValue, params)
 		if err != nil || len(userCookie) != 1 {
 			return err
 		}

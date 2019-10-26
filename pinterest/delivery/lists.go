@@ -3,13 +3,14 @@ package delivery
 import (
 	"encoding/json"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
-func (h *HandlersStruct) HandleListUsers(ctx echo.Context) error {
+func (h *HandlersStruct) HandleListUsers(ctx echo.Context) (Err error) {
 	var err error
 	defer func() {
-		if bodyCloseError := ctx.Request().Body.Close(); bodyCloseError != nil {
-			err = bodyCloseError
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")

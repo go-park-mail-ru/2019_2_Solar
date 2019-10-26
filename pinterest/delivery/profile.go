@@ -3,7 +3,7 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"io"
@@ -13,8 +13,8 @@ import (
 
 func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -53,10 +53,10 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return err
 	}
 
-	if err := h.PUsecase.EditProfileDataValidationCheck(newUserProfile); err != nil {
+	if err := h.PUsecase.CheckProfileData(newUserProfile); err != nil {
 		return err
 	}
-	if err := h.PUsecase.EditUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil {
+	if err := h.PUsecase.CheckUsernameEmailIsUnique(newUserProfile.Username, newUserProfile.Email, user.Username, user.Email, user.ID); err != nil {
 		return err
 	}
 
@@ -78,8 +78,8 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 
 func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err error) {
 	defer func() {
-		if err := ctx.Request().Body.Close(); err != nil {
-			Err = err
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
@@ -107,16 +107,16 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	if err != nil {
 		return err
 	}
-	if err = h.PUsecase.CreateDir("static/picture/" + fileHash[:2]); err != nil {
+	if err = h.PUsecase.AddDir("static/ava/" + fileHash[:2]); err != nil {
 		return err
 	}
 	formatFile, err := h.PUsecase.ExtractFormatFile(header.Filename)
 	if err != nil {
 		return err
 	}
-	fileName := "static/picture/" + fileHash[:2] + "/" + fileHash + formatFile
-	if err = h.PUsecase.CreatePictureFile(fileName, &buf); err != nil {
-		return
+	fileName := "static/ava/" + fileHash[:2] + "/" + fileHash + formatFile
+	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
+		return err
 	}
 	if _, err := h.PUsecase.SetUserAvatarDir(strconv.Itoa(int(user.ID)), fileName); err != nil {
 		return err

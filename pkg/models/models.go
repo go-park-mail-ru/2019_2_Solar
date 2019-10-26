@@ -51,9 +51,10 @@ type User struct {
 	Email     string `json:"email"`
 	Age       uint   `json:"age"`
 	Status    string `json:"status"`
-	AvatarDir string `json:"-"`
-	IsActive  bool   `json:"isactive"`
+	AvatarDir string `json:"avatar_dir"`
+	IsActive  bool   `json:"is_active"`
 }
+
 
 type DataJSON struct {
 	UserJSON  interface{} `json:"user,omitempty"`
@@ -63,4 +64,52 @@ type DataJSON struct {
 
 type OutJSON struct {
 	BodyJSON interface{} `json:"body"`
+}
+
+type NewBoard struct {
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Category string `json:"category"`
+}
+
+type Board struct {
+	ID			uint64 `json:"id"`
+	OwnerID 	uint64 `json:"owner_id"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
+	Category 	string `json:"category"`
+	CreatedTime time.Time `json:"created_time"`
+	IsDeleted 	bool `json:"is_deleted"`
+}
+
+type NewPin struct {
+	BoardID		uint64 `json:"board_id"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
+	PinDir 		string `json:"pin_dir"`
+}
+
+type Pin struct {
+	ID			uint64 `json:"id"`
+	OwnerID 	uint64 `json:"owner_id"`
+	AuthorID	uint64 `json:"author_id"`
+	BoardID		uint64 `json:"board_id"`
+	PinDir		string `json:"pin_dir"`
+	Title 		string `json:"title"`
+	Description string `json:"description"`
+	CreatedTime time.Time `json:"created_time"`
+	IsDeleted 	bool `json:"is_deleted"`
+}
+
+type NewNotice struct {
+	Message string `json:"message"`
+}
+
+type Notice struct {
+	ID uint64 `json:"id"`
+	UserID uint64 `json:"user_id"`
+	ReceiverID uint64 `json:"receiver_id"`
+	Message string `json:"message"`
+	CreatedTime time.Time `json:"created_time"`
+	IsRead 	bool `json:"is_read"`
 }

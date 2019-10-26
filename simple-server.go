@@ -19,6 +19,7 @@ func main() {
 	//e.Use(customMiddleware.AccessLogMiddleware)
 	e.Use(customMiddlewares.AuthenticationMiddleware)
 	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
+	e.Static("/static", "static")
 
 	handlers := delivery.HandlersStruct{}
 	var mutex sync.Mutex
