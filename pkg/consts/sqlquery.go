@@ -4,7 +4,7 @@ const (
 	SelectUserIdByEmail                        = "SELECT u.id from sunrise.users as u where u.email = $1"
 	SelectUserIdUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.users as u where u.username = $1 OR u.email = $2"
 	SelectAllUsers                             = "SELECT * from sunrise.users"
-	UpdateUserByID                             = "UPDATE sunrise_db.sunrise.users SET username = $1, name = $2, 	surname = $3," +
+	UpdateUserByID                             = "UPDATE sunrise_db.sunrise.users SET username = $1, name = $2,	surname = $3," +
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
 	UpdateUserAvatarDirByID = "UPDATE sunrise_db.sunrise.users SET avatardir = $1 where id = $2"
 	InsertRegistration      = "INSERT INTO sunrise.users (username, email, hashpassword)	values ($1,$2,$3) RETURNING id"
