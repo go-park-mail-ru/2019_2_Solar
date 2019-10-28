@@ -151,14 +151,38 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
-	ctx.Response().Header().Set("Content-Type", "application/json")
+	ctx.Response().Header().Set("Content-Type", "application/jsonStruct")
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetNewPins()
 	if err != nil {
 		return nil
 	}
-	json := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, json); err != nil {
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	var pins []models.PinForMainPage
+	pins, err := h.PUsecase.GetMyPins(user.ID)
+	if err != nil {
+		return nil
+	}
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
 		return err
 	}
 	return nil
@@ -177,12 +201,12 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 	var pins []models.PinForMainPage
-	pins, err := h.PUsecase.GetNewSubscribePins(user.ID)
+	pins, err := h.PUsecase.GetSubscribePins(user.ID)
 	if err != nil {
 		return nil
 	}
-	json := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, json); err != nil {
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
 		return err
 	}
 	return nil
