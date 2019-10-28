@@ -81,13 +81,24 @@ func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
 	}
 	return pins, nil
 }
-func (USC *UsecaseStruct) GetNewPins() ([]models.PinForManePage, error) {
+func (USC *UsecaseStruct) GetNewPins() ([]models.PinForMainPage, error) {
 	var err error
 	var params []interface{}
 	params = append(params, consts.NumberOfPinsOnPage)
 	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTNewPinsByNumber, params)
 	if err != nil {
-		return []models.PinForManePage{}, err
+		return []models.PinForMainPage{}, err
+	}
+	return pins, nil
+}
+
+func (USC *UsecaseStruct) GetNewSubscribePins(userId uint64) ([]models.PinForMainPage, error) {
+	var err error
+	var params []interface{}
+	params = append(params, consts.NumberOfPinsOnPage, userId)
+	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTNewPinsByNumber, params)
+	if err != nil {
+		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
 }

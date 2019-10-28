@@ -226,8 +226,8 @@ func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{
 	return board, nil
 }
 
-func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForManePage, Err error) {
-	var pins []models.PinForManePage
+func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
+	var pins []models.PinForMainPage
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return pins, err
@@ -237,7 +237,7 @@ func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interf
 			Err = err
 		}
 	}()
-	scanPin := models.PinForManePage{}
+	scanPin := models.PinForMainPage{}
 	for rows.Next() {
 		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.IsDeleted)
 		if err != nil {
