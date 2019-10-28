@@ -30,7 +30,7 @@ const (
 		"FROM sunrise.pin as p WHERE p.id = $1"
 	SELECTPinsByBoardId = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
-	SELECTNewPinsByNumber = "SELECT p.id, p.pindir FROM ( select id, pindir, ROW_NUMBER() OVER (ORDER BY createdtime) " +
+	SELECTNewPinsByNumber = "SELECT p.id, p.pindir, p.isdeleted FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 		"from sunrise.pin) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
 
 	INSERTNotice = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"

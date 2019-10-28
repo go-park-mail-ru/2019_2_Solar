@@ -89,6 +89,12 @@ type NewPin struct {
 	PinDir 		string `json:"pin_dir"`
 }
 
+type PinForManePage struct {
+	ID			uint64 `json:"id"`
+	PinDir		string `json:"pin_dir"`
+	IsDeleted 	bool `json:"is_deleted"`
+}
+
 type Pin struct {
 	ID			uint64 `json:"id"`
 	OwnerID 	uint64 `json:"owner_id"`
