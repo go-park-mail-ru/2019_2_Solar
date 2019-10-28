@@ -43,6 +43,7 @@ type UsecaseInterface interface {
 	AddPin(newPin models.Pin) (uint64, error)
 	GetPin(pinID uint64) (models.Pin, error)
 	GetPins(boardID uint64) ([]models.Pin, error)
+	GetNewPins() ([]models.Pin, error)
 
 	AddNotice(newNotice models.Notice) (uint64, error)
 
