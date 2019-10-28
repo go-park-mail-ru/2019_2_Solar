@@ -32,6 +32,8 @@ const (
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
 	SELECTNewPinsByNumber = "SELECT p.id, p.pindir, p.isdeleted FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 		"from sunrise.pin) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+	SELECTNewSubscribePinsByNumber = "SELECT p.id, p.pindir, p.isdeleted FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
+		"from sunrise.pin WHERE owner_id = $2) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
 
 	INSERTNotice = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
 )

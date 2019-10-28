@@ -96,7 +96,7 @@ func (USC *UsecaseStruct) GetNewSubscribePins(userId uint64) ([]models.PinForMai
 	var err error
 	var params []interface{}
 	params = append(params, consts.NumberOfPinsOnPage, userId)
-	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTNewPinsByNumber, params)
+	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTNewSubscribePinsByNumber, params)
 	if err != nil {
 		return []models.PinForMainPage{}, err
 	}
