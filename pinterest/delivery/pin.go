@@ -152,14 +152,14 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	var pins []models.Pin
+	var pins []models.PinForManePage
 	pins, err := h.PUsecase.GetNewPins()
 	if err != nil {
 		return nil
 	}
-	if err := ctx.JSON(200, pins); err != nil {
+	json := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, json); err != nil {
 		return err
 	}
-
 	return nil
 }
