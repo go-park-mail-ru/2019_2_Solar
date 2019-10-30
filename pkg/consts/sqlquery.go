@@ -41,4 +41,6 @@ const (
 
 	INSERTNotice  = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
 	INSERTComment = "INSERT INTO sunrise.comments (pin_id, text, author_id, created_time) VALUES ($1,$2,$3,$4) RETURNING id"
+	INSERTSubscribeByName = "INSERT INTO sunrise.subscribe (subscriber_id, followee_id) select $1, u.id from sunrise.users as u " +
+		"where u.name = $2 RETURNING followee_idVALUES ($1,$2) RETURNING id"
 )

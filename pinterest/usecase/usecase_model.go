@@ -50,6 +50,8 @@ type UsecaseInterface interface {
 
 	AddNotice(newNotice models.Notice) (uint64, error)
 
+	AddSubscribe(userId, followeeName string) error
+
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error
 	CalculateMD5FromFile (fileByte io.Reader) (string, error)

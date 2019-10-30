@@ -208,3 +208,13 @@ func (USC *UsecaseStruct) AddComment(pinId string, userId uint64, newComment mod
 	}
 	return nil
 }
+
+func (USC *UsecaseStruct) AddSubscribe(userId, followeeName string) error {
+	var params []interface{}
+	params = append(params, userId, followeeName)
+	_, err := USC.PRepository.Insert(consts.INSERTSubscribeByName, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
