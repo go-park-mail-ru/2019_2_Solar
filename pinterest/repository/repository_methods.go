@@ -217,11 +217,33 @@ func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{
 	scanBoard := models.Board{}
 	for rows.Next() {
 		err := rows.Scan(&scanBoard.ID, &scanBoard.OwnerID, &scanBoard.Title,
-			&scanBoard.Description, &scanBoard.Category,  &scanBoard.CreatedTime, &scanBoard.IsDeleted)
+			&scanBoard.Description, &scanBoard.Category, &scanBoard.CreatedTime, &scanBoard.IsDeleted)
 		if err != nil {
 			return board, err
 		}
 		board = scanBoard
 	}
 	return board, nil
+}
+
+func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
+	var pins []models.PinForMainPage
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	scanPin := models.PinForMainPage{}
+	for rows.Next() {
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.IsDeleted)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
 }

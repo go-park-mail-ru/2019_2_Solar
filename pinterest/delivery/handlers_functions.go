@@ -5,12 +5,15 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterface) {
+func (h *HandlersStruct) NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterface) {
 	h.PUsecase = IUsecase
 	e.GET("/", h.HandleEmpty)
 
 	e.GET("/users", h.HandleListUsers)
 	e.GET("/users/:email", h.HandleGetUserByEmail)
+
+	e.POST("/subscribe/:name", h.HandleCreateSubscribe)
+	e.DELETE("/subscribe/:name", h.HandleDeleteSubscribe)
 
 	e.POST("/registration", h.HandleRegUser)
 	e.POST("/login", h.HandleLoginUser)
@@ -23,10 +26,14 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
 
 	e.POST("/board", h.HandleCreateBoard)
-	e.GET( "/board/:id", h.HandleGetBoard)
+	e.GET("/board/:id", h.HandleGetBoard)
 
 	e.POST("/pin", h.HandleCreatePin)
-	e.GET( "/pin/:id", h.HandleGetPin)
+	e.POST("/pin/:id/comment", h.HandleCreateComment)
+	e.GET("/pin/:id", h.HandleGetPin)
+	e.GET("/pin/list/new", h.HandleGetNewPins)
+	e.GET("/pin/list/my", h.HandleGetMyPins)
+	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
 
-	e.POST( "/notice/:receiver_id", h.HandleCreateNotice)
+	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
 }

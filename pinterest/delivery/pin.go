@@ -3,9 +3,9 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -68,12 +68,12 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 		return err
 	}
 	pin := models.Pin{
-		OwnerID: user.ID,
-		AuthorID: user.ID,
-		BoardID: newPin.BoardID,
-		Title: newPin.Title,
+		OwnerID:     user.ID,
+		AuthorID:    user.ID,
+		BoardID:     newPin.BoardID,
+		Title:       newPin.Title,
 		Description: newPin.Description,
-		PinDir: newPin.PinDir,
+		PinDir:      newPin.PinDir,
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddPin(pin)
@@ -85,12 +85,12 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 
 	data := struct {
 		Body struct {
-			Pin models.Pin `json:"pin"`
-			Info string `json:"info"`
+			Pin  models.Pin `json:"pin"`
+			Info string     `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
-		Pin models.Pin `json:"pin"`
-		Info string `json:"info"`
+		Pin  models.Pin `json:"pin"`
+		Info string     `json:"info"`
 	}{Info: "data successfully saved", Pin: pin}}
 
 	if err := encoder.Encode(data); err != nil {
@@ -130,17 +130,112 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 
 	data := struct {
 		Body struct {
-			Pin models.Pin `json:"pin"`
-			Info string `json:"info"`
+			Pin  models.Pin `json:"pin"`
+			Info string     `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
-		Pin models.Pin `json:"pin"`
-		Info string `json:"info"`
+		Pin  models.Pin `json:"pin"`
+		Info string     `json:"info"`
 	}{Info: "OK", Pin: pin}}
 
 	if err := encoder.Encode(data); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/jsonStruct")
+	var pins []models.PinForMainPage
+	pins, err := h.PUsecase.GetNewPins()
+	if err != nil {
+		return nil
+	}
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	var pins []models.PinForMainPage
+	pins, err := h.PUsecase.GetMyPins(user.ID)
+	if err != nil {
+		return nil
+	}
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	var pins []models.PinForMainPage
+	pins, err := h.PUsecase.GetSubscribePins(user.ID)
+	if err != nil {
+		return nil
+	}
+	jsonStruct := models.JSONResponse{Body: pins}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	pinId := ctx.Param("id")
+	var newComment models.NewComment
+	if err := ctx.Bind(newComment); err != nil {
+		return err
+	}
+	if err := h.PUsecase.AddComment(pinId, user.ID, newComment); err != nil {
+		return err
+	}
+	info := "data successfully saved"
+	jsonStruct := models.JSONResponse{Body: info}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
 	return nil
 }

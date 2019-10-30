@@ -25,4 +25,5 @@ type RepositoryInterface interface {
 	SelectBoard(executeQuery string, params []interface{}) (models.Board, error)
 
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
+	SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
 }
