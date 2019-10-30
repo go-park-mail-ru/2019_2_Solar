@@ -46,6 +46,7 @@ type UsecaseInterface interface {
 	GetNewPins() ([]models.PinForMainPage, error)
 	GetMyPins(userId uint64) ([]models.PinForMainPage, error)
 	GetSubscribePins(userId uint64) ([]models.PinForMainPage, error)
+	AddComment(pinId string, userId uint64, newComment models.NewComment) error
 
 	AddNotice(newNotice models.Notice) (uint64, error)
 

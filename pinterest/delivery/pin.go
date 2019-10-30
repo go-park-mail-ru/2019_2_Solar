@@ -211,3 +211,31 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 	}
 	return nil
 }
+
+func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	pinId := ctx.Param("id")
+	var newComment models.NewComment
+	if err := ctx.Bind(newComment); err != nil {
+		return err
+	}
+	if err := h.PUsecase.AddComment(pinId, user.ID, newComment); err != nil {
+		return err
+	}
+	info := "data successfully saved"
+	jsonStruct := models.JSONResponse{Body: info}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	return nil
+}

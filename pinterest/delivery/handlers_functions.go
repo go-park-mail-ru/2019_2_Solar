@@ -26,6 +26,7 @@ func (h *HandlersStruct)NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterf
 	e.GET( "/board/:id", h.HandleGetBoard)
 
 	e.POST("/pin", h.HandleCreatePin)
+	e.POST("/pin/:id/comment", h.HandleCreateComment)
 	e.GET( "/pin/:id", h.HandleGetPin)
 	e.GET("/pin/list/new", h.HandleGetNewPins)
 	e.GET("/pin/list/my", h.HandleGetMyPins)

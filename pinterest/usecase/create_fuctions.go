@@ -105,7 +105,7 @@ func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.Us
 		if err != nil {
 			return 0, err
 		}
-		user.Age =uint(age)
+		user.Age = uint(age)
 	}
 	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
 	editUsers, err := USC.PRepository.Update(consts.UPDATEUserByID, params)
@@ -197,4 +197,14 @@ func (USC *UsecaseStruct) AddNotice(Notice models.Notice) (uint64, error) {
 		return 0, nil
 	}
 	return uint64(id), nil
+}
+
+func (USC *UsecaseStruct) AddComment(pinId string, userId uint64, newComment models.NewComment) error {
+	var params []interface{}
+	params = append(params, pinId, newComment.Text, userId, time.Now())
+	_, err := USC.PRepository.Insert(consts.INSERTComment, params)
+	if err != nil {
+		return err
+	}
+	return nil
 }
