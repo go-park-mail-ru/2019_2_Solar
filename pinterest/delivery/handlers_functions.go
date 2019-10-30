@@ -8,7 +8,7 @@ import (
 func (h *HandlersStruct) NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterface) {
 	h.PUsecase = IUsecase
 	e.GET("/", h.HandleEmpty)
-	//Поменять на name
+
 	e.GET("/users", h.HandleListUsers)
 	e.GET("/users/:email", h.HandleGetUserByEmail)
 
