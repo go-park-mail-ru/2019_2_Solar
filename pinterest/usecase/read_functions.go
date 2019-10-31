@@ -33,7 +33,7 @@ func (USC *UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
 	if len(userSlice) != 1 {
 		return models.User{}, errors.New("several users")
 	}
-	return userSlice[0], nil
+	return USC.Sanitizer.SanitizeUser(userSlice[0]), nil
 }
 
 func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
@@ -42,6 +42,9 @@ func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
 	users, err := USC.PRepository.SelectFullUser(consts.SELECTAllUsers, nil)
 	if err != nil {
 		return users, err
+	}
+	for _, user := range users {
+		user = USC.Sanitizer.SanitizeUser(user)
 	}
 	return users, nil
 }
@@ -55,7 +58,7 @@ func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
 	if err != nil {
 		return pin[0], err
 	}
-	return pin[0], nil
+	return USC.Sanitizer.SanitizePin(pin[0]), nil
 }
 
 func (USC *UsecaseStruct) GetBoard(boardID uint64) (models.Board, error) {
@@ -67,7 +70,7 @@ func (USC *UsecaseStruct) GetBoard(boardID uint64) (models.Board, error) {
 	if err != nil {
 		return board, err
 	}
-	return board, nil
+	return USC.Sanitizer.SanitizeBoard(board), nil
 }
 
 func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
@@ -78,6 +81,9 @@ func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
 	pins, err := USC.PRepository.SelectPin(consts.SELECTPinsByBoardId, params)
 	if err != nil {
 		return []models.Pin{}, err
+	}
+	for _, pin := range pins {
+		pin = USC.Sanitizer.SanitizePin(pin)
 	}
 	return pins, nil
 }

@@ -26,3 +26,10 @@ func (San *SanitizerStruct) SanitizeComment(comment models.Comment) models.Comme
 	comment.Text = San.sanitizer.Sanitize(comment.Text)
 	return comment
 }
+
+func (San *SanitizerStruct) SanitizeBoard(board models.Board) models.Board {
+	board.Title = San.sanitizer.Sanitize(board.Title)
+	board.Description = San.sanitizer.Sanitize(board.Description)
+	board.Category = San.sanitizer.Sanitize(board.Category)
+	return board
+}

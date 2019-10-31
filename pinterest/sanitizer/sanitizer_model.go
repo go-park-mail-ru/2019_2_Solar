@@ -13,4 +13,5 @@ type SanitizerInterface interface {
 	SanitizeUser(user models.User) models.User
 	SanitizePin(pin models.Pin) models.Pin
 	SanitizeComment(comment models.Comment) models.Comment
+	SanitizeBoard(board models.Board) models.Board
 }
