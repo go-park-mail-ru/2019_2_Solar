@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	customMiddlewares "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
@@ -18,13 +17,12 @@ func main() {
 	e.Use(customMiddlewares.AuthenticationMiddleware)
 	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
 	e.Static("/static", "static")
-	useCase := usecase.UsecaseStruct{}
-	if err := useCase.NewUseCase(); err != nil {
+
+	handlers := delivery.HandlersStruct{}
+	if err := handlers.NewHandlers(e); err != nil {
 		e.Logger.Errorf("server error: %s", err)
 		return
 	}
-	handlers := delivery.HandlersStruct{}
-	handlers.NewHandlers(e, &useCase)
 	e.Logger.Warnf("start listening on %s", consts.HostAddress)
 	if err := e.Start(consts.HostAddress); err != nil {
 		e.Logger.Errorf("server error: %s", err)
