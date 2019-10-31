@@ -14,10 +14,10 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo) error {
 	e.GET("/", h.HandleEmpty)
 
 	e.GET("/users", h.HandleListUsers)
-	e.GET("/users/:email", h.HandleGetUserByEmail)
+	e.GET("/users/:username", h.HandleGetUserByUsername)
 
-	e.POST("/subscribe/:name", h.HandleCreateSubscribe)
-	e.DELETE("/subscribe/:name", h.HandleDeleteSubscribe)
+	e.POST("/subscribe/:username", h.HandleCreateSubscribe)
+	e.DELETE("/subscribe/:username", h.HandleDeleteSubscribe)
 
 	e.POST("/registration", h.HandleRegUser)
 	e.POST("/login", h.HandleLoginUser)

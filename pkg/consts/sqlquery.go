@@ -15,6 +15,8 @@ const (
 		"where s.cookiesvalue = $1"
 	SELECTCookiesExpirationByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersessions" +
 		" as s where s.cookiesvalue = $1"
+	SELECTUserByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
+		" U.avatardir, U.isactive from sunrise.Users as U where U.username = $1"
 	SELECTUserByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive from sunrise.Users as U where U.email = $1"
 

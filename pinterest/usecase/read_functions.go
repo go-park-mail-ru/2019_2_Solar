@@ -21,12 +21,27 @@ func (USC *UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
 	return str[0], nil
 }
 
+func (USC *UsecaseStruct) GetUserByUsername(username string) (models.User, error) {
+	var userSlice []models.User
+	var params []interface{}
+	params = append(params, username)
+	var err error
+	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
+	if err != nil {
+		return models.User{}, err
+	}
+	if len(userSlice) != 1 {
+		return models.User{}, errors.New("several users")
+	}
+	return USC.Sanitizer.SanitizeUser(userSlice[0]), nil
+}
+
 func (USC *UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
 	var userSlice []models.User
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByEmail, params)
+	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
 	if err != nil {
 		return models.User{}, err
 	}

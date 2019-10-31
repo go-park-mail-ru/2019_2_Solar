@@ -20,6 +20,7 @@ type UsecaseInterface interface {
 	SetJsonData(data interface{}, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error)
 
+	GetUserByUsername(username string) (models.User, error)
 	GetUserByEmail(email string) (models.User, error)
 	GetUserIdByEmail(email string) (string, error)
 	GetAllUsers() ([]models.User, error)

@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (h *HandlersStruct) HandleGetUserByEmail(ctx echo.Context) (Err error) {
+func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
 			Err = errors.Wrap(Err, bodyErr.Error())
@@ -16,12 +16,12 @@ func (h *HandlersStruct) HandleGetUserByEmail(ctx echo.Context) (Err error) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 
-	email := ctx.Param("email")
-	if email == "" {
-		return errors.New("incorrect email")
+	username := ctx.Param("username")
+	if username == "" {
+		return errors.New("incorrect name")
 	}
 
-	userProfile, err := h.PUsecase.GetUserByEmail(email)
+	userProfile, err := h.PUsecase.GetUserByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error){
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	followeeName := ctx.Param("name")
+	followeeName := ctx.Param("username")
 	if err := h.PUsecase.AddSubscribe(string(user.ID), followeeName); err != nil {
 		return err
 	}
