@@ -22,7 +22,7 @@ func (San *SanitizerStruct) SanitizePin(pin models.Pin) models.Pin {
 	return pin
 }
 
-func (San *SanitizerStruct) SanitizeComment(comment models.Comment) models.Comment {
+func (San *SanitizerStruct) SanitizeComment(comment models.CommentForSend) models.CommentForSend {
 	comment.Text = San.sanitizer.Sanitize(comment.Text)
 	return comment
 }

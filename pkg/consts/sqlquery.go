@@ -39,6 +39,7 @@ const (
 		"from sunrise.pin WHERE owner_id = $2 AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
 	SELECTSubscribePinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $2 AND s.followee_id = pin.owner_id AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+	SELECTComments = "SELECT c.text, u.username, c.created_time FROM comment as c on c.pin_id = $1 join pin as p on p.id = $1 join user as u on u.id = p.owner_id"
 
 	INSERTNotice  = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
 	INSERTComment = "INSERT INTO sunrise.comments (pin_id, text, author_id, created_time) VALUES ($1,$2,$3,$4) RETURNING id"

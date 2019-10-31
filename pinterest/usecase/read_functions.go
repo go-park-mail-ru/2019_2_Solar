@@ -64,7 +64,7 @@ func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
+func (USC *UsecaseStruct) GetPin(pinID string) (models.Pin, error) {
 	var err error
 	var params []interface{}
 	params = append(params, pinID)
@@ -134,4 +134,18 @@ func (USC *UsecaseStruct) GetSubscribePins(userId uint64) ([]models.PinForMainPa
 		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
+}
+
+func (USC *UsecaseStruct) GetComments(pinId string) ([]models.CommentForSend, error) {
+	var err error
+	var params []interface{}
+	params = append(params, pinId)
+	comments, err := USC.PRepository.SelectComments(consts.SELECTComments, params)
+	if err != nil {
+		return []models.CommentForSend{}, err
+	}
+	for _, comment :=range comments{
+		comment = USC.Sanitizer.SanitizeComment(comment)
+	}
+	return comments, nil
 }

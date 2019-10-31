@@ -26,4 +26,5 @@ type RepositoryInterface interface {
 
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
 	SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
+	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error)
 }

@@ -120,7 +120,7 @@ type Notice struct {
 }
 
 type NewComment struct {
-	Text  string `json:"text"`
+	Text string `json:"text"`
 }
 
 type Comment struct {
@@ -129,4 +129,10 @@ type Comment struct {
 	Text        string    `json:"text"`
 	CreatedTime time.Time `json:"created_time"`
 	AuthorID    uint64    `json:"author_id"`
+}
+
+type CommentForSend struct {
+	Text        string    `json:"text"`
+	CreatedTime time.Time `json:"created_time"`
+	Author      string    `json:"author_username"`
 }
