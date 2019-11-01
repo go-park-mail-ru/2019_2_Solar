@@ -3,7 +3,9 @@ package repository
 import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+	"io/ioutil"
 	"strconv"
 )
 
@@ -20,6 +22,42 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	RS.DataBase.SetMaxOpenConns(10)
 	err = RS.DataBase.Ping()
 	if err != nil {
+		return err
+	}
+
+	if err := RS.LoadSchemaSQL(); err != nil {
+		err, ok := err.(*pq.Error)
+		if !ok {
+			return err
+		}
+		if err.Code != pq.ErrorCode("42P06") {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (RS *RepositoryStruct) LoadSchemaSQL() error {
+
+	dbSchema := "sunrise_db.sql"
+
+	content, err := ioutil.ReadFile(dbSchema)
+	if err != nil {
+		return err
+	}
+	tx, err := RS.DataBase.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	println(string(content))
+
+	if _, err = tx.Exec(string(content)); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
 		return err
 	}
 	return nil
