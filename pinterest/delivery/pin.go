@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -107,40 +106,46 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(ctx.Response())
+	/*encoder := json.NewEncoder(ctx.Response())*/
 	getUser := ctx.Get("User")
 	if getUser == nil {
 		return errors.New("not authorized")
 	}
-	//user := getUser.(models.User)
-
 	id := ctx.Param("id")
 	if id == "" {
 		return errors.New("incorrect id")
 	}
-	pinID, err := strconv.Atoi(id)
+	/*	pinID, err := strconv.Atoi(id)
+		if err != nil {
+			return err
+		}*/
+	pin, err := h.PUsecase.GetPin(id)
 	if err != nil {
 		return err
 	}
-
-	pin, err := h.PUsecase.GetPin(uint64(pinID))
+	comments, err := h.PUsecase.GetComments(id)
 	if err != nil {
 		return err
 	}
-
-	data := struct {
-		Body struct {
+	var body []interface{}
+	body = append(body, pin, comments)
+	jsonStruct := models.JSONResponse{Body: body}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
+	/*	data := struct {
+			Body struct {
+				Pin  models.Pin `json:"pin"`
+				Info string     `json:"info"`
+			} `json:"body"`
+		}{Body: struct {
 			Pin  models.Pin `json:"pin"`
 			Info string     `json:"info"`
-		} `json:"body"`
-	}{Body: struct {
-		Pin  models.Pin `json:"pin"`
-		Info string     `json:"info"`
-	}{Info: "OK", Pin: pin}}
+		}{Info: "OK", Pin: pin}}
 
-	if err := encoder.Encode(data); err != nil {
-		return err
-	}
+		if err := encoder.Encode(data); err != nil {
+			return err
+		}*/
 
 	return nil
 }

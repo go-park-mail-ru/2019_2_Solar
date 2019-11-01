@@ -247,3 +247,25 @@ func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interf
 	}
 	return pins, nil
 }
+
+func (RS *RepositoryStruct) SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error) {
+	var comments []models.CommentForSend
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return comments, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	scanComment := models.CommentForSend{}
+	for rows.Next() {
+		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.CreatedTime)
+		if err != nil {
+			return comments, err
+		}
+		comments = append(comments, scanComment)
+	}
+	return comments, nil
+}

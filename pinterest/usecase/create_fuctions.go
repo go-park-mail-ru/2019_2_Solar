@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
@@ -16,9 +17,19 @@ import (
 	"time"
 )
 
-func (USC *UsecaseStruct) NewUseCase(mu *sync.Mutex, IRepository repository.RepositoryInterface) {
-	USC.Mu = mu
-	USC.PRepository = IRepository
+func (USC *UsecaseStruct) NewUseCase() error {
+	rep := repository.RepositoryStruct{}
+	err := rep.NewDataBaseWorker()
+	if err != nil {
+		return err
+	}
+	var mutex sync.Mutex
+	san := sanitizer.SanitizerStruct{}
+	san.NewSanitizer()
+	USC.Mu = &mutex
+	USC.PRepository = &rep
+	USC.Sanitizer = &san
+	return nil
 }
 
 func (USC UsecaseStruct) AddNewUserSession(userId string) (http.Cookie, error) {

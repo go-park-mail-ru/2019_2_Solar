@@ -2,13 +2,10 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	customMiddlewares "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"sync"
 )
 
 func main() {
@@ -22,18 +19,12 @@ func main() {
 	e.Static("/static", "static")
 
 	handlers := delivery.HandlersStruct{}
-	var mutex sync.Mutex
-	rep := repository.RepositoryStruct{}
-	err := rep.NewDataBaseWorker()
-	if err != nil {
+	if err := handlers.NewHandlers(e); err != nil {
+		e.Logger.Errorf("server error: %s", err)
 		return
 	}
-	useCase := usecase.UsecaseStruct{}
-	useCase.NewUseCase(&mutex, &rep)
-	handlers.NewHandlers(e, &useCase)
 	e.Logger.Warnf("start listening on %s", consts.HostAddress)
-	err = e.Start(consts.HostAddress)
-	if err != nil {
+	if err := e.Start(consts.HostAddress); err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}
 

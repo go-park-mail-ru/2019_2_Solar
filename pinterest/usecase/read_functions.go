@@ -6,7 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
+func (USC *UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
 	var str []string
 	var params []interface{}
 	params = append(params, email)
@@ -21,19 +21,34 @@ func (USC UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
 	return str[0], nil
 }
 
-func (USC UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
+func (USC *UsecaseStruct) GetUserByUsername(username string) (models.User, error) {
 	var userSlice []models.User
 	var params []interface{}
-	params = append(params, email)
+	params = append(params, username)
 	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByEmail, params)
+	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
 	if err != nil {
 		return models.User{}, err
 	}
 	if len(userSlice) != 1 {
 		return models.User{}, errors.New("several users")
 	}
-	return userSlice[0], nil
+	return USC.Sanitizer.SanitizeUser(userSlice[0]), nil
+}
+
+func (USC *UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
+	var userSlice []models.User
+	var params []interface{}
+	params = append(params, email)
+	var err error
+	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
+	if err != nil {
+		return models.User{}, err
+	}
+	if len(userSlice) != 1 {
+		return models.User{}, errors.New("several users")
+	}
+	return USC.Sanitizer.SanitizeUser(userSlice[0]), nil
 }
 
 func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
@@ -43,10 +58,13 @@ func (USC *UsecaseStruct) GetAllUsers() ([]models.User, error) {
 	if err != nil {
 		return users, err
 	}
+	for _, user := range users {
+		user = USC.Sanitizer.SanitizeUser(user)
+	}
 	return users, nil
 }
 
-func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
+func (USC *UsecaseStruct) GetPin(pinID string) (models.Pin, error) {
 	var err error
 	var params []interface{}
 	params = append(params, pinID)
@@ -55,7 +73,7 @@ func (USC *UsecaseStruct) GetPin(pinID uint64) (models.Pin, error) {
 	if err != nil {
 		return pin[0], err
 	}
-	return pin[0], nil
+	return USC.Sanitizer.SanitizePin(pin[0]), nil
 }
 
 func (USC *UsecaseStruct) GetBoard(boardID uint64) (models.Board, error) {
@@ -67,7 +85,7 @@ func (USC *UsecaseStruct) GetBoard(boardID uint64) (models.Board, error) {
 	if err != nil {
 		return board, err
 	}
-	return board, nil
+	return USC.Sanitizer.SanitizeBoard(board), nil
 }
 
 func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
@@ -78,6 +96,9 @@ func (USC *UsecaseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
 	pins, err := USC.PRepository.SelectPin(consts.SELECTPinsByBoardId, params)
 	if err != nil {
 		return []models.Pin{}, err
+	}
+	for _, pin := range pins {
+		pin = USC.Sanitizer.SanitizePin(pin)
 	}
 	return pins, nil
 }
@@ -113,4 +134,18 @@ func (USC *UsecaseStruct) GetSubscribePins(userId uint64) ([]models.PinForMainPa
 		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
+}
+
+func (USC *UsecaseStruct) GetComments(pinId string) ([]models.CommentForSend, error) {
+	var err error
+	var params []interface{}
+	params = append(params, pinId)
+	comments, err := USC.PRepository.SelectComments(consts.SELECTComments, params)
+	if err != nil {
+		return []models.CommentForSend{}, err
+	}
+	for _, comment :=range comments{
+		comment = USC.Sanitizer.SanitizeComment(comment)
+	}
+	return comments, nil
 }

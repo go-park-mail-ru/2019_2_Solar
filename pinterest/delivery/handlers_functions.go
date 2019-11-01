@@ -5,15 +5,19 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInterface) {
-	h.PUsecase = IUsecase
+func (h *HandlersStruct) NewHandlers(e *echo.Echo) error {
+	useCase := usecase.UsecaseStruct{}
+	if err := useCase.NewUseCase(); err != nil {
+		return err
+	}
+	h.PUsecase = &useCase
 	e.GET("/", h.HandleEmpty)
 
 	e.GET("/users", h.HandleListUsers)
-	e.GET("/users/:email", h.HandleGetUserByEmail)
+	e.GET("/users/:username", h.HandleGetUserByUsername)
 
-	e.POST("/subscribe/:name", h.HandleCreateSubscribe)
-	e.DELETE("/subscribe/:name", h.HandleDeleteSubscribe)
+	e.POST("/subscribe/:username", h.HandleCreateSubscribe)
+	e.DELETE("/subscribe/:username", h.HandleDeleteSubscribe)
 
 	e.POST("/registration", h.HandleRegUser)
 	e.POST("/login", h.HandleLoginUser)
@@ -36,4 +40,5 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, IUsecase usecase.UsecaseInter
 	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
 
 	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
+	return nil
 }
