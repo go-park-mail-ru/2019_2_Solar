@@ -34,7 +34,10 @@ func (USC UsecaseStruct)SetJsonData(data interface{}, infMsg string) models.OutJ
 	return outJSON
 }
 
-func (USC UsecaseStruct)SetResponseError(encoder *json.Encoder, msg string, err error) {
+func (USC UsecaseStruct)SetResponseError(encoder *json.Encoder, msg string, err error) error {
 	data := USC.SetJsonData(nil, msg)
-	encoder.Encode(data)
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+	return nil
 }

@@ -18,7 +18,7 @@ type UsecaseStruct struct {
 
 type UsecaseInterface interface {
 	SetJsonData(data interface{}, infMsg string) models.OutJSON
-	SetResponseError(encoder *json.Encoder, msg string, err error)
+	SetResponseError(encoder *json.Encoder, msg string, err error) error
 
 	GetUserByUsername(username string) (models.User, error)
 	GetUserByEmail(email string) (models.User, error)
