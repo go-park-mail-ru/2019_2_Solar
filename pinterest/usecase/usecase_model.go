@@ -10,13 +10,13 @@ import (
 	"sync"
 )
 
-type UsecaseStruct struct {
-	PRepository repository.RepositoryInterface
-	Sanitizer   sanitizer.SanitizerInterface
+type UseStruct struct {
+	PRepository repository.ReposInterface
+	Sanitizer   sanitizer.SanitInterface
 	Mu          *sync.Mutex
 }
 
-type UsecaseInterface interface {
+type UseInterface interface {
 	SetJSONData(data interface{}, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error) error
 

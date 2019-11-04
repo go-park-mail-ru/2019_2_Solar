@@ -20,7 +20,7 @@ linters:
     - ineffassign
     - dogsled
     - funlen
-#    - golint
+    - golint
     - dupl
     - gochecknoinits
     - goconst
@@ -39,19 +39,19 @@ linters:
     - typecheck
     - unparam
     - whitespace
+    - varcheck
+    - structcheck
+    - gocognit
+    - prealloc
+    - maligned
+    - godox
+    - ineffassign
   # don't enable:
 #    - gocritic
 #    - goimports
 #    - gosec
-#    - ineffassign
 #    - scopelint
-#    - structcheck
-#    - varcheck
-#   - gochecknoglobals
-#   - gocognit
-#   - godox
-#   - maligned
-#   - prealloc
+#    - gochecknoglobals
 
 
 # golangci.com configuration

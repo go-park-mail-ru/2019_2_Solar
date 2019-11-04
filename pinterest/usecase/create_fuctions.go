@@ -17,14 +17,14 @@ import (
 	"time"
 )
 
-func (USC *UsecaseStruct) NewUseCase() error {
-	rep := repository.RepositoryStruct{}
+func (USC *UseStruct) NewUseCase() error {
+	rep := repository.ReposStruct{}
 	err := rep.NewDataBaseWorker()
 	if err != nil {
 		return err
 	}
 	var mutex sync.Mutex
-	san := sanitizer.SanitizerStruct{}
+	san := sanitizer.SanitStruct{}
 	san.NewSanitizer()
 	USC.Mu = &mutex
 	USC.PRepository = &rep
@@ -32,7 +32,7 @@ func (USC *UsecaseStruct) NewUseCase() error {
 	return nil
 }
 
-func (USC UsecaseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
+func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
 	sessionKeyValue, err := GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
@@ -81,7 +81,7 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC UsecaseStruct) AddNewUser(username, email, password string) (string, error) {
+func (USC UseStruct) AddNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
 	lastID, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
@@ -91,7 +91,7 @@ func (USC UsecaseStruct) AddNewUser(username, email, password string) (string, e
 	return lastID, nil
 }
 
-func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
+func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
 	var params []interface{}
 	if newUser.Username != "" {
 		user.Username = newUser.Username
@@ -126,7 +126,7 @@ func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.Us
 	return editUsers, nil
 }
 
-func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
+func (USC *UseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
 	var params []interface{}
 	params = append(params, fileName, idUser)
 	editUsers, err := USC.PRepository.Update(consts.UPDATEUserAvatarDirByID, params)
@@ -136,7 +136,7 @@ func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error)
 	return editUsers, nil
 }
 
-func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
+func (USC *UseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
 	hasher := md5.New()
 	if _, err := io.Copy(hasher, fileByte); err != nil {
 		return "", err
@@ -146,13 +146,13 @@ func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, erro
 	return fileHash, nil
 }
 
-func (USC *UsecaseStruct) AddDir(folder string) error {
+func (USC *UseStruct) AddDir(folder string) error {
 	if err := os.MkdirAll(folder, 0777); err != nil {
 		return err
 	}
 	return nil
 }
-func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err error) {
+func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err error) {
 	newFile, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -168,7 +168,7 @@ func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (E
 	return nil
 }
 
-func (USC *UsecaseStruct) AddBoard(Board models.Board) (uint64, error) {
+func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
 	var params []interface{}
 	params = append(params, Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
 	lastID, err := USC.PRepository.Insert(consts.INSERTBoard, params)
@@ -182,7 +182,7 @@ func (USC *UsecaseStruct) AddBoard(Board models.Board) (uint64, error) {
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddPin(Pin models.Pin) (uint64, error) {
+func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	var params []interface{}
 	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
 	lastID, err := USC.PRepository.Insert(consts.INSERTPin, params)
@@ -196,7 +196,7 @@ func (USC *UsecaseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddNotice(Notice models.Notice) (uint64, error) {
+func (USC *UseStruct) AddNotice(Notice models.Notice) (uint64, error) {
 	var params []interface{}
 	params = append(params, Notice.UserID, Notice.ReceiverID, Notice.Message, Notice.CreatedTime)
 	lastID, err := USC.PRepository.Insert(consts.INSERTNotice, params)
@@ -210,7 +210,7 @@ func (USC *UsecaseStruct) AddNotice(Notice models.Notice) (uint64, error) {
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
+func (USC *UseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
 	var params []interface{}
 	params = append(params, pinID, newComment.Text, userID, time.Now())
 	_, err := USC.PRepository.Insert(consts.INSERTComment, params)
@@ -220,7 +220,7 @@ func (USC *UsecaseStruct) AddComment(pinID string, userID uint64, newComment mod
 	return nil
 }
 
-func (USC *UsecaseStruct) AddSubscribe(userID, followeeName string) error {
+func (USC *UseStruct) AddSubscribe(userID, followeeName string) error {
 	var params []interface{}
 	params = append(params, userID, followeeName)
 	_, err := USC.PRepository.Insert(consts.INSERTSubscribeByName, params)

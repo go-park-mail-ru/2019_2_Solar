@@ -5,27 +5,27 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
-func (San *SanitizerStruct) NewSanitizer() {
-	San.sanitizer = bluemonday.UGCPolicy()
+func (San *SanitStruct) NewSanitizer() {
+	San.sanit = bluemonday.UGCPolicy()
 }
 
-func (San *SanitizerStruct) SanitizeUser(user *models.User) {
-	user.Name = San.sanitizer.Sanitize(user.Name)
-	user.Surname = San.sanitizer.Sanitize(user.Surname)
-	user.Username = San.sanitizer.Sanitize(user.Username)
+func (San *SanitStruct) SanitUser(user *models.User) {
+	user.Name = San.sanit.Sanitize(user.Name)
+	user.Surname = San.sanit.Sanitize(user.Surname)
+	user.Username = San.sanit.Sanitize(user.Username)
 }
 
-func (San *SanitizerStruct) SanitizePin(pin *models.Pin) {
-	pin.Description = San.sanitizer.Sanitize(pin.Description)
-	pin.Title = San.sanitizer.Sanitize(pin.Title)
+func (San *SanitStruct) SanitPin(pin *models.Pin) {
+	pin.Description = San.sanit.Sanitize(pin.Description)
+	pin.Title = San.sanit.Sanitize(pin.Title)
 }
 
-func (San *SanitizerStruct) SanitizeComment(comment *models.CommentForSend) {
-	comment.Text = San.sanitizer.Sanitize(comment.Text)
+func (San *SanitStruct) SanitComment(comment *models.CommentForSend) {
+	comment.Text = San.sanit.Sanitize(comment.Text)
 }
 
-func (San *SanitizerStruct) SanitizeBoard(board *models.Board) {
-	board.Title = San.sanitizer.Sanitize(board.Title)
-	board.Description = San.sanitizer.Sanitize(board.Description)
-	board.Category = San.sanitizer.Sanitize(board.Category)
+func (San *SanitStruct) SanitBoard(board *models.Board) {
+	board.Title = San.sanit.Sanitize(board.Title)
+	board.Description = San.sanit.Sanitize(board.Description)
+	board.Category = San.sanit.Sanitize(board.Category)
 }

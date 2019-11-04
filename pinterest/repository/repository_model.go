@@ -5,12 +5,12 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-type RepositoryStruct struct {
+type ReposStruct struct {
 	connectionString string
 	DataBase         *sql.DB
 }
 
-type RepositoryInterface interface {
+type ReposInterface interface {
 	Update(executeQuery string, params []interface{}) (int, error)
 	Insert(executeQuery string, params []interface{}) (string, error)
 

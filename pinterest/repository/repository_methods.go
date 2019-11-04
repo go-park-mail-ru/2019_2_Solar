@@ -11,7 +11,7 @@ import (
 
 var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
-func (RS *RepositoryStruct) NewDataBaseWorker() error {
+func (RS *ReposStruct) NewDataBaseWorker() error {
 	RS.connectionString = ConnStr
 	var err error
 
@@ -38,7 +38,7 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS *RepositoryStruct) LoadSchemaSQL() (Err error) {
+func (RS *ReposStruct) LoadSchemaSQL() (Err error) {
 	dbSchema := "sunrise_db.sql"
 
 	content, err := ioutil.ReadFile(dbSchema)
@@ -66,7 +66,7 @@ func (RS *RepositoryStruct) LoadSchemaSQL() (Err error) {
 	return nil
 }
 
-func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (string, error) {
+func (RS *ReposStruct) Insert(executeQuery string, params []interface{}) (string, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(executeQuery, params...).Scan(&id)
 	if err != nil {
@@ -75,7 +75,7 @@ func (RS *RepositoryStruct) Insert(executeQuery string, params []interface{}) (s
 	return strconv.FormatUint(id, 10), nil
 }
 
-func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (int, error) {
+func (RS *ReposStruct) Update(executeQuery string, params []interface{}) (int, error) {
 	result, err := RS.DataBase.Exec(executeQuery, params...)
 	if err != nil {
 		return 0, err
@@ -87,7 +87,7 @@ func (RS *RepositoryStruct) Update(executeQuery string, params []interface{}) (i
 	return int(rowsEdit), nil
 }
 
-func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interface{}) (Sl []models.User, Err error) {
+func (RS *ReposStruct) SelectFullUser(executeQuery string, params []interface{}) (Sl []models.User, Err error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -122,7 +122,7 @@ func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interfa
 	return usersSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
+func (RS *ReposStruct) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
 	userUniqueSlice := make([]models.UserUnique, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -144,7 +144,7 @@ func (RS *RepositoryStruct) SelectIDUsernameEmailUser(executeQuery string, param
 	return userUniqueSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
+func (RS *ReposStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -166,7 +166,7 @@ func (RS *RepositoryStruct) SelectUserCookies(executeQuery string, params []inte
 	return userCookiesSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectOneCol(executeQuery string, params []interface{}) (Sl []string, Err error) {
+func (RS *ReposStruct) SelectOneCol(executeQuery string, params []interface{}) (Sl []string, Err error) {
 	stringSlice := make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -188,7 +188,7 @@ func (RS *RepositoryStruct) SelectOneCol(executeQuery string, params []interface
 	return stringSlice, nil
 }
 
-func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interface{}) error {
+func (RS *ReposStruct) DeleteSession(executeQuery string, params []interface{}) error {
 	_, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err
@@ -196,7 +196,7 @@ func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interfac
 	return nil
 }
 
-func (RS *RepositoryStruct) DeleteSubscribe(executeQuery string, params []interface{}) error {
+func (RS *ReposStruct) DeleteSubscribe(executeQuery string, params []interface{}) error {
 	_, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err
@@ -204,7 +204,7 @@ func (RS *RepositoryStruct) DeleteSubscribe(executeQuery string, params []interf
 	return nil
 }
 
-func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interface{}) (categories []string, Err error) {
+func (RS *ReposStruct) SelectCategory(executeQuery string, params []interface{}) (categories []string, Err error) {
 	categories = make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -227,7 +227,7 @@ func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interfa
 	return categories, nil
 }
 
-func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{}) (Pins []models.Pin, Err error) {
+func (RS *ReposStruct) SelectPin(executeQuery string, params []interface{}) (Pins []models.Pin, Err error) {
 	pins := make([]models.Pin, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -251,7 +251,7 @@ func (RS *RepositoryStruct) SelectPin(executeQuery string, params []interface{})
 	return pins, nil
 }
 
-func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{}) (Board models.Board, Err error) {
+func (RS *ReposStruct) SelectBoard(executeQuery string, params []interface{}) (Board models.Board, Err error) {
 	var board models.Board
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -275,7 +275,7 @@ func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{
 	return board, nil
 }
 
-func (RS *RepositoryStruct) SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
+func (RS *ReposStruct) SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
 	var pins []models.PinForMainPage
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -297,7 +297,7 @@ func (RS *RepositoryStruct) SelectIDDirPins(executeQuery string, params []interf
 	return pins, nil
 }
 
-func (RS *RepositoryStruct) SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error) {
+func (RS *ReposStruct) SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error) {
 	var comments []models.CommentForSend
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
