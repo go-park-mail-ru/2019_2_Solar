@@ -6,7 +6,7 @@ import (
 )
 
 func (h *HandlersStruct) NewHandlers(e *echo.Echo) error {
-	useCase := usecase.UsecaseStruct{}
+	useCase := usecase.UseStruct{}
 	if err := useCase.NewUseCase(); err != nil {
 		return err
 	}

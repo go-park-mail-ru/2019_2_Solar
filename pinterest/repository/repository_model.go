@@ -5,19 +5,19 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-type RepositoryStruct struct {
+type ReposStruct struct {
 	connectionString string
 	DataBase         *sql.DB
 }
 
-type RepositoryInterface interface {
+type ReposInterface interface {
 	Update(executeQuery string, params []interface{}) (int, error)
 	Insert(executeQuery string, params []interface{}) (string, error)
 
 	SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error)
 	SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
-	SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
+	SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
 	DeleteSession(executeQuery string, params []interface{}) error
 	DeleteSubscribe(executeQuery string, params []interface{}) error
 
@@ -26,6 +26,6 @@ type RepositoryInterface interface {
 	SelectBoard(executeQuery string, params []interface{}) (models.Board, error)
 
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
-	SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
+	SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
 	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error)
 }

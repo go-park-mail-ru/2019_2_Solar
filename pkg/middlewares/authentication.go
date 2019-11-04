@@ -14,7 +14,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return next(ctx)
 		}
-		dbWorker := repository.RepositoryStruct{}
+		dbWorker := repository.ReposStruct{}
 		err = dbWorker.NewDataBaseWorker()
 		if err != nil {
 			return err

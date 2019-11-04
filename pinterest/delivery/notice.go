@@ -2,9 +2,9 @@ package delivery
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"strconv"
 	"time"
 )
@@ -29,7 +29,6 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 
 	if err := decoder.Decode(newNotice); err != nil {
 		return err
-
 	}
 
 	id := ctx.Param("receiver_id")
@@ -42,9 +41,9 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 	}
 
 	notice := models.Notice{
-		UserID: user.ID,
-		ReceiverID: uint64(receiverdID),
-		Message: newNotice.Message,
+		UserID:      user.ID,
+		ReceiverID:  uint64(receiverdID),
+		Message:     newNotice.Message,
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddNotice(notice)
@@ -57,11 +56,11 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 	data := struct {
 		Body struct {
 			Notice models.Notice `json:"notice"`
-			Info string `json:"info"`
+			Info   string        `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
 		Notice models.Notice `json:"notice"`
-		Info string `json:"info"`
+		Info   string        `json:"info"`
 	}{Info: "data successfully saved", Notice: notice}}
 
 	if err := encoder.Encode(data); err != nil {

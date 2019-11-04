@@ -18,16 +18,17 @@ import (
 	"time"
 )
 
-func (USC *UsecaseStruct) NewUseCase() error {
+
+func (USC *UseStruct) NewUseCase() error {
 	hub := webSocket.HubStruct{}
 	hub.NewHub()
-	rep := repository.RepositoryStruct{}
+	rep := repository.ReposStruct{}
 	err := rep.NewDataBaseWorker()
 	if err != nil {
 		return err
 	}
 	var mutex sync.Mutex
-	san := sanitizer.SanitizerStruct{}
+	san := sanitizer.SanitStruct{}
 	san.NewSanitizer()
 	USC.Mu = &mutex
 	USC.PRepository = &rep
@@ -37,7 +38,7 @@ func (USC *UsecaseStruct) NewUseCase() error {
 	return nil
 }
 
-func (USC UsecaseStruct) AddNewUserSession(userId string) (http.Cookie, error) {
+func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
 	sessionKeyValue, err := GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
@@ -48,7 +49,7 @@ func (USC UsecaseStruct) AddNewUserSession(userId string) (http.Cookie, error) {
 	cookieSessionKey.Path = "/"
 	cookieSessionKey.Expires = time.Now().Add(365 * 24 * time.Hour)
 	var params []interface{}
-	params = append(params, userId, cookieSessionKey.Value, cookieSessionKey.Expires)
+	params = append(params, userID, cookieSessionKey.Value, cookieSessionKey.Expires)
 	_, err = USC.PRepository.Insert(consts.INSERTSession, params)
 	if err != nil {
 		return *cookieSessionKey, err
@@ -86,17 +87,17 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC UsecaseStruct) AddNewUser(username, email, password string) (string, error) {
+func (USC UseStruct) AddNewUser(username, email, password string) (string, error) {
 	var params []interface{}
 	params = append(params, username, email, password)
-	lastId, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
+	lastID, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
 	if err != nil {
 		return "", err
 	}
-	return lastId, nil
+	return lastID, nil
 }
 
-func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
+func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
 	var params []interface{}
 	if newUser.Username != "" {
 		user.Username = newUser.Username
@@ -131,7 +132,7 @@ func (USC *UsecaseStruct) SetUser(newUser models.EditUserProfile, user models.Us
 	return editUsers, nil
 }
 
-func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
+func (USC *UseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
 	var params []interface{}
 	params = append(params, fileName, idUser)
 	editUsers, err := USC.PRepository.Update(consts.UPDATEUserAvatarDirByID, params)
@@ -141,7 +142,7 @@ func (USC *UsecaseStruct) SetUserAvatarDir(idUser, fileName string) (int, error)
 	return editUsers, nil
 }
 
-func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
+func (USC *UseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, error) {
 	hasher := md5.New()
 	if _, err := io.Copy(hasher, fileByte); err != nil {
 		return "", err
@@ -151,13 +152,13 @@ func (USC *UsecaseStruct) CalculateMD5FromFile(fileByte io.Reader) (string, erro
 	return fileHash, nil
 }
 
-func (USC *UsecaseStruct) AddDir(folder string) error {
+func (USC *UseStruct) AddDir(folder string) error {
 	if err := os.MkdirAll(folder, 0777); err != nil {
 		return err
 	}
 	return nil
 }
-func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err error) {
+func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err error) {
 	newFile, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -173,51 +174,51 @@ func (USC *UsecaseStruct) AddPictureFile(fileName string, fileByte io.Reader) (E
 	return nil
 }
 
-func (USC *UsecaseStruct) AddBoard(Board models.Board) (uint64, error) {
+func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
 	var params []interface{}
 	params = append(params, Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
-	lastId, err := USC.PRepository.Insert(consts.INSERTBoard, params)
+	lastID, err := USC.PRepository.Insert(consts.INSERTBoard, params)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastId)
+	id, err := strconv.Atoi(lastID)
 	if err != nil {
 		return 0, nil
 	}
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddPin(Pin models.Pin) (uint64, error) {
+func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	var params []interface{}
 	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
-	lastId, err := USC.PRepository.Insert(consts.INSERTPin, params)
+	lastID, err := USC.PRepository.Insert(consts.INSERTPin, params)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastId)
+	id, err := strconv.Atoi(lastID)
 	if err != nil {
 		return 0, nil
 	}
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddNotice(Notice models.Notice) (uint64, error) {
+func (USC *UseStruct) AddNotice(Notice models.Notice) (uint64, error) {
 	var params []interface{}
 	params = append(params, Notice.UserID, Notice.ReceiverID, Notice.Message, Notice.CreatedTime)
-	lastId, err := USC.PRepository.Insert(consts.INSERTNotice, params)
+	lastID, err := USC.PRepository.Insert(consts.INSERTNotice, params)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastId)
+	id, err := strconv.Atoi(lastID)
 	if err != nil {
 		return 0, nil
 	}
 	return uint64(id), nil
 }
 
-func (USC *UsecaseStruct) AddComment(pinId string, userId uint64, newComment models.NewComment) error {
+func (USC *UseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
 	var params []interface{}
-	params = append(params, pinId, newComment.Text, userId, time.Now())
+	params = append(params, pinID, newComment.Text, userID, time.Now())
 	_, err := USC.PRepository.Insert(consts.INSERTComment, params)
 	if err != nil {
 		return err
@@ -225,9 +226,9 @@ func (USC *UsecaseStruct) AddComment(pinId string, userId uint64, newComment mod
 	return nil
 }
 
-func (USC *UsecaseStruct) AddSubscribe(userId, followeeName string) error {
+func (USC *UseStruct) AddSubscribe(userID, followeeName string) error {
 	var params []interface{}
-	params = append(params, userId, followeeName)
+	params = append(params, userID, followeeName)
 	_, err := USC.PRepository.Insert(consts.INSERTSubscribeByName, params)
 	if err != nil {
 		return err

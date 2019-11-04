@@ -5,13 +5,13 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
-type SanitizerStruct struct {
-	sanitizer *bluemonday.Policy
+type SanitStruct struct {
+	sanit *bluemonday.Policy
 }
 
-type SanitizerInterface interface {
-	SanitizeUser(user *models.User)
-	SanitizePin(pin *models.Pin)
-	SanitizeComment(comment *models.CommentForSend)
-	SanitizeBoard(board *models.Board)
+type SanitInterface interface {
+	SanitUser(user *models.User)
+	SanitPin(pin *models.Pin)
+	SanitComment(comment *models.CommentForSend)
+	SanitBoard(board *models.Board)
 }

@@ -5,5 +5,7 @@ type JSONResponse struct {
 }
 
 type JSONInfoResponse struct {
-	Body struct{ Info string `json:"Info"` } `json:"Body"`
+	Body struct {
+		Info string `json:"Info"`
+	} `json:"Body"`
 }

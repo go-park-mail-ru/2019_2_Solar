@@ -3,9 +3,9 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -23,7 +23,7 @@ func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) 
 	if user == nil {
 		return errors.New("not authorized")
 	}
-	data := h.PUsecase.SetJsonData(user.(models.User), "OK")
+	data := h.PUsecase.SetJSONData(user.(models.User), "OK")
 
 	if err := encoder.Encode(data); err != nil {
 		return err
@@ -60,7 +60,7 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return err
 	}
 
-	editStrings, err := h.PUsecase.SetUser(*newUserProfile, user);
+	editStrings, err := h.PUsecase.SetUser(*newUserProfile, user)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return errors.New("several notes edit")
 	}
 
-	data := h.PUsecase.SetJsonData(nil, "data successfully saved")
+	data := h.PUsecase.SetJSONData(nil, "data successfully saved")
 
 	if err := encoder.Encode(data); err != nil {
 		return err
@@ -121,7 +121,7 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	if _, err := h.PUsecase.SetUserAvatarDir(strconv.Itoa(int(user.ID)), fileName); err != nil {
 		return err
 	}
-	data := h.PUsecase.SetJsonData(nil, "profile picture has been successfully saved")
+	data := h.PUsecase.SetJSONData(nil, "profile picture has been successfully saved")
 	if err := encoder.Encode(data); err != nil {
 		return err
 	}

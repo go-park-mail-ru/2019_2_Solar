@@ -4,7 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 )
 
-func (USC *UsecaseStruct) RemoveOldUserSession(sessionKey string) error {
+func (USC *UseStruct) RemoveOldUserSession(sessionKey string) error {
 	var params []interface{}
 	params = append(params, sessionKey)
 
@@ -15,9 +15,9 @@ func (USC *UsecaseStruct) RemoveOldUserSession(sessionKey string) error {
 	return nil
 }
 
-func (USC *UsecaseStruct) RemoveSubscribe(userId, followeeName string) error {
+func (USC *UseStruct) RemoveSubscribe(userID, followeeName string) error {
 	var params []interface{}
-	params = append(params, userId, followeeName)
+	params = append(params, userID, followeeName)
 
 	err := USC.PRepository.DeleteSubscribe(consts.DELETESubscribeByName, params)
 	if err != nil {

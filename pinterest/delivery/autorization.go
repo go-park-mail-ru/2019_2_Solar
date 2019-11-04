@@ -36,17 +36,17 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		return err
 	}
 
-	newUserId, err := h.PUsecase.AddNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
+	newUserID, err := h.PUsecase.AddNewUser(newUserReg.Username, newUserReg.Email, newUserReg.Password)
 	if err != nil {
 		return err
 	}
 
-	cookies, err := h.PUsecase.AddNewUserSession(newUserId)
+	cookies, err := h.PUsecase.AddNewUserSession(newUserID)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	ctx.SetCookie(&cookies)
-	data := h.PUsecase.SetJsonData(newUserReg, "OK")
+	data := h.PUsecase.SetJSONData(newUserReg, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 	if user := ctx.Get("User"); user != nil {
-		data := h.PUsecase.SetJsonData(user.(models.User), "OK")
+		data := h.PUsecase.SetJSONData(user.(models.User), "OK")
 		err := encoder.Encode(data)
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	ctx.SetCookie(&cookies)
-	data := h.PUsecase.SetJsonData(User, "OK")
+	data := h.PUsecase.SetJSONData(User, "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) (Err error) {
 	sessionKey.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(ctx.Response(), sessionKey)
 
-	data := h.PUsecase.SetJsonData(nil, "Session has been successfully deleted")
+	data := h.PUsecase.SetJSONData(nil, "Session has been successfully deleted")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err

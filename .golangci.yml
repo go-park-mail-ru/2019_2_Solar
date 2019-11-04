@@ -2,6 +2,10 @@ linters-settings:
   funlen:
     lines: 100
     statements: 50
+  dupl:
+    threshold: 160
+  lll:
+    line-length: 150
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -17,38 +21,37 @@ linters:
     - dogsled
     - funlen
     - golint
+    - dupl
+    - gochecknoinits
+    - goconst
+    - gocyclo
+    - gofmt
+    - lll
+    - gosimple
+    - staticcheck
+    - unused
+    - govet
+    - interfacer
+    - misspell
+    - nakedret
+    - stylecheck
+    - unconvert
+    - typecheck
+    - unparam
+    - whitespace
+    - varcheck
+    - structcheck
+    - gocognit
+    - prealloc
+    - maligned
+    - godox
+    - ineffassign
   # don't enable:
-
-#    - dupl
-#    - gochecknoinits
-#    - goconst
 #    - gocritic
-#    - gocyclo
-#    - gofmt
 #    - goimports
 #    - gosec
-#    - gosimple
-#    - govet
-#    - ineffassign
-#    - interfacer
-#    - lll
-#    - misspell
-#    - nakedret
 #    - scopelint
-#    - staticcheck
-#    - structcheck
-#    - stylecheck
-#    - typecheck
-#    - unconvert
-#    - unparam
-#    - unused
-#    - varcheck
-#    - whitespace
-#   - gochecknoglobals
-#   - gocognit
-#   - godox
-#   - maligned
-#   - prealloc
+#    - gochecknoglobals
 
 
 # golangci.com configuration

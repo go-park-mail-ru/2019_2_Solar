@@ -27,10 +27,13 @@ const (
 	SELECTBoardByID      = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
 		"FROM sunrise.board as b WHERE b.id = $1"
 
-	INSERTPin     = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"
-	SELECTPinByID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
+	INSERTPin = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime)" +
+		" VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"
+	SELECTPinByID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title," +
+		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.id = $1"
-	SELECTPinsByBoardID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
+	SELECTPinsByBoardID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title," +
+		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
 
 	SELECTNewPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
@@ -38,8 +41,14 @@ const (
 	SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 		"from sunrise.pin WHERE owner_id = $2 AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
 	SELECTSubscribePinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
-		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $2 AND s.followee_id = pin.owner_id AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
-	SELECTComments = "SELECT c.text, u.username, c.created_time FROM comment as c on c.pin_id = $1 join pin as p on p.id = $1 join user as u on u.id = p.owner_id"
+		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $2 " +
+		"AND s.followee_id = pin.owner_id " +
+		"AND isdeleted = false) as p " +
+		"WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+	SELECTComments = "SELECT c.text, u.username, c.created_time " +
+		"FROM comment as c on c.pin_id = $1 " +
+		"join pin as p on p.id = $1 " +
+		"join user as u on u.id = p.owner_id"
 
 	INSERTNotice          = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
 	INSERTComment         = "INSERT INTO sunrise.comments (pin_id, text, author_id, created_time) VALUES ($1,$2,$3,$4) RETURNING id"

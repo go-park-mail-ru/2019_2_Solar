@@ -2,9 +2,9 @@ package delivery
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"strconv"
 	"time"
 )
@@ -34,11 +34,11 @@ func (h *HandlersStruct) HandleCreateBoard(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.CheckBoardData(*newBoard); err != nil {
 		return err
 	}
-    board := models.Board{
-		OwnerID: user.ID,
-		Title: newBoard.Title,
+	board := models.Board{
+		OwnerID:     user.ID,
+		Title:       newBoard.Title,
 		Description: newBoard.Description,
-		Category: newBoard.Category,
+		Category:    newBoard.Category,
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddBoard(board)
@@ -51,11 +51,11 @@ func (h *HandlersStruct) HandleCreateBoard(ctx echo.Context) (Err error) {
 	data := struct {
 		Body struct {
 			Board models.Board `json:"board"`
-			Info string `json:"info"`
+			Info  string       `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
 		Board models.Board `json:"board"`
-		Info string `json:"info"`
+		Info  string       `json:"info"`
 	}{Info: "data successfully saved", Board: board}}
 
 	if err := encoder.Encode(data); err != nil {
@@ -100,13 +100,13 @@ func (h *HandlersStruct) HandleGetBoard(ctx echo.Context) (Err error) {
 	data := struct {
 		Body struct {
 			Board models.Board `json:"board"`
-			Pins []models.Pin `json:"pins"`
-			Info string `json:"info"`
+			Pins  []models.Pin `json:"pins"`
+			Info  string       `json:"info"`
 		} `json:"body"`
 	}{Body: struct {
 		Board models.Board `json:"board"`
-		Pins []models.Pin `json:"pins"`
-		Info string `json:"info"`
+		Pins  []models.Pin `json:"pins"`
+		Info  string       `json:"info"`
 	}{Info: "OK", Board: board, Pins: pins}}
 
 	if err := encoder.Encode(data); err != nil {
