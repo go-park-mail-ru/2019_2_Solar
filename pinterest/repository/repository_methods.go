@@ -12,7 +12,7 @@ import (
 
 var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
-func (RS *ReposStruct) NewDataBaseWorker() error {
+func (RS *ReposStruct) DataBaseInit() error {
 	RS.connectionString = ConnStr
 	var err error
 
@@ -64,6 +64,23 @@ func (RS *ReposStruct) LoadSchemaSQL() (Err error) {
 	if err := tx.Commit(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (RS *ReposStruct) NewDataBaseWorker() error {
+	RS.connectionString = ConnStr
+	var err error
+
+	RS.DataBase, err = sql.Open("postgres", ConnStr)
+	if err != nil {
+		return err
+	}
+	RS.DataBase.SetMaxOpenConns(10)
+	err = RS.DataBase.Ping()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -244,6 +261,29 @@ func (RS *ReposStruct) SelectPin(executeQuery string, params []interface{}) (Pin
 		scanPin := models.Pin{}
 		err := rows.Scan(&scanPin.ID, &scanPin.OwnerID, &scanPin.AuthorID, &scanPin.BoardID, &scanPin.Title,
 			&scanPin.Description, &scanPin.PinDir, &scanPin.CreatedTime, &scanPin.IsDeleted)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
+func (RS *ReposStruct) SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error) {
+	pins := make([]models.PinForSearchResult, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinForSearchResult{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
 		if err != nil {
 			return pins, err
 		}

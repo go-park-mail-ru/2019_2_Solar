@@ -23,7 +23,7 @@ func (USC *UseStruct) NewUseCase() error {
 	hub := webSocket.HubStruct{}
 	hub.NewHub()
 	rep := repository.ReposStruct{}
-	err := rep.NewDataBaseWorker()
+	err := rep.DataBaseInit()
 	if err != nil {
 		return err
 	}
@@ -124,6 +124,10 @@ func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) 
 		}
 		user.Age = uint(age)
 	}
+	if newUser.Status != "" {
+		user.Status = newUser.Status
+	}
+
 	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
 	editUsers, err := USC.PRepository.Update(consts.UPDATEUserByID, params)
 	if err != nil {

@@ -68,4 +68,6 @@ type UseInterface interface {
 	AddPictureFile(fileName string, fileByte io.Reader) (Err error)
 
 	ReturnHub() *webSocket.HubStruct
+	
+	SearchPinsByTag(tag string) ([]models.PinForSearchResult, error)
 }
