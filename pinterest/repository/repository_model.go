@@ -19,6 +19,7 @@ type RepositoryInterface interface {
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
 	SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
 	DeleteSession(executeQuery string, params []interface{}) error
+	DeleteSubscribe(executeQuery string, params []interface{}) error
 
 	SelectCategory(executeQuery string, params []interface{}) ([]string, error)
 

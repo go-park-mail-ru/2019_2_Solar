@@ -56,6 +56,7 @@ type UsecaseInterface interface {
 	AddNotice(newNotice models.Notice) (uint64, error)
 
 	AddSubscribe(userId, followeeName string) error
+	RemoveSubscribe(userId, followeeName string) error
 
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error

@@ -47,4 +47,8 @@ const (
 		"select $1, u.id from sunrise.users as u " +
 		"where u.username = $2 " +
 		"RETURNING id;"
+
+	DELETESubscribeByName = "DELETE FROM sunrise.subscribe as s WHERE s.subscriber_id = $1 and s.followee_id IN " +
+		"(select u.id from sunrise.users as u " +
+		"where u.username = $2);"
 )

@@ -193,6 +193,14 @@ func (RS *RepositoryStruct) DeleteSession(executeQuery string, params []interfac
 	return nil
 }
 
+func (RS *RepositoryStruct) DeleteSubscribe(executeQuery string, params []interface{}) error {
+	_, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (RS *RepositoryStruct) SelectCategory(executeQuery string, params []interface{}) (categories []string, Err error) {
 	categories = make([]string, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)

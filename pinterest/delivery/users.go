@@ -60,6 +60,25 @@ func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error){
 }
 
 func (h *HandlersStruct) HandleDeleteSubscribe(ctx echo.Context) (Err error) {
-
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	followeeName := ctx.Param("username")
+	if err := h.PUsecase.RemoveSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
+		return err
+	}
+	info := "data successfully deleted"
+	jsonStruct := models.JSONResponse{Body: info}
+	if err := ctx.JSON(200, jsonStruct); err != nil {
+		return err
+	}
 	return nil
 }

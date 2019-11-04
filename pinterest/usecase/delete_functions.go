@@ -14,3 +14,14 @@ func (USC *UsecaseStruct) RemoveOldUserSession(sessionKey string) error {
 	}
 	return nil
 }
+
+func (USC *UsecaseStruct) RemoveSubscribe(userId, followeeName string) error {
+	var params []interface{}
+	params = append(params, userId, followeeName)
+
+	err := USC.PRepository.DeleteSubscribe(consts.DELETESubscribeByName, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
