@@ -11,7 +11,7 @@ import (
 
 var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
-func (RS *ReposStruct) NewDataBaseWorker() error {
+func (RS *ReposStruct) DataBaseInit() error {
 	RS.connectionString = ConnStr
 	var err error
 
@@ -63,6 +63,23 @@ func (RS *ReposStruct) LoadSchemaSQL() (Err error) {
 	if err := tx.Commit(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (RS *ReposStruct) NewDataBaseWorker() error {
+	RS.connectionString = ConnStr
+	var err error
+
+	RS.DataBase, err = sql.Open("postgres", ConnStr)
+	if err != nil {
+		return err
+	}
+	RS.DataBase.SetMaxOpenConns(10)
+	err = RS.DataBase.Ping()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

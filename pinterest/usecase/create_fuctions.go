@@ -19,7 +19,7 @@ import (
 
 func (USC *UseStruct) NewUseCase() error {
 	rep := repository.ReposStruct{}
-	err := rep.NewDataBaseWorker()
+	err := rep.DataBaseInit()
 	if err != nil {
 		return err
 	}
