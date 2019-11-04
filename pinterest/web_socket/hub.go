@@ -1,10 +1,5 @@
 package webSocket
 
-type HubInterface interface {
-	NewHub()
-	Run()
-}
-
 type HubStruct struct {
 	// Registered Clients.
 	Clients map[*Client]bool
