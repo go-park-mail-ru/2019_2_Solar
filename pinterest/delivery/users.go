@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/labstack/echo"
+	"strconv"
 )
 
 func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
@@ -47,7 +48,7 @@ func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error){
 	}
 	user := getUser.(models.User)
 	followeeName := ctx.Param("username")
-	if err := h.PUsecase.AddSubscribe(string(user.ID), followeeName); err != nil {
+	if err := h.PUsecase.AddSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
 		return err
 	}
 	info := "data successfully saved"

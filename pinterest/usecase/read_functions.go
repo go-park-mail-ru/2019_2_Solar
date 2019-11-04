@@ -41,7 +41,7 @@ func (USC *UsecaseStruct) GetUserByEmail(email string) (models.User, error) {
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
+	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByEmail, params)
 	if err != nil {
 		return models.User{}, err
 	}
