@@ -3,9 +3,9 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -60,7 +60,7 @@ func (h *HandlersStruct) HandleEditProfileUserData(ctx echo.Context) (Err error)
 		return err
 	}
 
-	editStrings, err := h.PUsecase.SetUser(*newUserProfile, user);
+	editStrings, err := h.PUsecase.SetUser(*newUserProfile, user)
 	if err != nil {
 		return err
 	}

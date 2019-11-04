@@ -148,7 +148,7 @@ func (USC *UsecaseStruct) GetComments(pinId string) ([]models.CommentForSend, er
 	if err != nil {
 		return []models.CommentForSend{}, err
 	}
-	for _, comment :=range comments{
+	for _, comment := range comments {
 		USC.Sanitizer.SanitizeComment(&comment)
 	}
 	return comments, nil

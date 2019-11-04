@@ -3,8 +3,8 @@ package delivery
 import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/pkg/errors"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"strconv"
 )
 
@@ -35,7 +35,7 @@ func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 	return nil
 }
 
-func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error){
+func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error) {
 	defer func() {
 		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
 			Err = errors.Wrap(Err, bodyErr.Error())

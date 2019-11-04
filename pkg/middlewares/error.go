@@ -34,8 +34,12 @@ func CustomHTTPErrorHandler(err error, ctx echo.Context) {
 		ctx.Logger().Info(err)
 		//ctx.Logger().Fatal(err)
 		jsonError = ctx.JSON(400, struct {
-			Body struct{ Info string `json:"info"` } `json:"body"`
-		}{Body: struct{ Info string `json:"info"` }{Info: err.Error()}})
+			Body struct {
+				Info string `json:"info"`
+			} `json:"body"`
+		}{Body: struct {
+			Info string `json:"info"`
+		}{Info: err.Error()}})
 	}
 	if jsonError != nil {
 		ctx.Logger().Error("Server cant repay response")

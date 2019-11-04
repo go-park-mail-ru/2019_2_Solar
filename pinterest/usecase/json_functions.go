@@ -5,7 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC UsecaseStruct)SetJsonData(data interface{}, infMsg string) models.OutJSON {
+func (USC UsecaseStruct) SetJsonData(data interface{}, infMsg string) models.OutJSON {
 	user, ok := data.(models.User)
 	if ok {
 		outJSON := models.OutJSON{
@@ -34,7 +34,7 @@ func (USC UsecaseStruct)SetJsonData(data interface{}, infMsg string) models.OutJ
 	return outJSON
 }
 
-func (USC UsecaseStruct)SetResponseError(encoder *json.Encoder, msg string, err error) error {
+func (USC UsecaseStruct) SetResponseError(encoder *json.Encoder, msg string, err error) error {
 	data := USC.SetJsonData(nil, msg)
 	if err := encoder.Encode(data); err != nil {
 		return err
