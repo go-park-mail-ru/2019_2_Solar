@@ -6,7 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC *UsecaseStruct) GetUserIdByEmail(email string) (string, error) {
+func (USC *UsecaseStruct) GetUserIDByEmail(email string) (string, error) {
 	var str []string
 	var params []interface{}
 	params = append(params, email)
@@ -111,39 +111,39 @@ func (USC *UsecaseStruct) GetNewPins() ([]models.PinForMainPage, error) {
 	var err error
 	var params []interface{}
 	params = append(params, consts.NumberOfPinsOnPage)
-	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTNewPinsByNumber, params)
+	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTNewPinsByNumber, params)
 	if err != nil {
 		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UsecaseStruct) GetMyPins(userId uint64) ([]models.PinForMainPage, error) {
+func (USC *UsecaseStruct) GetMyPins(userID uint64) ([]models.PinForMainPage, error) {
 	var err error
 	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userId)
-	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTMyPinsByNumber, params)
+	params = append(params, consts.NumberOfPinsOnPage, userID)
+	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTMyPinsByNumber, params)
 	if err != nil {
 		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UsecaseStruct) GetSubscribePins(userId uint64) ([]models.PinForMainPage, error) {
+func (USC *UsecaseStruct) GetSubscribePins(userID uint64) ([]models.PinForMainPage, error) {
 	var err error
 	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userId)
-	pins, err := USC.PRepository.SelectIdDirPins(consts.SELECTSubscribePinsByNumber, params)
+	params = append(params, consts.NumberOfPinsOnPage, userID)
+	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTSubscribePinsByNumber, params)
 	if err != nil {
 		return []models.PinForMainPage{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UsecaseStruct) GetComments(pinId string) ([]models.CommentForSend, error) {
+func (USC *UsecaseStruct) GetComments(pinID string) ([]models.CommentForSend, error) {
 	var err error
 	var params []interface{}
-	params = append(params, pinId)
+	params = append(params, pinID)
 	comments, err := USC.PRepository.SelectComments(consts.SELECTComments, params)
 	if err != nil {
 		return []models.CommentForSend{}, err

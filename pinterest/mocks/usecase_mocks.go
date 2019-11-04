@@ -35,18 +35,18 @@ func (m *MockUsecaseInterface) EXPECT() *MockUsecaseInterfaceMockRecorder {
 	return m.recorder
 }
 
-// SetJsonData mocks base method
+// SetJSONData mocks base method
 func (m *MockUsecaseInterface) SetJsonData(data interface{}, infMsg string) models.OutJSON {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetJsonData", data, infMsg)
+	ret := m.ctrl.Call(m, "SetJSONData", data, infMsg)
 	ret0, _ := ret[0].(models.OutJSON)
 	return ret0
 }
 
-// SetJsonData indicates an expected call of SetJsonData
+// SetJSONData indicates an expected call of SetJSONData
 func (mr *MockUsecaseInterfaceMockRecorder) SetJsonData(data, infMsg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetJsonData", reflect.TypeOf((*MockUsecaseInterface)(nil).SetJsonData), data, infMsg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetJSONData", reflect.TypeOf((*MockUsecaseInterface)(nil).SetJsonData), data, infMsg)
 }
 
 // SetResponseError mocks base method

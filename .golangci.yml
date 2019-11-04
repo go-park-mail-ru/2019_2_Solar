@@ -4,6 +4,8 @@ linters-settings:
     statements: 50
   dupl:
     threshold: 160
+  lll:
+    line-length: 150
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -24,25 +26,25 @@ linters:
     - goconst
     - gocyclo
     - gofmt
+    - lll
+    - gosimple
+    - staticcheck
+    - unused
+    - govet
+    - interfacer
+    - misspell
+    - nakedret
+    - stylecheck
   # don't enable:
 #    - gocritic
 #    - goimports
 #    - gosec
-#    - gosimple
-#    - govet
 #    - ineffassign
-#    - interfacer
-#    - lll
-#    - misspell
-#    - nakedret
 #    - scopelint
-#    - staticcheck
 #    - structcheck
-#    - stylecheck
 #    - typecheck
 #    - unconvert
 #    - unparam
-#    - unused
 #    - varcheck
 #    - whitespace
 #   - gochecknoglobals

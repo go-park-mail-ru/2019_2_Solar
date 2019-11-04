@@ -125,7 +125,7 @@ type NewComment struct {
 
 type Comment struct {
 	ID          uint64    `json:"id"`
-	PinID       uint64    `json:"id"`
+	PinID       uint64    `json:"pin_id"`
 	Text        string    `json:"text"`
 	CreatedTime time.Time `json:"created_time"`
 	AuthorID    uint64    `json:"author_id"`

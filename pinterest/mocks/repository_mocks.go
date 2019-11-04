@@ -108,19 +108,19 @@ func (mr *MockRepositoryInterfaceMockRecorder) SelectOneCol(executeQuery, params
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectOneCol", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectOneCol), executeQuery, params)
 }
 
-// SelectIdUsernameEmailUser mocks base method
+// SelectIDUsernameEmailUser mocks base method
 func (m *MockRepositoryInterface) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectIdUsernameEmailUser", executeQuery, params)
+	ret := m.ctrl.Call(m, "SelectIDUsernameEmailUser", executeQuery, params)
 	ret0, _ := ret[0].([]models.UserUnique)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SelectIdUsernameEmailUser indicates an expected call of SelectIdUsernameEmailUser
+// SelectIDUsernameEmailUser indicates an expected call of SelectIDUsernameEmailUser
 func (mr *MockRepositoryInterfaceMockRecorder) SelectIdUsernameEmailUser(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectIdUsernameEmailUser", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectIdUsernameEmailUser), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectIDUsernameEmailUser", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectIdUsernameEmailUser), executeQuery, params)
 }
 
 // DeleteSession mocks base method

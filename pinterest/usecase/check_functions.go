@@ -24,14 +24,14 @@ func UsernameCheck(username string) error {
 	if len(username) >= 1 && len(username) <= 30 && validation.UsernameIsCorrect.MatchString(username) {
 		return nil
 	}
-	return errors.New("Incorrect username")
+	return errors.New("incorrect username")
 }
 
 func EmailCheck(email string) error {
 	if validation.EmailIsCorrect.MatchString(email) {
 		return nil
 	}
-	return errors.New("Incorrect email")
+	return errors.New("incorrect email")
 }
 
 func PasswordCheck(password string) error {
@@ -129,7 +129,7 @@ func (USC *UsecaseStruct) CheckRegUsernameEmailIsUnique(username, email string) 
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
-	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}
@@ -206,19 +206,19 @@ func (USC *UsecaseStruct) CheckProfileData(newProfileUser *models.EditUserProfil
 	return nil
 }
 
-func (USC *UsecaseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username, email string, userId uint64) error {
+func (USC *UsecaseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username, email string, userID uint64) error {
 	if newUsername == username && newEmail == email {
 		return nil
 	}
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, newUsername, newEmail)
-	userSlice, err := USC.PRepository.SelectIdUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
 	if err != nil {
 		return err
 	}
 	for _, user := range userSlice {
-		if user.ID == userId {
+		if user.ID == userID {
 			continue
 		}
 		if user.Username == newUsername {

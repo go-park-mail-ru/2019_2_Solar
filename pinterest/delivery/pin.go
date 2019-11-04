@@ -229,12 +229,12 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	pinId := ctx.Param("id")
+	pinID := ctx.Param("id")
 	var newComment models.NewComment
 	if err := ctx.Bind(newComment); err != nil {
 		return err
 	}
-	if err := h.PUsecase.AddComment(pinId, user.ID, newComment); err != nil {
+	if err := h.PUsecase.AddComment(pinID, user.ID, newComment); err != nil {
 		return err
 	}
 	info := "data successfully saved"

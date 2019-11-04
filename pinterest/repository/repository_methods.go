@@ -123,7 +123,7 @@ func (RS *RepositoryStruct) SelectFullUser(executeQuery string, params []interfa
 	return usersSlice, nil
 }
 
-func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
+func (RS *RepositoryStruct) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
 	userUniqueSlice := make([]models.UserUnique, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -276,7 +276,7 @@ func (RS *RepositoryStruct) SelectBoard(executeQuery string, params []interface{
 	return board, nil
 }
 
-func (RS *RepositoryStruct) SelectIdDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
+func (RS *RepositoryStruct) SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error) {
 	var pins []models.PinForMainPage
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {

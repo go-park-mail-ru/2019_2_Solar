@@ -15,9 +15,9 @@ func (USC *UsecaseStruct) RemoveOldUserSession(sessionKey string) error {
 	return nil
 }
 
-func (USC *UsecaseStruct) RemoveSubscribe(userId, followeeName string) error {
+func (USC *UsecaseStruct) RemoveSubscribe(userID, followeeName string) error {
 	var params []interface{}
-	params = append(params, userId, followeeName)
+	params = append(params, userID, followeeName)
 
 	err := USC.PRepository.DeleteSubscribe(consts.DELETESubscribeByName, params)
 	if err != nil {
