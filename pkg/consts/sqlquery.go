@@ -60,4 +60,8 @@ const (
 	DELETESubscribeByName = "DELETE FROM sunrise.subscribe as s WHERE s.subscriber_id = $1 and s.followee_id IN " +
 		"(select u.id from sunrise.users as u " +
 		"where u.username = $2);"
+
+	SELECTPinsByTag = "SELECT DISTINCT p.id, p.pindir, p.title FROM sunrise.pin as p " +
+		"JOIN sunrise.pinandtag as pt ON p.id = pt.pin_id " +
+		"WHERE pt.tag_name = $1 AND p.isdeleted = false;"
 )

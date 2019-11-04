@@ -1,8 +1,17 @@
 package usecase
 
-/*
-func SearchCookie(r *http.Request) (*http.Cookie, error) {
-	key, err := r.Cookie("session_key")
-	return key, err
+import (
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+)
+
+func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinForSearchResult, error) {
+	var err error
+	var params []interface{}
+	params = append(params, tag)
+	pins, err := USC.PRepository.SelectPinsByTag(consts.SELECTPinsByTag, params)
+	if err != nil {
+		return []models.PinForSearchResult{}, err
+	}
+	return pins, nil
 }
-*/

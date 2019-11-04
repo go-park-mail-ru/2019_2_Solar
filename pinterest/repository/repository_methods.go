@@ -268,6 +268,29 @@ func (RS *ReposStruct) SelectPin(executeQuery string, params []interface{}) (Pin
 	return pins, nil
 }
 
+func (RS *ReposStruct) SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error) {
+	pins := make([]models.PinForSearchResult, 0)
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinForSearchResult{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
 func (RS *ReposStruct) SelectBoard(executeQuery string, params []interface{}) (Board models.Board, Err error) {
 	var board models.Board
 	rows, err := RS.DataBase.Query(executeQuery, params...)

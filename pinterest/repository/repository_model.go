@@ -28,4 +28,5 @@ type ReposInterface interface {
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
 	SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
 	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error)
+	SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error)
 }

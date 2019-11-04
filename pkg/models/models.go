@@ -94,6 +94,12 @@ type PinForMainPage struct {
 	IsDeleted bool   `json:"is_deleted"`
 }
 
+type PinForSearchResult struct {
+	ID        uint64 `json:"id"`
+	PinDir    string `json:"pin_dir"`
+	Title	  string `json:"title"`
+}
+
 type Pin struct {
 	ID          uint64    `json:"id"`
 	OwnerID     uint64    `json:"owner_id"`

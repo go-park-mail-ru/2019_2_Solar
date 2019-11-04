@@ -40,5 +40,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo) error {
 	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
 
 	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
+
+	e.GET( "/find/pins/by/tag/:tag", h.HandlerFindPinByTag)
 	return nil
 }

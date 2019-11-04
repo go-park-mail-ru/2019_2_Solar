@@ -63,4 +63,6 @@ type UseInterface interface {
 	CalculateMD5FromFile(fileByte io.Reader) (string, error)
 	AddDir(folder string) error
 	AddPictureFile(fileName string, fileByte io.Reader) (Err error)
+
+	SearchPinsByTag(tag string) ([]models.PinForSearchResult, error)
 }
