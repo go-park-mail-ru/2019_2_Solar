@@ -1,15 +1,13 @@
 package delivery
 
 import (
-	"fmt"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/vars"
-	"github.com/gorilla/websocket"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
 func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
-	ws, err := vars.Upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
+	ws, err := webSocket.Upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {
 		return err
 	}
@@ -18,21 +16,12 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 			Err = errors.Wrap(Err, err.Error())
 		}
 	}()
-	for {
-		// Write
-		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		if err != nil {
-			ctx.Logger().Error(err)
-		}
+	client := &webSocket.Client{Hub: h.PUsecase.ReturnHub(), Conn: ws, Send: make(chan []byte, 256)}
+	client.Hub.Register <- client
 
-		// Read
-		_, msg, err := ws.ReadMessage()
-		if err != nil {
-			ctx.Logger().Error(err)
-		}
-		fmt.Printf("%s\n", msg)
-	}
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.WritePump()
+	go client.ReadPump()
 	return nil
 }
-
-

@@ -17,7 +17,6 @@ func main() {
 	e.Use(customMiddlewares.AuthenticationMiddleware)
 	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
 	e.Static("/static", "static")
-
 	handlers := delivery.HandlersStruct{}
 	if err := handlers.NewHandlers(e); err != nil {
 		e.Logger.Errorf("server error: %s", err)

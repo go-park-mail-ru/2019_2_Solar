@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
@@ -18,6 +19,8 @@ import (
 )
 
 func (USC *UsecaseStruct) NewUseCase() error {
+	hub := webSocket.HubStruct{}
+	hub.NewHub()
 	rep := repository.RepositoryStruct{}
 	err := rep.NewDataBaseWorker()
 	if err != nil {
@@ -29,6 +32,8 @@ func (USC *UsecaseStruct) NewUseCase() error {
 	USC.Mu = &mutex
 	USC.PRepository = &rep
 	USC.Sanitizer = &san
+	USC.Hub = hub
+	go USC.Hub.Run()
 	return nil
 }
 

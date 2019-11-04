@@ -1,45 +1,48 @@
-package web_socket
+package webSocket
 
-type Hub struct {
-	// Registered clients.
-	clients map[*Client]bool
-
-	// Inbound messages from the clients.
-	broadcast chan []byte
-
-	// Register requests from the clients.
-	register chan *Client
-
-	// Unregister requests from clients.
-	unregister chan *Client
+type HubInterface interface {
+	NewHub()
+	Run()
 }
 
-func newHub() *Hub {
-	return &Hub{
-		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
-	}
+type HubStruct struct {
+	// Registered Clients.
+	Clients map[*Client]bool
+
+	// Inbound messages from the Clients.
+	Broadcast chan []byte
+
+	// Register requests from the Clients.
+	Register chan *Client
+
+	// Unregister requests from Clients.
+	Unregister chan *Client
 }
 
-func (h *Hub) run() {
+func (h *HubStruct) NewHub() {
+	h.Broadcast = make(chan []byte)
+	h.Register = make(chan *Client)
+	h.Unregister = make(chan *Client)
+	h.Clients = make(map[*Client]bool)
+}
+
+func (h *HubStruct) Run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.clients[client] = true
-		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.send)
+		case client := <-h.Register:
+			h.Clients[client] = true
+		case client := <-h.Unregister:
+			if _, ok := h.Clients[client]; ok {
+				delete(h.Clients, client)
+				close(client.Send)
 			}
-		case message := <-h.broadcast:
-			for client := range h.clients {
+		case message := <-h.Broadcast:
+			for client := range h.Clients {
 				select {
-				case client.send <- message:
+				case client.Send <- message:
 				default:
-					close(client.send)
-					delete(h.clients, client)
+					close(client.Send)
+					delete(h.Clients, client)
 				}
 			}
 		}
