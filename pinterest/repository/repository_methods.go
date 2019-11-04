@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"strconv"
 )
@@ -38,7 +39,7 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	return nil
 }
 
-func (RS *RepositoryStruct) LoadSchemaSQL() error {
+func (RS *RepositoryStruct) LoadSchemaSQL() (Err error) {
 
 	dbSchema := "sunrise_db.sql"
 
@@ -50,7 +51,11 @@ func (RS *RepositoryStruct) LoadSchemaSQL() error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			Err = errors.Wrap(Err, err.Error())
+		}
+	}()
 
 	println(string(content))
 
