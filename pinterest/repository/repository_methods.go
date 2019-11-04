@@ -39,7 +39,6 @@ func (RS *RepositoryStruct) NewDataBaseWorker() error {
 }
 
 func (RS *RepositoryStruct) LoadSchemaSQL() (Err error) {
-
 	dbSchema := "sunrise_db.sql"
 
 	content, err := ioutil.ReadFile(dbSchema)

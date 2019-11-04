@@ -29,5 +29,4 @@ func main() {
 	}
 
 	e.Logger.Warnf("shutdown")
-
 }

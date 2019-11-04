@@ -17,7 +17,6 @@ func (USC UsecaseStruct) SetJSONData(data interface{}, infMsg string) models.Out
 		return outJSON
 	}
 	if users, ok := data.([]models.User); ok {
-
 		outJSON := models.OutJSON{
 			BodyJSON: models.DataJSON{
 				UsersJSON: users,

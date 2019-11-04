@@ -35,6 +35,10 @@ linters:
     - misspell
     - nakedret
     - stylecheck
+    - unconvert
+    - typecheck
+    - unparam
+    - whitespace
   # don't enable:
 #    - gocritic
 #    - goimports
@@ -42,11 +46,7 @@ linters:
 #    - ineffassign
 #    - scopelint
 #    - structcheck
-#    - typecheck
-#    - unconvert
-#    - unparam
 #    - varcheck
-#    - whitespace
 #   - gochecknoglobals
 #   - gocognit
 #   - godox

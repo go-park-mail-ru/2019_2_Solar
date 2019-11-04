@@ -29,7 +29,6 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 
 	if err := decoder.Decode(newNotice); err != nil {
 		return err
-
 	}
 
 	id := ctx.Param("receiver_id")
