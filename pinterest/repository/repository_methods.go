@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"strconv"
@@ -14,7 +13,7 @@ var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disa
 
 func (RS *RepositoryStruct) NewDataBaseWorker() error {
 	RS.connectionString = ConnStr
-	var err error = nil
+	var err error
 
 	RS.DataBase, err = sql.Open("postgres", ConnStr)
 	if err != nil {
@@ -137,7 +136,7 @@ func (RS *RepositoryStruct) SelectIdUsernameEmailUser(executeQuery string, param
 	}()
 	for rows.Next() {
 		user := models.UserUnique{}
-		err := rows.Scan(&user.Id, &user.Username, &user.Email)
+		err := rows.Scan(&user.ID, &user.Username, &user.Email)
 		if err != nil {
 			return userUniqueSlice, err
 		}

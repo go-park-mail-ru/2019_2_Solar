@@ -22,7 +22,7 @@ type UserReg struct {
 }
 
 type UserUnique struct {
-	Id       uint64
+	ID       uint64
 	Email    string
 	Username string
 }

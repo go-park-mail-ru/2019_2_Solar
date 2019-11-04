@@ -56,7 +56,7 @@ func GenSessionKey(length int) (string, error) {
 	bufferSize := int(float64(length) * 1.3)
 	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
 		if j%bufferSize == 0 {
-			var err error = nil
+			var err error
 			randomBytes, err = SecureRandomBytes(bufferSize)
 			if err != nil {
 				return "", err

@@ -1,25 +1,31 @@
+linters-settings:
+  funlen:
+    lines: 100
+    statements: 50
+
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
     - errcheck
-
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - ineffassign
+    - dogsled
+    - funlen
+    - golint
   # don't enable:
-#    - bodyclose
-#    - deadcode
-#    - depguard
-#    - dogsled
+
 #    - dupl
-#    - errcheck
-#    - funlen
 #    - gochecknoinits
 #    - goconst
 #    - gocritic
 #    - gocyclo
 #    - gofmt
 #    - goimports
-#    - golint
 #    - gosec
 #    - gosimple
 #    - govet
