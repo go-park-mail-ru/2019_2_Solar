@@ -41,7 +41,7 @@ func (USC UsecaseStruct) AddNewUserSession(userId string) (http.Cookie, error) {
 	cookieSessionKey.Name = "session_key"
 	cookieSessionKey.Value = sessionKeyValue
 	cookieSessionKey.Path = "/"
-	cookieSessionKey.Expires = time.Now().Add(1 * time.Hour)
+	cookieSessionKey.Expires = time.Now().Add(365 * 24 * time.Hour)
 	var params []interface{}
 	params = append(params, userId, cookieSessionKey.Value, cookieSessionKey.Expires)
 	_, err = USC.PRepository.Insert(consts.INSERTSession, params)
