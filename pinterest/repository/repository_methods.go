@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"strconv"

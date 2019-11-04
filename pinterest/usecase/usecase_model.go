@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"io"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 type UsecaseStruct struct {
 	PRepository repository.RepositoryInterface
 	Sanitizer   sanitizer.SanitizerInterface
+	Hub         webSocket.HubStruct
+	//HubClient	webSocket.Client
 	Mu          *sync.Mutex
 }
 
@@ -63,4 +66,6 @@ type UsecaseInterface interface {
 	CalculateMD5FromFile(fileByte io.Reader) (string, error)
 	AddDir(folder string) error
 	AddPictureFile(fileName string, fileByte io.Reader) (Err error)
+
+	ReturnHub() *webSocket.HubStruct
 }
