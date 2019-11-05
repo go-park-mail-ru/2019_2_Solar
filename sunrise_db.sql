@@ -58,10 +58,10 @@ CREATE TABLE sunrise.category (
 ALTER TABLE sunrise.category OWNER TO postgres;
 
 --
--- Name: comments; Type: TABLE; Schema: sunrise; Owner: postgres
+-- Name: comment; Type: TABLE; Schema: sunrise; Owner: postgres
 --
 
-CREATE TABLE sunrise.comments (
+CREATE TABLE sunrise.comment (
     id integer NOT NULL,
     pin_id integer,
     text text NOT NULL,
@@ -70,13 +70,13 @@ CREATE TABLE sunrise.comments (
 );
 
 
-ALTER TABLE sunrise.comments OWNER TO postgres;
+ALTER TABLE sunrise.comment OWNER TO postgres;
 
 --
--- Name: comments_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
+-- Name: comment_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
 --
 
-CREATE SEQUENCE sunrise.comments_id_seq
+CREATE SEQUENCE sunrise.comment_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -85,13 +85,13 @@ CREATE SEQUENCE sunrise.comments_id_seq
     CACHE 1;
 
 
-ALTER TABLE sunrise.comments_id_seq OWNER TO postgres;
+ALTER TABLE sunrise.comment_id_seq OWNER TO postgres;
 
 --
--- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
+-- Name: comment_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
 --
 
-ALTER SEQUENCE sunrise.comments_id_seq OWNED BY sunrise.comments.id;
+ALTER SEQUENCE sunrise.comment_id_seq OWNED BY sunrise.comment.id;
 
 
 --
@@ -255,10 +255,10 @@ CREATE TABLE sunrise.tag (
 ALTER TABLE sunrise.tag OWNER TO postgres;
 
 --
--- Name: users; Type: TABLE; Schema: sunrise; Owner: postgres
+-- Name: user; Type: TABLE; Schema: sunrise; Owner: postgres
 --
 
-CREATE TABLE sunrise.users (
+CREATE TABLE sunrise.user (
     id integer NOT NULL,
     username text NOT NULL,
     name text,
@@ -272,13 +272,13 @@ CREATE TABLE sunrise.users (
 );
 
 
-ALTER TABLE sunrise.users OWNER TO postgres;
+ALTER TABLE sunrise.user OWNER TO postgres;
 
 --
--- Name: users_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
+-- Name: user_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
 --
 
-CREATE SEQUENCE sunrise.users_id_seq
+CREATE SEQUENCE sunrise.user_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -287,20 +287,20 @@ CREATE SEQUENCE sunrise.users_id_seq
     CACHE 1;
 
 
-ALTER TABLE sunrise.users_id_seq OWNER TO postgres;
+ALTER TABLE sunrise.user_id_seq OWNER TO postgres;
 
 --
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
+-- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
 --
 
-ALTER SEQUENCE sunrise.users_id_seq OWNED BY sunrise.users.id;
+ALTER SEQUENCE sunrise.user_id_seq OWNED BY sunrise.user.id;
 
 
 --
--- Name: usersessions; Type: TABLE; Schema: sunrise; Owner: postgres
+-- Name: usersession; Type: TABLE; Schema: sunrise; Owner: postgres
 --
 
-CREATE TABLE sunrise.usersessions (
+CREATE TABLE sunrise.usersession (
     id integer NOT NULL,
     userid integer NOT NULL,
     cookiesvalue text NOT NULL,
@@ -308,13 +308,13 @@ CREATE TABLE sunrise.usersessions (
 );
 
 
-ALTER TABLE sunrise.usersessions OWNER TO postgres;
+ALTER TABLE sunrise.usersession OWNER TO postgres;
 
 --
--- Name: usersessions_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
+-- Name: usersession_id_seq; Type: SEQUENCE; Schema: sunrise; Owner: postgres
 --
 
-CREATE SEQUENCE sunrise.usersessions_id_seq
+CREATE SEQUENCE sunrise.usersession_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -323,13 +323,13 @@ CREATE SEQUENCE sunrise.usersessions_id_seq
     CACHE 1;
 
 
-ALTER TABLE sunrise.usersessions_id_seq OWNER TO postgres;
+ALTER TABLE sunrise.usersession_id_seq OWNER TO postgres;
 
 --
--- Name: usersessions_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
+-- Name: usersession_id_seq; Type: SEQUENCE OWNED BY; Schema: sunrise; Owner: postgres
 --
 
-ALTER SEQUENCE sunrise.usersessions_id_seq OWNED BY sunrise.usersessions.id;
+ALTER SEQUENCE sunrise.usersession_id_seq OWNED BY sunrise.usersession.id;
 
 
 --
@@ -340,10 +340,10 @@ ALTER TABLE ONLY sunrise.board ALTER COLUMN id SET DEFAULT nextval('sunrise.boar
 
 
 --
--- Name: comments id; Type: DEFAULT; Schema: sunrise; Owner: postgres
+-- Name: comment id; Type: DEFAULT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.comments ALTER COLUMN id SET DEFAULT nextval('sunrise.comments_id_seq'::regclass);
+ALTER TABLE ONLY sunrise.comment ALTER COLUMN id SET DEFAULT nextval('sunrise.comment_id_seq'::regclass);
 
 
 --
@@ -375,17 +375,17 @@ ALTER TABLE ONLY sunrise.subscribe ALTER COLUMN id SET DEFAULT nextval('sunrise.
 
 
 --
--- Name: users id; Type: DEFAULT; Schema: sunrise; Owner: postgres
+-- Name: user id; Type: DEFAULT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.users ALTER COLUMN id SET DEFAULT nextval('sunrise.users_id_seq'::regclass);
+ALTER TABLE ONLY sunrise.user ALTER COLUMN id SET DEFAULT nextval('sunrise.user_id_seq'::regclass);
 
 
 --
--- Name: usersessions id; Type: DEFAULT; Schema: sunrise; Owner: postgres
+-- Name: usersession id; Type: DEFAULT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.usersessions ALTER COLUMN id SET DEFAULT nextval('sunrise.usersessions_id_seq'::regclass);
+ALTER TABLE ONLY sunrise.usersession ALTER COLUMN id SET DEFAULT nextval('sunrise.usersession_id_seq'::regclass);
 
 
 --
@@ -396,10 +396,10 @@ SELECT pg_catalog.setval('sunrise.board_id_seq', 1, false);
 
 
 --
--- Name: comments_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
+-- Name: comment_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sunrise.comments_id_seq', 1, false);
+SELECT pg_catalog.setval('sunrise.comment_id_seq', 1, false);
 
 
 --
@@ -431,17 +431,17 @@ SELECT pg_catalog.setval('sunrise.subscribe_id_seq', 7, true);
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
+-- Name: user_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sunrise.users_id_seq', 2, true);
+SELECT pg_catalog.setval('sunrise.user_id_seq', 2, true);
 
 
 --
--- Name: usersessions_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
+-- Name: usersession_id_seq; Type: SEQUENCE SET; Schema: sunrise; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sunrise.usersessions_id_seq', 4, true);
+SELECT pg_catalog.setval('sunrise.usersession_id_seq', 4, true);
 
 
 --
@@ -461,11 +461,11 @@ ALTER TABLE ONLY sunrise.category
 
 
 --
--- Name: comments comments_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: comment comment_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.comments
-    ADD CONSTRAINT comments_pk PRIMARY KEY (id);
+ALTER TABLE ONLY sunrise.comment
+    ADD CONSTRAINT comment_pk PRIMARY KEY (id);
 
 
 --
@@ -517,19 +517,19 @@ ALTER TABLE ONLY sunrise.tag
 
 
 --
--- Name: users users_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: user user_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.users
-    ADD CONSTRAINT users_pk PRIMARY KEY (id);
+ALTER TABLE ONLY sunrise.user
+    ADD CONSTRAINT user_pk PRIMARY KEY (id);
 
 
 --
--- Name: usersessions usersessions_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: usersession usersession_pk; Type: CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
-ALTER TABLE ONLY sunrise.usersessions
-    ADD CONSTRAINT usersessions_pk PRIMARY KEY (id);
+ALTER TABLE ONLY sunrise.usersession
+    ADD CONSTRAINT usersession_pk PRIMARY KEY (id);
 
 
 --
@@ -547,10 +547,10 @@ CREATE UNIQUE INDEX category_name_uindex ON sunrise.category USING btree (name);
 
 
 --
--- Name: comments_id_uindex; Type: INDEX; Schema: sunrise; Owner: postgres
+-- Name: comment_id_uindex; Type: INDEX; Schema: sunrise; Owner: postgres
 --
 
-CREATE UNIQUE INDEX comments_id_uindex ON sunrise.comments USING btree (id);
+CREATE UNIQUE INDEX comment_id_uindex ON sunrise.comment USING btree (id);
 
 
 --
@@ -589,10 +589,10 @@ CREATE UNIQUE INDEX tag_name_uindex ON sunrise.tag USING btree (name);
 
 
 --
--- Name: users_id_uindex; Type: INDEX; Schema: sunrise; Owner: postgres
+-- Name: user_id_uindex; Type: INDEX; Schema: sunrise; Owner: postgres
 --
 
-CREATE UNIQUE INDEX users_id_uindex ON sunrise.users USING btree (id);
+CREATE UNIQUE INDEX user_id_uindex ON sunrise.user USING btree (id);
 
 
 --
@@ -604,27 +604,27 @@ ALTER TABLE ONLY sunrise.board
 
 
 --
--- Name: board board_users_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: board board_user_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.board
-    ADD CONSTRAINT board_users_id_fk FOREIGN KEY (owner_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT board_user_id_fk FOREIGN KEY (owner_id) REFERENCES sunrise.user(id);
 
 
 --
--- Name: notice notice_users_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
---
-
-ALTER TABLE ONLY sunrise.notice
-    ADD CONSTRAINT notice_users_id_fk FOREIGN KEY (user_id) REFERENCES sunrise.users(id);
-
-
---
--- Name: notice notice_users_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: notice notice_user_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.notice
-    ADD CONSTRAINT notice_users_id_fk_2 FOREIGN KEY (receiver_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT notice_user_id_fk FOREIGN KEY (user_id) REFERENCES sunrise.user(id);
+
+
+--
+-- Name: notice notice_user_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+--
+
+ALTER TABLE ONLY sunrise.notice
+    ADD CONSTRAINT notice_user_id_fk_2 FOREIGN KEY (receiver_id) REFERENCES sunrise.user(id);
 
 
 --
@@ -636,19 +636,19 @@ ALTER TABLE ONLY sunrise.pin
 
 
 --
--- Name: pin pin_users_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: pin pin_user_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.pin
-    ADD CONSTRAINT pin_users_id_fk FOREIGN KEY (owner_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT pin_user_id_fk FOREIGN KEY (owner_id) REFERENCES sunrise.user(id);
 
 
 --
--- Name: pin pin_users_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: pin pin_user_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.pin
-    ADD CONSTRAINT pin_users_id_fk_2 FOREIGN KEY (author_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT pin_user_id_fk_2 FOREIGN KEY (author_id) REFERENCES sunrise.user(id);
 
 
 --
@@ -668,19 +668,19 @@ ALTER TABLE ONLY sunrise.pinandtag
 
 
 --
--- Name: subscribe subscribe_users_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: subscribe subscribe_user_id_fk; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.subscribe
-    ADD CONSTRAINT subscribe_users_id_fk FOREIGN KEY (subscriber_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT subscribe_user_id_fk FOREIGN KEY (subscriber_id) REFERENCES sunrise.user(id);
 
 
 --
--- Name: subscribe subscribe_users_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
+-- Name: subscribe subscribe_user_id_fk_2; Type: FK CONSTRAINT; Schema: sunrise; Owner: postgres
 --
 
 ALTER TABLE ONLY sunrise.subscribe
-    ADD CONSTRAINT subscribe_users_id_fk_2 FOREIGN KEY (followee_id) REFERENCES sunrise.users(id);
+    ADD CONSTRAINT subscribe_user_id_fk_2 FOREIGN KEY (followee_id) REFERENCES sunrise.user(id);
 
 
 --
