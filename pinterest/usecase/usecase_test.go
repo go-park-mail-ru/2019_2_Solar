@@ -3,6 +3,8 @@ package usecase
 import (
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/mocks"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/golang/mock/gomock"
@@ -19,16 +21,18 @@ func TestPinterestUsecase_InsertNewUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
-
-	//ListUsers := make([]models.User, 0)
-	//ListSessions := make([]models.UserSession, 0)
-
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	t.Run("success", func(t *testing.T) {
 		user := &models.UserReg{
@@ -53,12 +57,18 @@ func TestPinterestUsecase_CreateNewUserSession(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	user := models.User{
 		ID: 1,
@@ -80,12 +90,18 @@ func TestPinterestUsecase_DeleteOldUserSession(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	session := models.UserSession{
 		ID: 0,
@@ -125,12 +141,18 @@ func TestPinterestUsecase_EditUsernameEmailIsUnique(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	user := models.User{
 		ID: 1,
@@ -146,7 +168,7 @@ func TestPinterestUsecase_EditUsernameEmailIsUnique(t *testing.T) {
 		var params []interface{}
 		params = append(params, newUsername, newEmail)
 
-		repo.EXPECT().SelectFullUser(consts.SELECTUserIdUsernameEmailByUsernameOrEmail, params).Return(nil, nil)
+		repo.EXPECT().SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params).Return(nil, nil)
 
 		err := us.CheckUsernameEmailIsUnique(newUsername, newEmail, user.Username, user.Email, user.ID)
 
@@ -255,12 +277,18 @@ func TestPinterestUsecase_EditProfileDataValidationCheck(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	t.Run("success", func (t *testing.T) {
 		newProfile := models.EditUserProfile{
@@ -283,12 +311,18 @@ func TestPinterestUsecase_GetAllUsers(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	expectedUsers := make([]models.User, 0)
 
@@ -331,7 +365,9 @@ func TestPinterestUsecase_GetAllUsers(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotNil(t, users)
-		assert.Equal(t, users, expectedUsers)
+		assert.Equal(t, users[0].Email, expectedUsers[0].Email)
+		assert.Equal(t, users[1].Email, expectedUsers[1].Email)
+		assert.Equal(t, users[2].Email, expectedUsers[2].Email)
 	})
 }
 
@@ -339,12 +375,18 @@ func TestPinterestUsecase_GenSessionKey(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	t.Run("success", func (t *testing.T) {
 		sessionKeyLenght := 20
@@ -361,12 +403,18 @@ func TestPinterestUsecase_GetUserByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	expectedUser := models.User{
 		ID:       2,
@@ -395,12 +443,18 @@ func TestPinterestUsecase_UpdateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	repo := mocks.NewMockRepositoryInterface(ctrl)
+	repo := mocks.NewMockReposInterface(ctrl)
 
 	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
 
-	us := UsecaseStruct{}
-	us.NewUseCase(&mutex, repo)
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
 
 	t.Run("success", func(t *testing.T) {
 		newProfile := models.EditUserProfile{
@@ -420,42 +474,492 @@ func TestPinterestUsecase_UpdateUser(t *testing.T) {
 		}
 
 		var params []interface{}
-		params = append(params, newProfile.Username, newProfile.Email, newProfile.Password)
+		params = append(params, newProfile.Username, newProfile.Name, newProfile.Surname, newProfile.Password, newProfile.Email,
+			newProfile.Age, newProfile.Status, user.ID)
 
-		repo.EXPECT().Insert(consts.INSERTRegistration, params).Return("0", nil)
+		repo.EXPECT().Update(consts.UPDATEUserByID, gomock.Any()).Return(0, nil)
 
 		id, err := us.SetUser(newProfile, user)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, id)
-		assert.Equal(t, id, strconv.Itoa(int(user.ID)))
+		assert.Equal(t, id, int(user.ID))
 	})
 }
 
-/*
-func TestPinterestUsecase_SearchUserByEmail(t *testing.T) {
-	mockListUsers := make([]models.User, 0)
-	mockListSession := make([]models.UserSession, 0)
+func TestUseStruct_AddBoard(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	user1 := models.User{
-		ID:       0,
-		Username: "Vitaly",
-		Email:    "something@mail.ru",
-		Password: "123QWErty!",
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
 	}
 
-	mockListUsers = append(mockListUsers, user1)
 	t.Run("success", func(t *testing.T) {
-		uc := NewPinterestUsecase(mockListUsers, mockListSession, &sync.Mutex{})
-		loginUser := models.UserLogin{
+		newBoard := models.Board{
+			OwnerID: 14,
+			Title: "SomeTitle",
+			Description: "SomeDesc",
+			Category: "Cars",
+			CreatedTime: time.Now(),
+		}
+		var params []interface{}
+		params = append(params, newBoard.OwnerID, newBoard.Title, newBoard.Description,
+			newBoard.Category, newBoard.CreatedTime)
+
+		repo.EXPECT().Insert(consts.INSERTBoard, params).Return("1", nil)
+
+		id, err := us.AddBoard(newBoard)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, id)
+		assert.Equal(t, id, uint64(1))
+	})
+}
+
+func TestUseStruct_AddPin(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		newPin := models.Pin{
+			OwnerID: 14,
+			AuthorID: 14,
+			BoardID: 1,
+			PinDir: "/die/",
+			Title: "SomeTitle",
+			Description: "SomeDesc",
+			CreatedTime: time.Now(),
+		}
+		var params []interface{}
+		params = append(params, newPin.OwnerID, newPin.AuthorID, newPin.BoardID, newPin.Title, newPin.Description,
+			newPin.PinDir, newPin.CreatedTime)
+
+		repo.EXPECT().Insert(consts.INSERTPin, params).Return("1", nil)
+
+		id, err := us.AddPin(newPin)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, id)
+		assert.Equal(t, id, uint64(1))
+	})
+}
+
+func TestUseStruct_SetJSONData(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+
+	t.Run("success for user json", func(t *testing.T) {
+		user := models.User{
+			ID:       0,
+			Username: "Vitaly",
 			Email:    "something@mail.ru",
 			Password: "123QWErty!",
 		}
-
-		user := uc.SearchUserByEmail(&loginUser)
-
-		assert.NotNil(t, user)
-
+		json := us.SetJSONData(user, "", "OK")
+		assert.NotNil(t, json)
+	})
+	t.Run("success for anotherUser json", func(t *testing.T) {
+		user := models.AnotherUser{
+			ID:       0,
+			Username: "Vitaly",
+			Password: "123QWErty!",
+		}
+		json := us.SetJSONData(user, "", "OK")
+		assert.NotNil(t, json)
+	})
+	t.Run("success for users json", func(t *testing.T) {
+		users := []models.User{
+			{
+				ID:       0,
+				Username: "Vitaly",
+				Email:    "something@mail.ru",
+				Password: "123QWErty!",
+			},
+			{
+				ID:       1,
+				Username: "Anton",
+				Email:    "Logvinov@mail.ru",
+				Password: "123QWErty!",
+			},
+		}
+		json := us.SetJSONData(users, "", "OK")
+		assert.NotNil(t, json)
+	})
+	t.Run("success for AnotherUsers json", func(t *testing.T) {
+		users := []models.AnotherUser{
+			{
+				ID:       0,
+				Username: "Vitaly",
+				Password: "123QWErty!",
+			},
+			{
+				ID:       1,
+				Username: "Anton",
+				Password: "123QWErty!",
+			},
+		}
+		json := us.SetJSONData(users, "", "OK")
+		assert.NotNil(t, json)
+	})
+	t.Run("success for info json", func(t *testing.T) {
+		json := us.SetJSONData(nil, "", "OK")
+		assert.NotNil(t, json)
 	})
 }
-*/
+
+func TestUseStruct_AddNotice(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		newNotice := models.Notice{
+			UserID:      1,
+			ReceiverID:  1,
+			Message:     "Hello",
+			CreatedTime: time.Time{},
+		}
+		var params []interface{}
+		params = append(params, newNotice.UserID, newNotice.ReceiverID, newNotice.Message,
+			newNotice.CreatedTime)
+
+		repo.EXPECT().Insert(consts.INSERTNotice, params).Return("1", nil)
+
+		lastID, err := us.AddNotice(newNotice)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, lastID)
+		assert.Equal(t, lastID, uint64(1))
+	})
+}
+
+func TestUseStruct_AddConment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		newComment := models.NewComment{
+			Text:        "Fuu",
+		}
+		var params []interface{}
+		params = append(params, "1", newComment.Text, uint64(1),  time.Now())
+
+		repo.EXPECT().Insert(consts.INSERTComment, gomock.Any()).Return("1", nil)
+
+		err := us.AddComment("1", uint64(1),newComment)
+
+		assert.NoError(t, err)
+	})
+}
+
+func TestUseStruct_ExtractFormatFile(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		fileName := "file.txt"
+
+		format, err := us.ExtractFormatFile(fileName)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, format)
+		assert.Equal(t, ".txt", format)
+	})
+	t.Run("failed", func(t *testing.T) {
+		fileName := "file,txt"
+
+		_, err := us.ExtractFormatFile(fileName)
+
+		assert.Error(t, err)
+	})
+}
+
+func TestUseStruct_SearchPinsByTag(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		tagName := "car"
+
+		expectedPin := []models.PinForSearchResult{
+			{
+				ID:     1,
+				PinDir: "/dir/",
+				Title:  "TheBest",
+			},
+		}
+		var params []interface{}
+		params = append(params, tagName)
+
+		repo.EXPECT().SelectPinsByTag(consts.SELECTPinsByTag, params).Return(expectedPin, nil)
+
+		pinst, err := us.SearchPinsByTag(tagName)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, pinst)
+		assert.Equal(t, pinst[0], expectedPin[0])
+	})
+}
+
+func TestUseStruct_GetAllUsers(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+	t.Run("success", func(t *testing.T) {
+		selectedUsers := []models.User{
+			{
+				ID:       0,
+				Username: "Vitaly",
+				Email:    "something@mail.ru",
+				Password: "123QWErty!",
+			},
+			{
+				ID:       1,
+				Username: "Anton",
+				Email:    "Logvinov@mail.ru",
+				Password: "123QWErty!",
+			},
+		}
+
+		expectedUsers := []models.AnotherUser{
+			{
+				ID:       0,
+				Username: "Vitaly",
+				Email:    "something@mail.ru",
+				Password: "123QWErty!",
+			},
+			{
+				ID:       1,
+				Username: "Anton",
+				Email:    "Logvinov@mail.ru",
+				Password: "123QWErty!",
+			},
+		}
+
+		repo.EXPECT().SelectFullUser(consts.SELECTAllUsers, nil).Return(selectedUsers, nil)
+
+		users, err := us.GetAllUsers()
+
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.Equal(t, users, expectedUsers)
+	})
+}
+
+func TestUseStruct_GetUserIDByEmail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		email := "something@mail.ru"
+
+		var params []interface{}
+		params = append(params, email)
+
+		repo.EXPECT().SelectOneCol(consts.SELECTUserIDByEmail, params).Return([]string{"1"}, nil)
+
+		id, err := us.GetUserIDByEmail(email)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, id)
+		assert.Equal(t, id, "1")
+	})
+}
+
+func TestUseStruct_GetPin(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		pinID := "1"
+		selectedPins := []models.Pin{
+			{
+				OwnerID: 14,
+				AuthorID: 14,
+				BoardID: 1,
+				PinDir: "/die/",
+				Title: "SomeTitle",
+				Description: "SomeDesc",
+				CreatedTime: time.Now(),
+			},
+		}
+
+		var params []interface{}
+		params = append(params, pinID)
+
+		repo.EXPECT().SelectPin(consts.SELECTPinByID, params).Return(selectedPins, nil)
+
+		pin, err := us.GetPin(pinID)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, pin)
+		assert.Equal(t, pin, selectedPins[0])
+	})
+}
+
+func TestUseStruct_GetBoard(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockReposInterface(ctrl)
+
+	var mutex sync.Mutex
+	san :=  sanitizer.SanitStruct{}
+	san.NewSanitizer()
+	hub :=  webSocket.HubStruct{}
+	hub.NewHub()
+
+	us := UseStruct{}
+	if err := us.NewUseCase(&mutex, repo, &san, hub); err != nil {
+		assert.NoError(t, err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		boardID := uint64(1)
+		selectedBoard := models.Board{
+				ID: 1,
+				OwnerID: 14,
+				Title: "SomeTitle",
+				Description: "SomeDesc",
+				Category: "cars",
+				CreatedTime: time.Now(),
+		}
+
+		var params []interface{}
+		params = append(params, boardID)
+
+		repo.EXPECT().SelectBoard(consts.SELECTBoardByID, params).Return(selectedBoard, nil)
+
+		board, err := us.GetBoard(boardID)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, board)
+		assert.Equal(t, board, selectedBoard)
+	})
+}
