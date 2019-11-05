@@ -49,11 +49,13 @@ func (h *HandlersStruct) HandleCreateBoard(ctx echo.Context) (Err error) {
 	board.IsDeleted = false
 
 	data := struct {
+		CSRFToken string `json:'csrf_token'`
 		Body struct {
 			Board models.Board `json:"board"`
 			Info  string       `json:"info"`
 		} `json:"body"`
-	}{Body: struct {
+	}{	CSRFToken: ctx.Get("token").(string),
+		Body: struct {
 		Board models.Board `json:"board"`
 		Info  string       `json:"info"`
 	}{Info: "data successfully saved", Board: board}}
@@ -98,12 +100,14 @@ func (h *HandlersStruct) HandleGetBoard(ctx echo.Context) (Err error) {
 	}
 
 	data := struct {
+		CSRFToken string `json:'csrf_token'`
 		Body struct {
 			Board models.Board `json:"board"`
 			Pins  []models.Pin `json:"pins"`
 			Info  string       `json:"info"`
 		} `json:"body"`
-	}{Body: struct {
+	}{  CSRFToken: ctx.Get("token").(string),
+		Body: struct {
 		Board models.Board `json:"board"`
 		Pins  []models.Pin `json:"pins"`
 		Info  string       `json:"info"`

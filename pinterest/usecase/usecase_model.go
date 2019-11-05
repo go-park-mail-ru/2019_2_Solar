@@ -20,7 +20,7 @@ type UseStruct struct {
 }
 
 type UseInterface interface {
-	SetJSONData(data interface{}, infMsg string) models.OutJSON
+	SetJSONData(data interface{}, token string, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error) error
 
 	GetUserByUsername(username string) (models.AnotherUser, error)

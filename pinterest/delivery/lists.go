@@ -21,7 +21,7 @@ func (h *HandlersStruct) HandleListUsers(ctx echo.Context) (Err error) {
 		return err
 	}
 
-	data := h.PUsecase.SetJSONData(users, "OK")
+	data := h.PUsecase.SetJSONData(users, ctx.Get("token").(string),"OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err

@@ -359,3 +359,25 @@ func (RS *ReposStruct) SelectComments(executeQuery string, params []interface{})
 	}
 	return comments, nil
 }
+
+func (RS *ReposStruct) SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error) {
+	var sessions []models.UserSession
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return sessions, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	scanSession := models.UserSession{}
+	for rows.Next() {
+		err := rows.Scan(&scanSession.ID, &scanSession.UserID)
+		if err != nil {
+			return sessions, err
+		}
+		sessions = append(sessions, scanSession)
+	}
+	return sessions, nil
+}

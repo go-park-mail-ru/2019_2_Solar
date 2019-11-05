@@ -15,7 +15,7 @@ func (h *HandlersStruct) HandleEmpty(ctx echo.Context) (Err error) {
 		}
 	}()
 	encoder := json.NewEncoder(ctx.Response())
-	data := h.PUsecase.SetJSONData(nil, "Empty handler has been done")
+	data := h.PUsecase.SetJSONData(nil, ctx.Get("token").(string), "Empty handler has been done")
 	if err := encoder.Encode(data); err != nil {
 		return err
 	}

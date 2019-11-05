@@ -75,7 +75,8 @@ type DataJSON struct {
 }
 
 type OutJSON struct {
-	BodyJSON interface{} `json:"body"`
+	CSRFToken string 	  `json:"csrf_token"`
+	BodyJSON  interface{} `json:"body"`
 }
 
 type NewBoard struct {

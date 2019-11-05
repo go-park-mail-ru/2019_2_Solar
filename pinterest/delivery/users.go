@@ -27,7 +27,7 @@ func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 		return err
 	}
 
-	data := h.PUsecase.SetJSONData(userProfile, "OK")
+	data := h.PUsecase.SetJSONData(userProfile, ctx.Get("token").(string), "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err

@@ -64,4 +64,7 @@ const (
 	SELECTPinsByTag = "SELECT DISTINCT p.id, p.pindir, p.title FROM sunrise.pin as p " +
 		"JOIN sunrise.pinandtag as pt ON p.id = pt.pin_id " +
 		"WHERE pt.tag_name = $1 AND p.isdeleted = false;"
+
+	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersessions as s " +
+		"WHERE s.cookiesvalue = $1;"
 )

@@ -83,11 +83,13 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 	pin.IsDeleted = false
 
 	data := struct {
+		CSRFToken string `json:'csrf_token'`
 		Body struct {
 			Pin  models.Pin `json:"pin"`
 			Info string     `json:"info"`
 		} `json:"body"`
-	}{Body: struct {
+	}{	CSRFToken: ctx.Get("token").(string),
+		Body: struct {
 		Pin  models.Pin `json:"pin"`
 		Info string     `json:"info"`
 	}{Info: "data successfully saved", Pin: pin}}

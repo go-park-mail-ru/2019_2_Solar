@@ -54,11 +54,13 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 	notice.IsRead = false
 
 	data := struct {
+		CSRFToken string `json:'csrf_token'`
 		Body struct {
 			Notice models.Notice `json:"notice"`
 			Info   string        `json:"info"`
 		} `json:"body"`
-	}{Body: struct {
+	}{ CSRFToken: ctx.Get("token").(string),
+		Body: struct {
 		Notice models.Notice `json:"notice"`
 		Info   string        `json:"info"`
 	}{Info: "data successfully saved", Notice: notice}}
