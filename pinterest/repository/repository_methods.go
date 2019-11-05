@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var ConnStr string = "user=postgres password=7396 dbname=sunrise_db sslmode=disable"
+var ConnStr string = "host=my_postgres user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
 func (RS *ReposStruct) DataBaseInit() error {
 	RS.connectionString = ConnStr
