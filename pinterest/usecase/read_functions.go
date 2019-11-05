@@ -11,7 +11,7 @@ func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	str, err = USC.PRepository.SelectOneCol(consts.SelectUserIDByEmail, params)
+	str, err = USC.PRepository.SelectOneCol(consts.SELECTUserIDByEmail, params)
 	if err != nil {
 		return "", err
 	}

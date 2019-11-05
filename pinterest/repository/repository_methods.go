@@ -56,8 +56,6 @@ func (RS *ReposStruct) LoadSchemaSQL() (Err error) {
 		}
 	}()
 
-	println(string(content))
-
 	if _, err = tx.Exec(string(content)); err != nil {
 		return err
 	}

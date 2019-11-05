@@ -19,20 +19,11 @@ import (
 )
 
 
-func (USC *UseStruct) NewUseCase() error {
-	hub := webSocket.HubStruct{}
-	hub.NewHub()
-	rep := repository.ReposStruct{}
-	err := rep.DataBaseInit()
-	if err != nil {
-		return err
-	}
-	var mutex sync.Mutex
-	san := sanitizer.SanitStruct{}
-	san.NewSanitizer()
-	USC.Mu = &mutex
-	USC.PRepository = &rep
-	USC.Sanitizer = &san
+func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
+	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
+	USC.Mu = mu
+	USC.PRepository = rep
+	USC.Sanitizer = san
 	USC.Hub = hub
 	go USC.Hub.Run()
 	return nil
