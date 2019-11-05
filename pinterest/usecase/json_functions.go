@@ -16,10 +16,28 @@ func (USC UseStruct) SetJSONData(data interface{}, infMsg string) models.OutJSON
 		}
 		return outJSON
 	}
+	if anotherUser, ok := data.(models.AnotherUser); ok {
+		outJSON := models.OutJSON{
+			BodyJSON: models.DataJSON{
+				UserJSON: anotherUser,
+				InfoJSON:  infMsg,
+			},
+		}
+		return outJSON
+	}
 	if users, ok := data.([]models.User); ok {
 		outJSON := models.OutJSON{
 			BodyJSON: models.DataJSON{
 				UsersJSON: users,
+				InfoJSON:  infMsg,
+			},
+		}
+		return outJSON
+	}
+	if anotherUsers, ok := data.([]models.AnotherUser); ok {
+		outJSON := models.OutJSON{
+			BodyJSON: models.DataJSON{
+				UsersJSON: anotherUsers,
 				InfoJSON:  infMsg,
 			},
 		}

@@ -42,8 +42,21 @@ type EditUserProfile struct {
 	Status   string `json:"status"`
 }
 
+type AnotherUser struct {
+	ID        uint64 `json:"id"`
+	Username  string `json:"username"`
+	Name      string `json:"name"`
+	Surname   string `json:"surname"`
+	Password  string `json:"-"`
+	Email     string `json:"-"`
+	Age       uint   `json:"age"`
+	Status    string `json:"status"`
+	AvatarDir string `json:"avatar_dir"`
+	IsActive  bool   `json:"is_active"`
+}
+
 type User struct {
-	ID        uint64 `json:"-"`
+	ID        uint64 `json:"id"`
 	Username  string `json:"username"`
 	Name      string `json:"name"`
 	Surname   string `json:"surname"`

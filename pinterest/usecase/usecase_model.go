@@ -23,10 +23,10 @@ type UseInterface interface {
 	SetJSONData(data interface{}, infMsg string) models.OutJSON
 	SetResponseError(encoder *json.Encoder, msg string, err error) error
 
-	GetUserByUsername(username string) (models.User, error)
+	GetUserByUsername(username string) (models.AnotherUser, error)
 	GetUserByEmail(email string) (models.User, error)
 	GetUserIDByEmail(email string) (string, error)
-	GetAllUsers() ([]models.User, error)
+	GetAllUsers() ([]models.AnotherUser, error)
 
 	CheckRegData(newUser *models.UserReg) error
 	CheckRegUsernameEmailIsUnique(username, email string) error
