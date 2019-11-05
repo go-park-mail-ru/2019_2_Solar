@@ -1,11 +1,13 @@
 package webSocket
 
+import "github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+
 type HubStruct struct {
 	// Registered Clients.
 	Clients map[*Client]bool
 
 	// Inbound messages from the Clients.
-	Broadcast chan []byte
+	Broadcast chan models.ChatMessage
 
 	// Register requests from the Clients.
 	Register chan *Client
@@ -15,7 +17,7 @@ type HubStruct struct {
 }
 
 func (h *HubStruct) NewHub() {
-	h.Broadcast = make(chan []byte)
+	h.Broadcast = make(chan models.ChatMessage)
 	h.Register = make(chan *Client)
 	h.Unregister = make(chan *Client)
 	h.Clients = make(map[*Client]bool)
@@ -31,13 +33,15 @@ func (h *HubStruct) Run() {
 				delete(h.Clients, client)
 				close(client.Send)
 			}
-		case message := <-h.Broadcast:
+		case chatMessage := <-h.Broadcast:
 			for client := range h.Clients {
-				select {
-				case client.Send <- message:
-				default:
-					close(client.Send)
-					delete(h.Clients, client)
+				if client.UserId == chatMessage.IdRecipient {
+					select {
+					case client.Send <- chatMessage:
+					default:
+						close(client.Send)
+						delete(h.Clients, client)
+					}
 				}
 			}
 		}

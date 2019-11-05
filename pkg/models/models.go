@@ -95,9 +95,9 @@ type PinForMainPage struct {
 }
 
 type PinForSearchResult struct {
-	ID        uint64 `json:"id"`
-	PinDir    string `json:"pin_dir"`
-	Title	  string `json:"title"`
+	ID     uint64 `json:"id"`
+	PinDir string `json:"pin_dir"`
+	Title  string `json:"title"`
 }
 
 type Pin struct {
@@ -141,4 +141,18 @@ type CommentForSend struct {
 	Text        string    `json:"text"`
 	CreatedTime time.Time `json:"created_time"`
 	Author      string    `json:"author_username"`
+}
+
+type NewChatMessage struct {
+	IdSender          uint64 `json:"id_sender"`
+	UserNameRecipient string `json:"username_recipient"`
+	Message              string `json:"text"`
+}
+
+type ChatMessage struct {
+	IdSender    uint64    `json:"id_sender"`
+	IdRecipient uint64    `json:"id_recipient"`
+	Message        string    `json:"text"`
+	SendTime    time.Time `json:"send_time"`
+	IsDeleted   bool      `json:"is_deleted"`
 }
