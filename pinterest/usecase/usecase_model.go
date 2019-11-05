@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/gorilla/websocket"
 	"io"
 	"net/http"
 	"sync"
@@ -70,4 +71,6 @@ type UseInterface interface {
 	ReturnHub() *webSocket.HubStruct
 	
 	SearchPinsByTag(tag string) ([]models.PinForSearchResult, error)
+
+	CreateClient(conn *websocket.Conn, userId uint64)
 }

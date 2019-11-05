@@ -57,6 +57,9 @@ const (
 		"where u.username = $2 " +
 		"RETURNING id;"
 
+	INSERTChatMessage = "INSERT INTO sunrise.message (sender_id, receiver_id, message, send_time) " +
+		"SELECT $1, u.id, $3, $4 from sunrise.users as u where u.username = $2 RETURNING id"
+
 	DELETESubscribeByName = "DELETE FROM sunrise.subscribe as s WHERE s.subscriber_id = $1 and s.followee_id IN " +
 		"(select u.id from sunrise.users as u " +
 		"where u.username = $2);"
