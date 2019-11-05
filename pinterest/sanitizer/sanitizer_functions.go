@@ -12,7 +12,9 @@ func (San *SanitStruct) NewSanitizer() {
 func (San *SanitStruct) SanitUser(user *models.User) {
 	user.Name = San.sanit.Sanitize(user.Name)
 	user.Surname = San.sanit.Sanitize(user.Surname)
+	user.Email = San.sanit.Sanitize(user.Email)
 	user.Username = San.sanit.Sanitize(user.Username)
+	user.Status = San.sanit.Sanitize(user.Status)
 }
 
 func (San *SanitStruct) SanitPin(pin *models.Pin) {
@@ -20,8 +22,14 @@ func (San *SanitStruct) SanitPin(pin *models.Pin) {
 	pin.Title = San.sanit.Sanitize(pin.Title)
 }
 
+func (San *SanitStruct) SanitPinForSearchResult(pin *models.PinForSearchResult) {
+	pin.Title = San.sanit.Sanitize(pin.Title)
+}
+
+
 func (San *SanitStruct) SanitComment(comment *models.CommentForSend) {
 	comment.Text = San.sanit.Sanitize(comment.Text)
+	comment.Author = San.sanit.Sanitize(comment.Author)
 }
 
 func (San *SanitStruct) SanitBoard(board *models.Board) {

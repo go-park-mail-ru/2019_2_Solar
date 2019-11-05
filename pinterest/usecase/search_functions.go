@@ -13,5 +13,8 @@ func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinForSearchResult, 
 	if err != nil {
 		return []models.PinForSearchResult{}, err
 	}
+	for _, pin := range pins {
+		USC.Sanitizer.SanitPinForSearchResult(&pin)
+	}
 	return pins, nil
 }
