@@ -75,4 +75,6 @@ type UseInterface interface {
 	SearchPinsByTag(tag string) ([]models.PinForSearchResult, error)
 
 	CreateClient(conn *websocket.Conn, userId uint64)
+
+	GetBoards(UserID uint64) ([]models.Board, error)
 }

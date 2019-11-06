@@ -118,6 +118,21 @@ func (USC *UseStruct) GetBoard(boardID uint64) (models.Board, error) {
 	return board, nil
 }
 
+func (USC *UseStruct) GetBoards(UserID uint64) ([]models.Board, error) {
+	var err error
+	var params []interface{}
+	params = append(params, UserID)
+
+	boards, err := USC.PRepository.SelectBoards(consts.SELECTBoardsByUserID, params)
+	if err != nil {
+		return boards, err
+	}
+	for _, board := range boards {
+		USC.Sanitizer.SanitBoard(&board)
+	}
+	return boards, nil
+}
+
 func (USC *UseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
 	var err error
 	var params []interface{}

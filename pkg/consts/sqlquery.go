@@ -27,6 +27,8 @@ const (
 	INSERTBoard          = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
 	SELECTBoardByID      = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
 		"FROM sunrise.board as b WHERE b.id = $1"
+	SELECTBoardsByUserID = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
+		"FROM sunrise.board as b WHERE b.owner_id = $1"
 
 	INSERTPin = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime)" +
 		" VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"

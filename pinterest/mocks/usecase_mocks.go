@@ -588,3 +588,18 @@ func (mr *MockUseInterfaceMockRecorder) CreateClient(conn, userId interface{}) *
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockUseInterface)(nil).CreateClient), conn, userId)
 }
+
+// GetBoards mocks base method
+func (m *MockUseInterface) GetBoards(UserID uint64) ([]models.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBoards", UserID)
+	ret0, _ := ret[0].([]models.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoards indicates an expected call of GetBoards
+func (mr *MockUseInterfaceMockRecorder) GetBoards(UserID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoards", reflect.TypeOf((*MockUseInterface)(nil).GetBoards), UserID)
+}

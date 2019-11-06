@@ -255,3 +255,18 @@ func (mr *MockReposInterfaceMockRecorder) SelectSessions(executeQuery, params in
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectSessions", reflect.TypeOf((*MockReposInterface)(nil).SelectSessions), executeQuery, params)
 }
+
+// SelectBoards mocks base method
+func (m *MockReposInterface) SelectBoards(executeQuery string, params []interface{}) ([]models.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectBoards", executeQuery, params)
+	ret0, _ := ret[0].([]models.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectBoards indicates an expected call of SelectBoards
+func (mr *MockReposInterfaceMockRecorder) SelectBoards(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectBoards", reflect.TypeOf((*MockReposInterface)(nil).SelectBoards), executeQuery, params)
+}

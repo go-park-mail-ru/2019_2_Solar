@@ -31,4 +31,6 @@ type ReposInterface interface {
 	SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error)
 
 	SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error)
+
+	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)
 }

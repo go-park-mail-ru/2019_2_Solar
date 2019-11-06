@@ -381,3 +381,26 @@ func (RS *ReposStruct) SelectSessions(executeQuery string, params []interface{})
 	}
 	return sessions, nil
 }
+
+func (RS *ReposStruct) SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error) {
+	var boards []models.Board
+	rows, err := RS.DataBase.Query(executeQuery, params...)
+	if err != nil {
+		return boards, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	scanBoard := models.Board{}
+	for rows.Next() {
+		err := rows.Scan(&scanBoard.ID, &scanBoard.OwnerID, &scanBoard.Title,
+			&scanBoard.Description, &scanBoard.Category, &scanBoard.CreatedTime, &scanBoard.IsDeleted)
+		if err != nil {
+			return boards, err
+		}
+		boards = append(boards, scanBoard)
+	}
+	return boards, nil
+}

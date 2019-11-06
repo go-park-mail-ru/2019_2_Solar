@@ -119,3 +119,41 @@ func (h *HandlersStruct) HandleGetBoard(ctx echo.Context) (Err error) {
 
 	return nil
 }
+
+func (h *HandlersStruct) HandleGetMyBoards(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+
+	boards, err := h.PUsecase.GetBoards(uint64(user.ID))
+	if err != nil {
+		return err
+	}
+
+	data := struct {
+		CSRFToken string `json:"csrf_token"`
+		Body struct {
+			Boards []models.Board `json:"boards"`
+			Info  string       `json:"info"`
+		} `json:"body"`
+	}{  CSRFToken: ctx.Get("token").(string),
+		Body: struct {
+			Boards []models.Board `json:"boards"`
+			Info  string       `json:"info"`
+		}{Info: "OK", Boards: boards}}
+
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+
+	return nil
+}
