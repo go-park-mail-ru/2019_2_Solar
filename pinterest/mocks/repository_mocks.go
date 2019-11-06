@@ -10,31 +10,31 @@ import (
 	reflect "reflect"
 )
 
-// MockRepositoryInterface is a mock of RepositoryInterface interface
-type MockRepositoryInterface struct {
+// MockReposInterface is a mock of ReposInterface interface
+type MockReposInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockRepositoryInterfaceMockRecorder
+	recorder *MockReposInterfaceMockRecorder
 }
 
-// MockRepositoryInterfaceMockRecorder is the mock recorder for MockRepositoryInterface
-type MockRepositoryInterfaceMockRecorder struct {
-	mock *MockRepositoryInterface
+// MockReposInterfaceMockRecorder is the mock recorder for MockReposInterface
+type MockReposInterfaceMockRecorder struct {
+	mock *MockReposInterface
 }
 
-// NewMockRepositoryInterface creates a new mock instance
-func NewMockRepositoryInterface(ctrl *gomock.Controller) *MockRepositoryInterface {
-	mock := &MockRepositoryInterface{ctrl: ctrl}
-	mock.recorder = &MockRepositoryInterfaceMockRecorder{mock}
+// NewMockReposInterface creates a new mock instance
+func NewMockReposInterface(ctrl *gomock.Controller) *MockReposInterface {
+	mock := &MockReposInterface{ctrl: ctrl}
+	mock.recorder = &MockReposInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder {
+func (m *MockReposInterface) EXPECT() *MockReposInterfaceMockRecorder {
 	return m.recorder
 }
 
 // Update mocks base method
-func (m *MockRepositoryInterface) Update(executeQuery string, params []interface{}) (int, error) {
+func (m *MockReposInterface) Update(executeQuery string, params []interface{}) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", executeQuery, params)
 	ret0, _ := ret[0].(int)
@@ -43,13 +43,13 @@ func (m *MockRepositoryInterface) Update(executeQuery string, params []interface
 }
 
 // Update indicates an expected call of Update
-func (mr *MockRepositoryInterfaceMockRecorder) Update(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) Update(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockRepositoryInterface)(nil).Update), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockReposInterface)(nil).Update), executeQuery, params)
 }
 
 // Insert mocks base method
-func (m *MockRepositoryInterface) Insert(executeQuery string, params []interface{}) (string, error) {
+func (m *MockReposInterface) Insert(executeQuery string, params []interface{}) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Insert", executeQuery, params)
 	ret0, _ := ret[0].(string)
@@ -58,13 +58,13 @@ func (m *MockRepositoryInterface) Insert(executeQuery string, params []interface
 }
 
 // Insert indicates an expected call of Insert
-func (mr *MockRepositoryInterfaceMockRecorder) Insert(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) Insert(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockRepositoryInterface)(nil).Insert), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockReposInterface)(nil).Insert), executeQuery, params)
 }
 
 // SelectFullUser mocks base method
-func (m *MockRepositoryInterface) SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error) {
+func (m *MockReposInterface) SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectFullUser", executeQuery, params)
 	ret0, _ := ret[0].([]models.User)
@@ -73,13 +73,13 @@ func (m *MockRepositoryInterface) SelectFullUser(executeQuery string, params []i
 }
 
 // SelectFullUser indicates an expected call of SelectFullUser
-func (mr *MockRepositoryInterfaceMockRecorder) SelectFullUser(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) SelectFullUser(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectFullUser", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectFullUser), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectFullUser", reflect.TypeOf((*MockReposInterface)(nil).SelectFullUser), executeQuery, params)
 }
 
 // SelectUserCookies mocks base method
-func (m *MockRepositoryInterface) SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
+func (m *MockReposInterface) SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectUserCookies", executeQuery, params)
 	ret0, _ := ret[0].([]models.UserCookie)
@@ -88,13 +88,13 @@ func (m *MockRepositoryInterface) SelectUserCookies(executeQuery string, params 
 }
 
 // SelectUserCookies indicates an expected call of SelectUserCookies
-func (mr *MockRepositoryInterfaceMockRecorder) SelectUserCookies(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) SelectUserCookies(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUserCookies", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectUserCookies), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUserCookies", reflect.TypeOf((*MockReposInterface)(nil).SelectUserCookies), executeQuery, params)
 }
 
 // SelectOneCol mocks base method
-func (m *MockRepositoryInterface) SelectOneCol(executeQuery string, params []interface{}) ([]string, error) {
+func (m *MockReposInterface) SelectOneCol(executeQuery string, params []interface{}) ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectOneCol", executeQuery, params)
 	ret0, _ := ret[0].([]string)
@@ -103,13 +103,13 @@ func (m *MockRepositoryInterface) SelectOneCol(executeQuery string, params []int
 }
 
 // SelectOneCol indicates an expected call of SelectOneCol
-func (mr *MockRepositoryInterfaceMockRecorder) SelectOneCol(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) SelectOneCol(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectOneCol", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectOneCol), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectOneCol", reflect.TypeOf((*MockReposInterface)(nil).SelectOneCol), executeQuery, params)
 }
 
 // SelectIDUsernameEmailUser mocks base method
-func (m *MockRepositoryInterface) SelectIdUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error) {
+func (m *MockReposInterface) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectIDUsernameEmailUser", executeQuery, params)
 	ret0, _ := ret[0].([]models.UserUnique)
@@ -118,13 +118,13 @@ func (m *MockRepositoryInterface) SelectIdUsernameEmailUser(executeQuery string,
 }
 
 // SelectIDUsernameEmailUser indicates an expected call of SelectIDUsernameEmailUser
-func (mr *MockRepositoryInterfaceMockRecorder) SelectIdUsernameEmailUser(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) SelectIDUsernameEmailUser(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectIDUsernameEmailUser", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectIdUsernameEmailUser), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectIDUsernameEmailUser", reflect.TypeOf((*MockReposInterface)(nil).SelectIDUsernameEmailUser), executeQuery, params)
 }
 
 // DeleteSession mocks base method
-func (m *MockRepositoryInterface) DeleteSession(executeQuery string, params []interface{}) error {
+func (m *MockReposInterface) DeleteSession(executeQuery string, params []interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteSession", executeQuery, params)
 	ret0, _ := ret[0].(error)
@@ -132,7 +132,126 @@ func (m *MockRepositoryInterface) DeleteSession(executeQuery string, params []in
 }
 
 // DeleteSession indicates an expected call of DeleteSession
-func (mr *MockRepositoryInterfaceMockRecorder) DeleteSession(executeQuery, params interface{}) *gomock.Call {
+func (mr *MockReposInterfaceMockRecorder) DeleteSession(executeQuery, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockRepositoryInterface)(nil).DeleteSession), executeQuery, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockReposInterface)(nil).DeleteSession), executeQuery, params)
+}
+
+// DeleteSubscribe mocks base method
+func (m *MockReposInterface) DeleteSubscribe(executeQuery string, params []interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSubscribe", executeQuery, params)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSubscribe indicates an expected call of DeleteSubscribe
+func (mr *MockReposInterfaceMockRecorder) DeleteSubscribe(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubscribe", reflect.TypeOf((*MockReposInterface)(nil).DeleteSubscribe), executeQuery, params)
+}
+
+// SelectCategory mocks base method
+func (m *MockReposInterface) SelectCategory(executeQuery string, params []interface{}) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectCategory", executeQuery, params)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectCategory indicates an expected call of SelectCategory
+func (mr *MockReposInterfaceMockRecorder) SelectCategory(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectCategory", reflect.TypeOf((*MockReposInterface)(nil).SelectCategory), executeQuery, params)
+}
+
+// SelectBoard mocks base method
+func (m *MockReposInterface) SelectBoard(executeQuery string, params []interface{}) (models.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectBoard", executeQuery, params)
+	ret0, _ := ret[0].(models.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectBoard indicates an expected call of SelectBoard
+func (mr *MockReposInterfaceMockRecorder) SelectBoard(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectBoard", reflect.TypeOf((*MockReposInterface)(nil).SelectBoard), executeQuery, params)
+}
+
+// SelectPin mocks base method
+func (m *MockReposInterface) SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectPin", executeQuery, params)
+	ret0, _ := ret[0].([]models.Pin)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectPin indicates an expected call of SelectPin
+func (mr *MockReposInterfaceMockRecorder) SelectPin(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectPin", reflect.TypeOf((*MockReposInterface)(nil).SelectPin), executeQuery, params)
+}
+
+// SelectIDDirPins mocks base method
+func (m *MockReposInterface) SelectIDDirPins(executeQuery string, params []interface{}) ([]models.PinForMainPage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectIDDirPins", executeQuery, params)
+	ret0, _ := ret[0].([]models.PinForMainPage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectIDDirPins indicates an expected call of SelectIDDirPins
+func (mr *MockReposInterfaceMockRecorder) SelectIDDirPins(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectIDDirPins", reflect.TypeOf((*MockReposInterface)(nil).SelectIDDirPins), executeQuery, params)
+}
+
+// SelectComments mocks base method
+func (m *MockReposInterface) SelectComments(executeQuery string, params []interface{}) ([]models.CommentForSend, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectComments", executeQuery, params)
+	ret0, _ := ret[0].([]models.CommentForSend)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectComments indicates an expected call of SelectComments
+func (mr *MockReposInterfaceMockRecorder) SelectComments(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectComments", reflect.TypeOf((*MockReposInterface)(nil).SelectComments), executeQuery, params)
+}
+
+// SelectPinsByTag mocks base method
+func (m *MockReposInterface) SelectPinsByTag(executeQuery string, params []interface{}) ([]models.PinForSearchResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectPinsByTag", executeQuery, params)
+	ret0, _ := ret[0].([]models.PinForSearchResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectPinsByTag indicates an expected call of SelectPinsByTag
+func (mr *MockReposInterfaceMockRecorder) SelectPinsByTag(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectPinsByTag", reflect.TypeOf((*MockReposInterface)(nil).SelectPinsByTag), executeQuery, params)
+}
+
+// SelectSessions mocks base method
+func (m *MockReposInterface) SelectSessions(executeQuery string, params []interface{}) ([]models.UserSession, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectSessions", executeQuery, params)
+	ret0, _ := ret[0].([]models.UserSession)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectSessions indicates an expected call of SelectSessions
+func (mr *MockReposInterfaceMockRecorder) SelectSessions(executeQuery, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectSessions", reflect.TypeOf((*MockReposInterface)(nil).SelectSessions), executeQuery, params)
 }

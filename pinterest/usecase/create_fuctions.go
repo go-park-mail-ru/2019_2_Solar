@@ -19,20 +19,11 @@ import (
 )
 
 
-func (USC *UseStruct) NewUseCase() error {
-	hub := webSocket.HubStruct{}
-	hub.NewHub()
-	rep := repository.ReposStruct{}
-	err := rep.DataBaseInit()
-	if err != nil {
-		return err
-	}
-	var mutex sync.Mutex
-	san := sanitizer.SanitStruct{}
-	san.NewSanitizer()
-	USC.Mu = &mutex
-	USC.PRepository = &rep
-	USC.Sanitizer = &san
+func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
+	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
+	USC.Mu = mu
+	USC.PRepository = rep
+	USC.Sanitizer = san
 	USC.Hub = hub
 	go USC.Hub.Run()
 	return nil
@@ -87,9 +78,14 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC UseStruct) AddNewUser(username, email, password string) (string, error) {
+func (USC *UseStruct) AddNewUser(username, email, password string) (string, error) {
+	salt, err := GenSessionKey(10)
+	if err != nil {
+		return "", err
+	}
 	var params []interface{}
-	params = append(params, username, email, password)
+	hashPassword := HashPassword(password, salt)
+	params = append(params, username, email, hashPassword, salt, time.Now())
 	lastID, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
 	if err != nil {
 		return "", err

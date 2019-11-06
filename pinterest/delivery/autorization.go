@@ -46,7 +46,7 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	ctx.SetCookie(&cookies)
-	data := h.PUsecase.SetJSONData(newUserReg, "OK")
+	data := h.PUsecase.SetJSONData(newUserReg, "", "OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 	if user := ctx.Get("User"); user != nil {
-		data := h.PUsecase.SetJSONData(user.(models.User), "OK")
+		data := h.PUsecase.SetJSONData(user.(models.User), ctx.Get("token").(string),"OK")
 		err := encoder.Encode(data)
 		if err != nil {
 			return err
@@ -81,7 +81,8 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	if User.Password != newUserLogin.Password { //Добавить функцию хеша от пароля
+
+	if err := h.PUsecase.ComparePassword(User.Password, User.Salt, newUserLogin.Password); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
@@ -90,7 +91,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	ctx.SetCookie(&cookies)
-	data := h.PUsecase.SetJSONData(User, "OK")
+	data := h.PUsecase.SetJSONData(User, "","OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err
@@ -121,7 +122,7 @@ func (h *HandlersStruct) HandleLogoutUser(ctx echo.Context) (Err error) {
 	sessionKey.Expires = time.Now().AddDate(0, 0, -999)
 	http.SetCookie(ctx.Response(), sessionKey)
 
-	data := h.PUsecase.SetJSONData(nil, "Session has been successfully deleted")
+	data := h.PUsecase.SetJSONData(nil, ctx.Get("token").(string),"Session has been successfully deleted")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err

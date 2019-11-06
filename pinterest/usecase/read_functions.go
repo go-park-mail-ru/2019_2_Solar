@@ -11,30 +11,42 @@ func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
 	var params []interface{}
 	params = append(params, email)
 	var err error
-	str, err = USC.PRepository.SelectOneCol(consts.SelectUserIDByEmail, params)
+	str, err = USC.PRepository.SelectOneCol(consts.SELECTUserIDByEmail, params)
 	if err != nil {
 		return "", err
 	}
 	if len(str) != 1 {
-		return "", errors.New("several users")
+		return "", errors.New("several users or no one user")
 	}
 	return str[0], nil
 }
 
-func (USC *UseStruct) GetUserByUsername(username string) (models.User, error) {
+func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, error) {
 	var userSlice []models.User
 	var params []interface{}
 	params = append(params, username)
 	var err error
 	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
 	if err != nil {
-		return models.User{}, err
+		return models.AnotherUser{}, err
 	}
 	if len(userSlice) != 1 {
-		return models.User{}, errors.New("several users")
+		return models.AnotherUser{}, errors.New("several users or no one user")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
-	return userSlice[0], nil
+	anotherUser := models.AnotherUser{
+		ID:        userSlice[0].ID,
+		Username:  userSlice[0].Username,
+		Name:      userSlice[0].Name,
+		Surname:   userSlice[0].Surname,
+		Password:  userSlice[0].Password,
+		Email:     userSlice[0].Email,
+		Age:       userSlice[0].Age,
+		Status:    userSlice[0].Status,
+		AvatarDir: userSlice[0].AvatarDir,
+		IsActive:  userSlice[0].IsActive,
+	}
+	return anotherUser, nil
 }
 
 func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
@@ -47,23 +59,37 @@ func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, err
 	}
 	if len(userSlice) != 1 {
-		return models.User{}, errors.New("several users")
+		return models.User{}, errors.New("several users or no one user")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	return userSlice[0], nil
 }
 
-func (USC *UseStruct) GetAllUsers() ([]models.User, error) {
+func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
 	var err error
 
 	users, err := USC.PRepository.SelectFullUser(consts.SELECTAllUsers, nil)
 	if err != nil {
-		return users, err
+		return []models.AnotherUser{}, err
 	}
+	anotherUsers := []models.AnotherUser{}
 	for _, user := range users {
 		USC.Sanitizer.SanitUser(&user)
+		anotherUser := models.AnotherUser{
+			ID:        user.ID,
+			Username:  user.Username,
+			Name:      user.Name,
+			Surname:   user.Surname,
+			Password:  user.Password,
+			Email:     user.Email,
+			Age:       user.Age,
+			Status:    user.Status,
+			AvatarDir: user.AvatarDir,
+			IsActive:  user.IsActive,
+		}
+		anotherUsers = append(anotherUsers, anotherUser)
 	}
-	return users, nil
+	return anotherUsers, nil
 }
 
 func (USC *UseStruct) GetPin(pinID string) (models.Pin, error) {

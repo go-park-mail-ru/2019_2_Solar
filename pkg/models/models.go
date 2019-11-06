@@ -42,17 +42,32 @@ type EditUserProfile struct {
 	Status   string `json:"status"`
 }
 
-type User struct {
-	ID        uint64 `json:"-"`
+type AnotherUser struct {
+	ID        uint64 `json:"id"`
 	Username  string `json:"username"`
 	Name      string `json:"name"`
 	Surname   string `json:"surname"`
 	Password  string `json:"-"`
-	Email     string `json:"email"`
+	Email     string `json:"-"`
 	Age       uint   `json:"age"`
 	Status    string `json:"status"`
 	AvatarDir string `json:"avatar_dir"`
 	IsActive  bool   `json:"is_active"`
+}
+
+type User struct {
+	ID          uint64    `json:"-"`
+	Username    string    `json:"username"`
+	Name        string    `json:"name"`
+	Surname     string    `json:"surname"`
+	Password    string    `json:"-"`
+	Email       string    `json:"email"`
+	Age         uint      `json:"age"`
+	Status      string    `json:"status"`
+	AvatarDir   string    `json:"avatar_dir"`
+	IsActive    bool      `json:"is_active"`
+	Salt        string    `json:"-"`
+	CreatedTime time.Time `json:"created_time"`
 }
 
 type DataJSON struct {
@@ -62,7 +77,8 @@ type DataJSON struct {
 }
 
 type OutJSON struct {
-	BodyJSON interface{} `json:"body"`
+	CSRFToken string 	  `json:"csrf_token"`
+	BodyJSON  interface{} `json:"body"`
 }
 
 type NewBoard struct {
@@ -146,13 +162,13 @@ type CommentForSend struct {
 type NewChatMessage struct {
 	IdSender          uint64 `json:"id_sender"`
 	UserNameRecipient string `json:"username_recipient"`
-	Message              string `json:"text"`
+	Message           string `json:"text"`
 }
 
 type ChatMessage struct {
 	IdSender    uint64    `json:"id_sender"`
 	IdRecipient uint64    `json:"id_recipient"`
-	Message        string    `json:"text"`
+	Message     string    `json:"text"`
 	SendTime    time.Time `json:"send_time"`
 	IsDeleted   bool      `json:"is_deleted"`
 }

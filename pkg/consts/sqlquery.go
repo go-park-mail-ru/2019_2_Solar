@@ -1,26 +1,27 @@
 package consts
 
 const (
-	SelectUserIDByEmail                        = "SELECT u.id from sunrise.users as u where u.email = $1"
-	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.users as u where u.username = $1 OR u.email = $2"
-	SELECTAllUsers                             = "SELECT * from sunrise.users"
-	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.users SET username = $1, name = $2, 	surname = $3," +
+	SELECTUserIDByEmail                        = "SELECT u.id from sunrise.user as u where u.email = $1"
+	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.user as u where u.username = $1 OR u.email = $2"
+	SELECTAllUsers                             = "SELECT * from sunrise.user"
+	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.user SET username = $1, name = $2, 	surname = $3," +
+
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
-	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.users SET avatardir = $1 where id = $2"
-	INSERTRegistration      = "INSERT INTO sunrise.users (username, email, hashpassword)	values ($1,$2,$3) RETURNING id"
-	INSERTSession           = "INSERT INTO sunrise.usersessions (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
+	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
+	INSERTRegistration      = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
+	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive from sunrise.Users as U JOIN sunrise.usersessions as s on U.id = s.userid " +
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U JOIN sunrise.usersession as s on U.id = s.userid " +
 		"where s.cookiesvalue = $1"
-	SELECTCookiesExpirationByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersessions" +
+	SELECTCookiesExpirationByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
 		" as s where s.cookiesvalue = $1"
 	SELECTUserByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive from sunrise.Users as U where U.username = $1"
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"
 	SELECTUserByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive from sunrise.Users as U where U.email = $1"
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.email = $1"
 
-	DELETESessionByKey = "DELETE FROM sunrise.usersessions as s WHERE s.cookiesvalue = $1"
+	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
 	INSERTBoard          = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
@@ -45,26 +46,27 @@ const (
 		"AND s.followee_id = pin.owner_id " +
 		"AND isdeleted = false) as p " +
 		"WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
-	SELECTComments = "SELECT c.text, u.username, c.created_time " +
-		"FROM comment as c on c.pin_id = $1 " +
-		"join pin as p on p.id = $1 " +
-		"join user as u on u.id = p.owner_id"
+	SELECTComments = "SELECT c.text, u.username, c.created_time FROM sunrise.comment as c join sunrise.pin as p on p.id = $1 " +
+		"join sunrise.user as u on u.id = p.owner_id where c.pin_id = $1"
 
 	INSERTNotice          = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
-	INSERTComment         = "INSERT INTO sunrise.comments (pin_id, text, author_id, created_time) VALUES ($1,$2,$3,$4) RETURNING id"
+	INSERTComment         = "INSERT INTO sunrise.comment (pin_id, text, author_id, created_time) VALUES ($1,$2,$3,$4) RETURNING id"
 	INSERTSubscribeByName = "INSERT INTO sunrise.subscribe (subscriber_id, followee_id) " +
-		"select $1, u.id from sunrise.users as u " +
+		"select $1, u.id from sunrise.user as u " +
 		"where u.username = $2 " +
 		"RETURNING id;"
 
-	INSERTChatMessage = "INSERT INTO sunrise.message (sender_id, receiver_id, message, send_time) " +
-		"SELECT $1, u.id, $3, $4 from sunrise.users as u where u.username = $2 RETURNING id"
+	INSERTChatMessage = "INSERT INTO sunrise.chat_message (sender_id, receiver_id, text, send_time) " +
+		"SELECT $1, u.id, $3, $4 from sunrise.user as u where u.username = $2 RETURNING id"
 
 	DELETESubscribeByName = "DELETE FROM sunrise.subscribe as s WHERE s.subscriber_id = $1 and s.followee_id IN " +
-		"(select u.id from sunrise.users as u " +
+		"(select u.id from sunrise.user as u " +
 		"where u.username = $2);"
 
 	SELECTPinsByTag = "SELECT DISTINCT p.id, p.pindir, p.title FROM sunrise.pin as p " +
 		"JOIN sunrise.pinandtag as pt ON p.id = pt.pin_id " +
 		"WHERE pt.tag_name = $1 AND p.isdeleted = false;"
+
+	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersession as s " +
+		"WHERE s.cookiesvalue = $1;"
 )

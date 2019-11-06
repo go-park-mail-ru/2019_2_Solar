@@ -12,6 +12,7 @@ type SanitStruct struct {
 type SanitInterface interface {
 	SanitUser(user *models.User)
 	SanitPin(pin *models.Pin)
+	SanitPinForSearchResult(pin *models.PinForSearchResult)
 	SanitComment(comment *models.CommentForSend)
 	SanitBoard(board *models.Board)
 }
