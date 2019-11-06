@@ -10,11 +10,17 @@ go:
 services:
   - docker
 
+env:
+  - DOCKER_COMPOSE_VERSION=3
+
+install: true
+
 before_install:
   - docker build -t solar/sunrise .
 
 script:
-  - docker run solar/sunrise go test --
+  - docker-compose stop
+  - docker-compose up --build -d
 
 deploy:
   provider: elasticbeanstalk
