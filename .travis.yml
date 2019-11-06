@@ -5,16 +5,22 @@ dist: trusty
 language: go
 
 go:
-  - 1.12.x
+  - 1.13.x
 
 services:
   - docker
+  - postgresql
+
+env:
+  - DOCKER_COMPOSE_VERSION=3
+
+install: true
 
 before_install:
   - docker build -t solar/sunrise .
 
 script:
-  - docker run solar/sunrise go test --
+  - docker build -t solar/sunrise .
 
 deploy:
   provider: elasticbeanstalk
