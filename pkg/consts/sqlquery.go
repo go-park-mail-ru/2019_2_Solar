@@ -1,10 +1,10 @@
 package consts
 
 const (
-	SELECTUserIDByEmail                        = "SELECT u.id from sunrise.users as u where u.email = $1"
-	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.users as u where u.username = $1 OR u.email = $2"
-	SELECTAllUsers                             = "SELECT * from sunrise.users"
-	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.users SET username = $1, name = $2, 	surname = $3," +
+	SELECTUserIDByEmail                        = "SELECT u.id from sunrise.user as u where u.email = $1"
+	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.user as u where u.username = $1 OR u.email = $2"
+	SELECTAllUsers                             = "SELECT * from sunrise.user"
+	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.user SET username = $1, name = $2, 	surname = $3," +
 
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
 	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
@@ -67,6 +67,6 @@ const (
 		"JOIN sunrise.pinandtag as pt ON p.id = pt.pin_id " +
 		"WHERE pt.tag_name = $1 AND p.isdeleted = false;"
 
-	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersessions as s " +
+	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersession as s " +
 		"WHERE s.cookiesvalue = $1;"
 )

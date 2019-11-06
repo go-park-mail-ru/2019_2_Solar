@@ -54,7 +54,7 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 	notice.IsRead = false
 
 	data := struct {
-		CSRFToken string `json:'csrf_token'`
+		CSRFToken string `json:"csrf_token"`
 		Body struct {
 			Notice models.Notice `json:"notice"`
 			Info   string        `json:"info"`

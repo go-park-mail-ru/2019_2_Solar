@@ -225,6 +225,7 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 			Err = errors.Wrap(Err, bodyErr.Error())
 		}
 	}()
+	decoder := json.NewDecoder(ctx.Request().Body)
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	getUser := ctx.Get("User")
 	if getUser == nil {
@@ -232,11 +233,15 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 	pinID := ctx.Param("id")
-	var newComment models.NewComment
-	if err := ctx.Bind(newComment); err != nil {
+
+	newComment := new(models.NewComment)
+
+	if err := decoder.Decode(newComment); err != nil {
 		return err
 	}
-	if err := h.PUsecase.AddComment(pinID, user.ID, newComment); err != nil {
+	comment := models.NewComment{Text: newComment.Text}
+
+	if err := h.PUsecase.AddComment(pinID, user.ID, comment); err != nil {
 		return err
 	}
 	info := "data successfully saved"
