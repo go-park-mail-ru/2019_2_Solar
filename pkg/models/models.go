@@ -107,6 +107,7 @@ type NewPin struct {
 type PinForMainPage struct {
 	ID        uint64 `json:"id"`
 	PinDir    string `json:"pin_dir"`
+	Title  	  string `json:"title"`
 	IsDeleted bool   `json:"is_deleted"`
 }
 

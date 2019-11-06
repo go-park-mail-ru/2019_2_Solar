@@ -144,7 +144,7 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetNewPins()
 	if err != nil {
-		return nil
+		return err
 	}
 	jsonStruct := models.JSONResponse{Body: pins}
 	if err := ctx.JSON(200, jsonStruct); err != nil {

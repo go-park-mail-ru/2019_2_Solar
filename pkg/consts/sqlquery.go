@@ -39,10 +39,11 @@ const (
 		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
 
-	SELECTNewPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
+	SELECTNewPinsByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime desc) " +
 		"from sunrise.pin WHERE isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
-	SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
-		"from sunrise.pin WHERE owner_id = $2 AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+	//SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
+	//	"from sunrise.pin WHERE owner_id = $2 AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+	SELECTMyPinsByNumber = "SELECT p.id, p.pindir, p.title FROM sunrise.pin as p WHERE p.isdeleted = false and p.owner_id = $2 LIMIT $1;"
 	SELECTSubscribePinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $2 " +
 		"AND s.followee_id = pin.owner_id " +
