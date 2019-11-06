@@ -20,8 +20,7 @@ before_install:
   - docker build -t solar/sunrise .
 
 script:
-  - docker-compose stop
-  - docker-compose up --build -d
+  - docker build -t solar/sunrise .
 
 deploy:
   provider: elasticbeanstalk
