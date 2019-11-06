@@ -329,7 +329,7 @@ func (RS *ReposStruct) SelectIDDirPins(executeQuery string, params []interface{}
 	}()
 	scanPin := models.PinForMainPage{}
 	for rows.Next() {
-		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.IsDeleted)
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir)
 		if err != nil {
 			return pins, err
 		}
