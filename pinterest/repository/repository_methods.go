@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -10,13 +11,12 @@ import (
 	"strconv"
 )
 
-var ConnStr string = "host=my_postgres user=postgres password=7396 dbname=sunrise_db sslmode=disable"
 
 func (RS *ReposStruct) DataBaseInit() error {
-	RS.connectionString = ConnStr
+	RS.connectionString = consts.ConnStr
 	var err error
 
-	RS.DataBase, err = sql.Open("postgres", ConnStr)
+	RS.DataBase, err = sql.Open("postgres", consts.ConnStr)
 	if err != nil {
 		return err
 	}
@@ -68,10 +68,10 @@ func (RS *ReposStruct) LoadSchemaSQL() (Err error) {
 }
 
 func (RS *ReposStruct) NewDataBaseWorker() error {
-	RS.connectionString = ConnStr
+	RS.connectionString = consts.ConnStr
 	var err error
 
-	RS.DataBase, err = sql.Open("postgres", ConnStr)
+	RS.DataBase, err = sql.Open("postgres", consts.ConnStr)
 	if err != nil {
 		return err
 	}
@@ -119,21 +119,23 @@ func (RS *ReposStruct) SelectFullUser(executeQuery string, params []interface{})
 	for rows.Next() {
 		dbuser := models.DBUser{}
 		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
-			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive)
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime)
 		if err != nil {
 			return usersSlice, err
 		}
 		user := models.User{
-			ID:        dbuser.ID,
-			Username:  dbuser.Username,
-			Name:      dbuser.Name.String,
-			Surname:   dbuser.Surname.String,
-			Password:  dbuser.Password,
-			Email:     dbuser.Email,
-			Age:       uint(dbuser.Age.Int32),
-			Status:    dbuser.Status.String,
-			AvatarDir: dbuser.AvatarDir.String,
-			IsActive:  dbuser.IsActive,
+			ID:          dbuser.ID,
+			Username:    dbuser.Username,
+			Name:        dbuser.Name.String,
+			Surname:     dbuser.Surname.String,
+			Password:    dbuser.Password,
+			Email:       dbuser.Email,
+			Age:         uint(dbuser.Age.Int32),
+			Status:      dbuser.Status.String,
+			AvatarDir:   dbuser.AvatarDir.String,
+			IsActive:    dbuser.IsActive,
+			Salt:        dbuser.Salt,
+			CreatedTime: dbuser.CreatedTime,
 		}
 		usersSlice = append(usersSlice, user)
 	}

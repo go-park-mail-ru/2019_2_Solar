@@ -28,6 +28,7 @@ type UseInterface interface {
 	GetUserByEmail(email string) (models.User, error)
 	GetUserIDByEmail(email string) (string, error)
 	GetAllUsers() ([]models.User, error)
+	ComparePassword(password, salt, loginPassword string) error
 
 	CheckRegData(newUser *models.UserReg) error
 	CheckRegUsernameEmailIsUnique(username, email string) error
