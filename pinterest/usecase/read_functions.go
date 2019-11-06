@@ -16,7 +16,7 @@ func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
 		return "", err
 	}
 	if len(str) != 1 {
-		return "", errors.New("several users")
+		return "", errors.New("several users or no one user")
 	}
 	return str[0], nil
 }
@@ -31,7 +31,7 @@ func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, er
 		return models.AnotherUser{}, err
 	}
 	if len(userSlice) != 1 {
-		return models.AnotherUser{}, errors.New("several users")
+		return models.AnotherUser{}, errors.New("several users or no one user")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	anotherUser := models.AnotherUser{
@@ -59,7 +59,7 @@ func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, err
 	}
 	if len(userSlice) != 1 {
-		return models.User{}, errors.New("several users")
+		return models.User{}, errors.New("several users or no one user")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	return userSlice[0], nil

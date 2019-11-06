@@ -9,6 +9,7 @@ import (
 	web_socket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	models "github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	gomock "github.com/golang/mock/gomock"
+	websocket "github.com/gorilla/websocket"
 	io "io"
 	http "net/http"
 	reflect "reflect"
@@ -123,6 +124,20 @@ func (m *MockUseInterface) GetAllUsers() ([]models.AnotherUser, error) {
 func (mr *MockUseInterfaceMockRecorder) GetAllUsers() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsers", reflect.TypeOf((*MockUseInterface)(nil).GetAllUsers))
+}
+
+// ComparePassword mocks base method
+func (m *MockUseInterface) ComparePassword(password, salt, loginPassword string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ComparePassword", password, salt, loginPassword)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ComparePassword indicates an expected call of ComparePassword
+func (mr *MockUseInterfaceMockRecorder) ComparePassword(password, salt, loginPassword interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComparePassword", reflect.TypeOf((*MockUseInterface)(nil).ComparePassword), password, salt, loginPassword)
 }
 
 // CheckRegData mocks base method
@@ -560,4 +575,16 @@ func (m *MockUseInterface) SearchPinsByTag(tag string) ([]models.PinForSearchRes
 func (mr *MockUseInterfaceMockRecorder) SearchPinsByTag(tag interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPinsByTag", reflect.TypeOf((*MockUseInterface)(nil).SearchPinsByTag), tag)
+}
+
+// CreateClient mocks base method
+func (m *MockUseInterface) CreateClient(conn *websocket.Conn, userId uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CreateClient", conn, userId)
+}
+
+// CreateClient indicates an expected call of CreateClient
+func (mr *MockUseInterfaceMockRecorder) CreateClient(conn, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockUseInterface)(nil).CreateClient), conn, userId)
 }

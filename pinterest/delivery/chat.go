@@ -22,12 +22,6 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	client := &webSocket.Client{Hub: h.PUsecase.ReturnHub(), Conn: ws, Send: make(chan []byte, 256), UserId: user.ID}
-	client.Hub.Register <- client
-
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go client.WritePump()
-	go client.ReadPump()
+	h.PUsecase.CreateClient(ws, user.ID)
 	return nil
 }

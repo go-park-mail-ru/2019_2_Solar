@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"bytes"
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
@@ -229,4 +230,11 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 		}
 	}
 	return nil
+}
+
+func (USC *UseStruct) ComparePassword(password, salt, loginPassword string) error {
+	if  bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
+		return nil
+	}
+	return errors.New("different passwords")
 }

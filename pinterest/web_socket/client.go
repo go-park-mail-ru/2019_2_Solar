@@ -1,7 +1,10 @@
 package webSocket
 
 import (
-	"bytes"
+	"encoding/json"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/gorilla/websocket"
 	"log"
 	"time"
@@ -21,10 +24,10 @@ const (
 	maxMessageSize = 512
 )
 
-var (
+/*var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
-)
+)*/
 
 var Upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -39,7 +42,7 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	Send chan []byte
+	Send chan models.ChatMessage
 }
 
 // ReadPump pumps messages from the websocket connection to the Hub.
@@ -47,7 +50,7 @@ type Client struct {
 // The application runs ReadPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) ReadPump() {
+func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 	defer func() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
@@ -63,8 +66,22 @@ func (c *Client) ReadPump() {
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.Hub.Broadcast <- message
+		newChatMessage := models.NewChatMessage{}
+		json.Unmarshal(message, newChatMessage)
+		var params1 []interface{}
+		params1 = append(params1, newChatMessage.IdSender, newChatMessage.UserNameRecipient, newChatMessage.Message, time.Now())
+		_, _ = PRepository.Insert(consts.INSERTChatMessage, params1)
+		var params2 []interface{}
+		params2 = append(params2, newChatMessage.IdSender, newChatMessage.UserNameRecipient)
+		idRecipient, _ := PRepository.SelectFullUser(consts.SELECTUserByUsername, params2)
+		chatMessage := models.ChatMessage{
+			IdSender:    newChatMessage.IdSender,
+			IdRecipient: idRecipient[0].ID,
+			Message:     newChatMessage.Message,
+			SendTime:    time.Now(),
+			IsDeleted:   false,
+		}
+		c.Hub.Broadcast <- chatMessage
 	}
 }
 
@@ -88,23 +105,25 @@ func (c *Client) WritePump() {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+			c.Conn.WriteJSON(message)
 
-			w, err := c.Conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			w.Write(message)
+			/*			w, err := c.Conn.NextWriter(websocket.TextMessage)
+						if err != nil {
+							return
+						}
 
-			// Add queued chat messages to the current websocket message.
-			n := len(c.Send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.Send)
-			}
+						w.Write(message)
 
-			if err := w.Close(); err != nil {
-				return
-			}
+						// Add queued chat messages to the current websocket message.
+						n := len(c.Send)
+						for i := 0; i < n; i++ {
+							w.Write(newline)
+							w.Write(<-c.Send)
+						}
+
+						if err := w.Close(); err != nil {
+							return
+						}*/
 		case <-ticker.C:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {

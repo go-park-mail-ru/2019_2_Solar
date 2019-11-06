@@ -53,7 +53,7 @@ func TestReposStruct_WriteData(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 	var params []interface{}
@@ -85,25 +85,25 @@ func TestReposStruct_ReadUser(t *testing.T) {
 
 	// good query
 	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age",
-		"status", "avatardir", "isactive"})
+		"status", "avatardir", "isactive", "salt", "created_time"})
 	expect := []*models.User{
 		{1, "Mari", "Mari", "Frolova", "Qw12##!NFkq",
-			"mari@mail.ru", 32, "I'am okey", "img/p1.png", true},
+			"mari@mail.ru", 32, "I'am okey", "img/p1.png", true, "", time.Now()},
 	}
 
 	for _, user := range expect {
 		rows = rows.AddRow(user.ID, user.Username, user.Name, user.Surname, user.Password,
-			user.Email, user.Age, user.Status, user.AvatarDir, user.IsActive)
+			user.Email, user.Age, user.Status, user.AvatarDir, user.IsActive, user.Salt, user.CreatedTime)
 	}
 
 	mock.
 		ExpectQuery("SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive from sunrise.Users as U where").
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where").
 		WithArgs(email).
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -143,13 +143,13 @@ func TestReposStruct_ReadUserCookies(t *testing.T) {
 	}
 
 	mock.
-		ExpectQuery("SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersessions" +
-	" as s where").
+		ExpectQuery("SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
+		" as s where").
 		WithArgs(CookieValue).
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -196,7 +196,7 @@ func TestReposStruct_ReadOneCol(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -227,12 +227,12 @@ func TestReposStruct_DeleteSession(t *testing.T) {
 	var sessionKey string = "FF"
 
 	mock.
-		ExpectQuery("DELETE FROM sunrise.usersessions as s WHERE").
+		ExpectQuery("DELETE FROM sunrise.usersession as s WHERE").
 		WithArgs(sessionKey).
 		WillReturnRows(nil)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -266,7 +266,7 @@ func TestReposStruct_DeleteSubscribe(t *testing.T) {
 		WillReturnRows(nil)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -313,7 +313,7 @@ func TestReposStruct_SelectBoard(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -355,7 +355,7 @@ func TestReposStruct_SelectCategory(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -405,7 +405,7 @@ func TestReposStruct_SelectComments(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -456,7 +456,7 @@ func TestReposStruct_SelectPin(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -503,7 +503,7 @@ func TestReposStruct_SelectPinsByTag(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -549,7 +549,7 @@ func TestReposStruct_SelectSessions(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 
@@ -596,7 +596,7 @@ func TestReposStruct_SelectIDUsernameEmailUser(t *testing.T) {
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
-		connectionString: ConnStr,
+		connectionString: consts.ConnStr,
 		DataBase:         db,
 	}
 

@@ -44,7 +44,7 @@ func TestPinterestUsecase_InsertNewUser(t *testing.T) {
 		var params []interface{}
 		params = append(params, user.Username, user.Email, user.Password)
 
-		repo.EXPECT().Insert(consts.INSERTRegistration, params).Return("1", nil)
+		repo.EXPECT().Insert(consts.INSERTRegistration, gomock.Any()).Return("1", nil)
 
 		newUserId, err := us.AddNewUser(user.Username, user.Email, user.Password)
 
@@ -53,6 +53,7 @@ func TestPinterestUsecase_InsertNewUser(t *testing.T) {
 		assert.Nil(t, err)
 	})
 }
+
 func TestPinterestUsecase_CreateNewUserSession(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

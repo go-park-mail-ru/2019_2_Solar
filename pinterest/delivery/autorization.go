@@ -81,7 +81,8 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	if User.Password != newUserLogin.Password { //Добавить функцию хеша от пароля
+
+	if err := h.PUsecase.ComparePassword(User.Password, User.Salt, newUserLogin.Password); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 

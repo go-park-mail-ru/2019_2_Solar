@@ -78,9 +78,14 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC UseStruct) AddNewUser(username, email, password string) (string, error) {
+func (USC *UseStruct) AddNewUser(username, email, password string) (string, error) {
+	salt, err := GenSessionKey(10)
+	if err != nil {
+		return "", err
+	}
 	var params []interface{}
-	params = append(params, username, email, password)
+	hashPassword := HashPassword(password, salt)
+	params = append(params, username, email, hashPassword, salt, time.Now())
 	lastID, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
 	if err != nil {
 		return "", err

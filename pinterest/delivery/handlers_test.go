@@ -72,8 +72,7 @@ func TestHandlers_HandleListUsers(t *testing.T) {
 		t.Errorf("err is not nil: %s", err)
 	}
 
-	expectedJSON := `{"csrf_token":"","body":{"users":[{"id":0,"username":"Name1","name":"","surname":"","email":"email1","age":0,"status":"","avatar_dir":"","is_active":false},{"id":0,"username":"Name2","name":"","surname":"","email":"email1","age":0,"status":"","avatar_dir":"","is_active":false}],"info":"OK"}}`
-
+	expectedJSON := `{"csrf_token":"","body":{"users":[{"username":"Name1","name":"","surname":"","email":"email1","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"},{"username":"Name2","name":"","surname":"","email":"email1","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"}],"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(rec.Body)
 	bodyJSOn := strings.Trim(string(bytes), "\n")
@@ -148,7 +147,7 @@ func TestHandlers_HandleRegUser(t *testing.T) {
 		t.Errorf("err is not nil: %s", err)
 	}
 
-	expectedJSON := `{"csrf_token":"","body":{"user":{"id":0,"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false},"info":"OK"}}`
+	expectedJSON := `{"csrf_token":"","body":{"user":{"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"},"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(rec.Body)
 	bodyJSOn := strings.Trim(string(bytes), "\n")
@@ -210,6 +209,7 @@ func TestHandlers_HandleLoginUser(t *testing.T) {
 	c.Set("token", "")
 
 	usecase.EXPECT().GetUserByEmail(newUserLogin.Email).Return(user, nil)
+	usecase.EXPECT().ComparePassword(user.Password, gomock.Any(), newUserLogin.Password)
 	usecase.EXPECT().AddNewUserSession(strconv.Itoa(int(user.ID))).Return(cookie, nil)
 	usecase.EXPECT().SetJSONData(user, "", "OK").Return(outJson)
 
@@ -219,7 +219,7 @@ func TestHandlers_HandleLoginUser(t *testing.T) {
 		t.Errorf("err is not nil: %s", err)
 	}
 
-	expectedJSON := `{"csrf_token":"","body":{"user":{"id":0,"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false},"info":"OK"}}`
+	expectedJSON := `{"csrf_token":"","body":{"user":{"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"},"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(rec.Body)
 	bodyJSOn := strings.Trim(string(bytes), "\n")
@@ -281,7 +281,7 @@ func TestHandlers_HandleGetUserByUsername(t *testing.T) {
 		t.Errorf("err is not nil: %s", err)
 	}
 
-	expectedJSON := `{"csrf_token":"","body":{"user":{"id":0,"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false},"info":"OK"}}`
+	expectedJSON := `{"csrf_token":"","body":{"user":{"username":"Nova","name":"","surname":"","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"},"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(rec.Body)
 	bodyJSOn := strings.Trim(string(bytes), "\n")
@@ -417,7 +417,7 @@ func TestHandlers_HandleGetProfileUserData(t *testing.T) {
 		t.Errorf("err is not nil: %s", err)
 	}
 
-	expectedJSON := `{"csrf_token":"","body":{"user":{"id":100,"username":"Nova","name":"Andrey","surname":"dmitrievich","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false},"info":"OK"}}`
+	expectedJSON := `{"csrf_token":"","body":{"user":{"username":"Nova","name":"Andrey","surname":"dmitrievich","email":"new@mail.ru","age":0,"status":"","avatar_dir":"","is_active":false,"created_time":"0001-01-01T00:00:00Z"},"info":"OK"}}`
 
 	bytes, _ := ioutil.ReadAll(rec.Body)
 	bodyJSOn := strings.Trim(string(bytes), "\n")
