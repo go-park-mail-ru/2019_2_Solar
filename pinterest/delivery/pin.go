@@ -83,7 +83,7 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 	pin.IsDeleted = false
 
 	data := struct {
-		CSRFToken string `json:'csrf_token'`
+		CSRFToken string `json:"csrf_token"`
 		Body struct {
 			Pin  models.Pin `json:"pin"`
 			Info string     `json:"info"`
@@ -108,7 +108,6 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	/*encoder := json.NewEncoder(ctx.Response())*/
 	getUser := ctx.Get("User")
 	if getUser == nil {
 		return errors.New("not authorized")
@@ -117,10 +116,6 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	if id == "" {
 		return errors.New("incorrect id")
 	}
-	/*	pinID, err := strconv.Atoi(id)
-		if err != nil {
-			return err
-		}*/
 	pin, err := h.PUsecase.GetPin(id)
 	if err != nil {
 		return err
@@ -135,19 +130,6 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	if err := ctx.JSON(200, jsonStruct); err != nil {
 		return err
 	}
-	/*	data := struct {
-			Body struct {
-				Pin  models.Pin `json:"pin"`
-				Info string     `json:"info"`
-			} `json:"body"`
-		}{Body: struct {
-			Pin  models.Pin `json:"pin"`
-			Info string     `json:"info"`
-		}{Info: "OK", Pin: pin}}
-
-		if err := encoder.Encode(data); err != nil {
-			return err
-		}*/
 
 	return nil
 }
