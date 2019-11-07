@@ -26,10 +26,13 @@ func (h *HandlersStruct) HandlerFindPinByTag(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinForSearchResult `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
-
 }

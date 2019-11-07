@@ -124,10 +124,13 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	var body []interface{}
-	body = append(body, pin, comments)
-	jsonStruct := models.JSONResponse{Body: body}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pin  models.Pin `json:"pins"`
+		Comments []models.CommentForSend `json:"comments"`
+		Info  string     `json:"info"`
+	}{pin, comments ,"OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 
@@ -146,8 +149,12 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinForMainPage `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -168,10 +175,16 @@ func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetMyPins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+
+	//jsonStruct := models.JSONResponse{Body: jsonPin}
+	body := struct {
+		Pins  []models.PinForMainPage `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -192,10 +205,14 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetSubscribePins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinForMainPage `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -226,9 +243,11 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.AddComment(pinID, user.ID, comment); err != nil {
 		return err
 	}
-	info := "data successfully saved"
-	jsonStruct := models.JSONResponse{Body: info}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Info  string     `json:"info"`
+	}{"data successfully saved"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil

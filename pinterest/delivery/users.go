@@ -51,9 +51,11 @@ func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.AddSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
 		return err
 	}
-	info := "data successfully saved"
-	jsonStruct := models.JSONResponse{Body: info}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Info  string     `json:"info"`
+	}{"data successfully saved"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -75,9 +77,11 @@ func (h *HandlersStruct) HandleDeleteSubscribe(ctx echo.Context) (Err error) {
 	if err := h.PUsecase.RemoveSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
 		return err
 	}
-	info := "data successfully deleted"
-	jsonStruct := models.JSONResponse{Body: info}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Info  string     `json:"info"`
+	}{"data successfully saved"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
