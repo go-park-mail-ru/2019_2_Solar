@@ -29,7 +29,7 @@ func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 	return nil
 }
 
-func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
+func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
 	sessionKeyValue, err := GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
@@ -39,9 +39,7 @@ func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
 	cookieSessionKey.Value = sessionKeyValue
 	cookieSessionKey.Path = "/"
 	cookieSessionKey.Expires = time.Now().Add(365 * 24 * time.Hour)
-	var params []interface{}
-	params = append(params, userID, cookieSessionKey.Value, cookieSessionKey.Expires)
-	_, err = USC.PRepository.Insert(consts.INSERTSession, params)
+	_, err = USC.PRepository.InsertSession(userID, cookieSessionKey.Value, cookieSessionKey.Expires)
 	if err != nil {
 		return *cookieSessionKey, err
 	}

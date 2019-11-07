@@ -467,7 +467,16 @@ func (RS *ReposStruct) SelectCookiesByCookieValue(cookieValue string) (Cookies [
 
 func (RS *ReposStruct) InsertUser(username, email, salt string, hashPassword []byte, createdTime time.Time) (uint64, error) {
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTRegistration, username, email, hashPassword, salt, createdTime).Scan(&id)
+	err := RS.DataBase.QueryRow(consts.INSERTUser, username, email, hashPassword, salt, createdTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func (RS *ReposStruct) InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTSession, userId, cookieValue, cookieExpires).Scan(&id)
 	if err != nil {
 		return 0, err
 	}

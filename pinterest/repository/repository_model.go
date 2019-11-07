@@ -38,4 +38,5 @@ type ReposInterface interface {
 	SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error)
 	SelectCookiesByCookieValue(cookieValue string) (Cookies []models.UserCookie, Err error)
 	InsertUser(username, email, salt string, hashPassword []byte , createdTime time.Time) (uint64, error)
+	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
 }

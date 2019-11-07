@@ -8,7 +8,7 @@ const (
 
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
 	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
-	INSERTRegistration      = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
+	INSERTUser     = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +

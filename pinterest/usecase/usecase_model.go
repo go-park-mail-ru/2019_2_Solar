@@ -44,7 +44,7 @@ type UseInterface interface {
 	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
 
 	AddNewUser(username, email, password string) (uint64, error)
-	AddNewUserSession(userID string) (http.Cookie, error)
+	AddNewUserSession(userID uint64) (http.Cookie, error)
 
 	AddBoard(newBoard models.Board) (uint64, error)
 	GetBoard(boardID uint64) (models.Board, error)
