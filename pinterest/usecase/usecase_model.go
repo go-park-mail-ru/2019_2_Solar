@@ -48,6 +48,7 @@ type UseInterface interface {
 
 	AddBoard(newBoard models.Board) (uint64, error)
 	GetBoard(boardID uint64) (models.Board, error)
+	GetMyBoards(UserID uint64) ([]models.Board, error)
 
 	AddPin(newPin models.Pin) (uint64, error)
 	GetPin(pinID string) (models.Pin, error)
@@ -77,7 +78,7 @@ type UseInterface interface {
 
 	CreateClient(conn *websocket.Conn, userId uint64)
 
-	GetBoards(UserID uint64) ([]models.Board, error)
+
 
 
 }

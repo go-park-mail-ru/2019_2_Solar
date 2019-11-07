@@ -119,12 +119,8 @@ func (USC *UseStruct) GetBoard(boardID uint64) (models.Board, error) {
 	return board[0], nil
 }
 
-func (USC *UseStruct) GetBoards(UserID uint64) ([]models.Board, error) {
-	var err error
-	var params []interface{}
-	params = append(params, UserID)
-
-	boards, err := USC.PRepository.SelectBoards(consts.SELECTBoardsByUserID, params)
+func (USC *UseStruct) GetMyBoards(UserID uint64) ([]models.Board, error) {
+	boards, err := USC.PRepository.SelectBoardsByOwnerId(UserID)
 	if err != nil {
 		return boards, err
 	}
