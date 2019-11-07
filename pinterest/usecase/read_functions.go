@@ -135,13 +135,10 @@ func (USC *UseStruct) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error
 	return pins, nil
 }
 
-func (USC *UseStruct) GetNewPins() ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTNewPinsByNumber, params)
+func (USC *UseStruct) GetNewPins() ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(0, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }

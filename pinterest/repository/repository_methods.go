@@ -731,3 +731,26 @@ func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.Co
 	}
 	return comments, nil
 }
+
+func (RS *ReposStruct) SelectNewPinsDisplayByNumber(first, last int) (Pins []models.PinDisplay, Err error) {
+	pins := make([]models.PinDisplay, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTNewPinsDisplayByNumber, first, last)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}

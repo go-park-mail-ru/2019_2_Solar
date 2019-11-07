@@ -149,13 +149,13 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/jsonStruct")
-	var pins []models.PinForMainPage
+	var pins []models.PinDisplay
 	pins, err := h.PUsecase.GetNewPins()
 	if err != nil {
 		return err
 	}
 	body := struct {
-		Pins  []models.PinForMainPage `json:"pins"`
+		Pins  []models.PinDisplay `json:"pins"`
 		Info  string     `json:"info"`
 	}{pins, "OK"}
 	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
