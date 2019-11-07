@@ -134,17 +134,13 @@ func (USC *UseStruct) GetBoards(UserID uint64) ([]models.Board, error) {
 	return boards, nil
 }
 
-func (USC *UseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
-	var err error
-	var params []interface{}
-	params = append(params, boardID)
-
-	pins, err := USC.PRepository.SelectPin(consts.SELECTPinsByBoardID, params)
+func (USC *UseStruct) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectPinsDisplayByBoardId(boardID)
 	if err != nil {
-		return []models.Pin{}, err
+		return []models.PinDisplay{}, err
 	}
 	for _, pin := range pins {
-		USC.Sanitizer.SanitPin(&pin)
+		USC.Sanitizer.SanitPinDisplay(&pin)
 	}
 	return pins, nil
 }

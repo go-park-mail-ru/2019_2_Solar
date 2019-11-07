@@ -583,3 +583,26 @@ func (RS *ReposStruct) SelectBoardsByID(boardId uint64) (Boards []models.Board, 
 	}
 	return boards, nil
 }
+
+func (RS *ReposStruct) SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error) {
+	pins := make([]models.PinDisplay, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTPinsDisplayByBoardId, boardID)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}

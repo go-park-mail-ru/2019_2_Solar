@@ -77,7 +77,7 @@ type DataJSON struct {
 }
 
 type OutJSON struct {
-	CSRFToken string 	  `json:"csrf_token"`
+	CSRFToken string      `json:"csrf_token"`
 	BodyJSON  interface{} `json:"body"`
 }
 
@@ -107,11 +107,17 @@ type NewPin struct {
 type PinForMainPage struct {
 	ID        uint64 `json:"id"`
 	PinDir    string `json:"pin_dir"`
-	Title  	  string `json:"title"`
+	Title     string `json:"title"`
 	IsDeleted bool   `json:"is_deleted"`
 }
 
 type PinForSearchResult struct {
+	ID     uint64 `json:"id"`
+	PinDir string `json:"pin_dir"`
+	Title  string `json:"title"`
+}
+
+type PinDisplay struct {
 	ID     uint64 `json:"id"`
 	PinDir string `json:"pin_dir"`
 	Title  string `json:"title"`
