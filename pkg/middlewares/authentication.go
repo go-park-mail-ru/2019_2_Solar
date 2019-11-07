@@ -3,7 +3,6 @@ package middlewares
 import (
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
@@ -51,10 +50,8 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(ctx)
 		}
 
-		var params []interface{}
-		params = append(params, cookie.Value)
 		var userSessions []models.UserSession
-		userSessions, err = dbWorker.SelectSessions(consts.SELECTSessionByCookieValue, params)
+		userSessions, err = dbWorker.SelectSessionsByCookieValue(cookie.Value)
 
 		sess := functions.Session{
 			UserID: uint(userSessions[0].UserID),
