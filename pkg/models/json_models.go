@@ -9,3 +9,7 @@ type JSONInfoResponse struct {
 		Info string `json:"Info"`
 	} `json:"Body"`
 }
+
+type BodyInfo struct {
+	Info string `json:"Info"`
+}
