@@ -206,13 +206,13 @@ func (RS *ReposStruct) SelectOneCol(executeQuery string, params []interface{}) (
 	return stringSlice, nil
 }
 
-func (RS *ReposStruct) DeleteSession(executeQuery string, params []interface{}) error {
+/*func (RS *ReposStruct) DeleteSession(executeQuery string, params []interface{}) error {
 	_, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return err
 	}
 	return nil
-}
+}*/
 
 func (RS *ReposStruct) DeleteSubscribe(executeQuery string, params []interface{}) error {
 	_, err := RS.DataBase.Query(executeQuery, params...)
@@ -518,4 +518,12 @@ func (RS *ReposStruct) SelectUsersByEmail(email string) (Users []models.User, Er
 		usersSlice = append(usersSlice, user)
 	}
 	return usersSlice, nil
+}
+
+func (RS *ReposStruct) DeleteSessionByKey(cookieValue string) error {
+	_, err := RS.DataBase.Query(consts.DELETESessionByKey, cookieValue)
+	if err != nil {
+		return err
+	}
+	return nil
 }

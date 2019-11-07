@@ -19,7 +19,7 @@ type ReposInterface interface {
 	//SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
 	SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
-	DeleteSession(executeQuery string, params []interface{}) error
+	//DeleteSession(executeQuery string, params []interface{}) error
 	DeleteSubscribe(executeQuery string, params []interface{}) error
 
 	SelectCategory(executeQuery string, params []interface{}) ([]string, error)
@@ -38,6 +38,7 @@ type ReposInterface interface {
 	SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error)
 	SelectUsersByEmail(email string) (Users []models.User, Err error)
 	SelectCookiesByCookieValue(cookieValue string) (Cookies []models.UserCookie, Err error)
-	InsertUser(username, email, salt string, hashPassword []byte , createdTime time.Time) (uint64, error)
+	InsertUser(username, email, salt string, hashPassword []byte, createdTime time.Time) (uint64, error)
 	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
+	DeleteSessionByKey(cookieValue string) error
 }
