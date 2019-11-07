@@ -559,3 +559,27 @@ func (RS *ReposStruct) InsertBoard(ownerID uint64, title, description, category 
 	}
 	return id, nil
 }
+
+func (RS *ReposStruct) SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error) {
+	var boards []models.Board
+	rows, err := RS.DataBase.Query(consts.SELECTBoardByID, boardId)
+	if err != nil {
+		return boards, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	scanBoard := models.Board{}
+	for rows.Next() {
+		err := rows.Scan(&scanBoard.ID, &scanBoard.OwnerID, &scanBoard.Title,
+			&scanBoard.Description, &scanBoard.Category, &scanBoard.CreatedTime, &scanBoard.IsDeleted)
+		if err != nil {
+			return boards, err
+		}
+		boards = append(boards, scanBoard)
+	}
+	return boards, nil
+}

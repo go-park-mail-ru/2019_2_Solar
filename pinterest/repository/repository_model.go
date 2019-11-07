@@ -44,4 +44,6 @@ type ReposInterface interface {
 	SelectCategoryByName(categoryName string) (categories []string, Err error)
 	//DeleteSubscribeByName()
 	InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error)
+	SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error)
+
 }
