@@ -15,7 +15,7 @@ type ReposInterface interface {
 	Insert(executeQuery string, params []interface{}) (string, error)
 
 	SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error)
-	SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
+	//SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
 	SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
 	DeleteSession(executeQuery string, params []interface{}) error
@@ -34,5 +34,6 @@ type ReposInterface interface {
 
 	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)
 	//-----------------------------------------------------
-	SelectUserByCookieValue(cookieValue string) (Users []models.User, Err error)
+	SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error)
+	SelectCookiesByCookieValue(cookieValue string) (Cookies []models.UserCookie, Err error)
 }

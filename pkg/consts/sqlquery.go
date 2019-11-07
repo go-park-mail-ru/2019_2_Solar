@@ -14,7 +14,7 @@ const (
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U JOIN sunrise.usersession as s on U.id = s.userid " +
 		"where s.cookiesvalue = $1"
-	SELECTCookiesExpirationByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
+	SELECTCookiesByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
 		" as s where s.cookiesvalue = $1"
 	SELECTUserByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"

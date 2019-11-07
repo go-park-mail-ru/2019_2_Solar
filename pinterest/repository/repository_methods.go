@@ -11,7 +11,6 @@ import (
 	"strconv"
 )
 
-
 func (RS *ReposStruct) DataBaseInit() error {
 	RS.connectionString = consts.ConnStr
 	var err error
@@ -162,7 +161,7 @@ func (RS *ReposStruct) SelectIDUsernameEmailUser(executeQuery string, params []i
 	return userUniqueSlice, nil
 }
 
-func (RS *ReposStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
+/*func (RS *ReposStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -182,7 +181,7 @@ func (RS *ReposStruct) SelectUserCookies(executeQuery string, params []interface
 		userCookiesSlice = append(userCookiesSlice, userCookie)
 	}
 	return userCookiesSlice, nil
-}
+}*/
 
 func (RS *ReposStruct) SelectOneCol(executeQuery string, params []interface{}) (Sl []string, Err error) {
 	stringSlice := make([]string, 0)
@@ -404,6 +403,7 @@ func (RS *ReposStruct) SelectBoards(executeQuery string, params []interface{}) (
 	}
 	return boards, nil
 }
+
 //-----------------------------------------------------------------------------
 func (RS *ReposStruct) SelectUserByCookieValue(cookieValue string) (Users []models.User, Err error) {
 	usersSlice := make([]models.User, 0)
@@ -440,4 +440,26 @@ func (RS *ReposStruct) SelectUserByCookieValue(cookieValue string) (Users []mode
 		usersSlice = append(usersSlice, user)
 	}
 	return usersSlice, nil
+}
+
+func (RS *ReposStruct) SelectCookiesByCookieValue(cookieValue string) (Cookies []models.UserCookie, Err error) {
+	userCookiesSlice := make([]models.UserCookie, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTCookiesByCookieValue, cookieValue)
+	if err != nil {
+		return userCookiesSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		userCookie := models.UserCookie{}
+		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
+		if err != nil {
+			return userCookiesSlice, err
+		}
+		userCookiesSlice = append(userCookiesSlice, userCookie)
+	}
+	return userCookiesSlice, nil
 }

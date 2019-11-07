@@ -30,7 +30,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		var userCookie []models.UserCookie
-		userCookie, err = dbWorker.SelectUserCookies(consts.SELECTCookiesExpirationByCookieValue, params)
+		userCookie, err = dbWorker.SelectCookiesByCookieValue(cookie.Value)
 		if err != nil || len(userCookie) != 1 {
 			return err
 		}
