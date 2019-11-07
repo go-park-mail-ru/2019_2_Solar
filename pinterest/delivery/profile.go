@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 func (h *HandlersStruct) HandleGetProfileUserData(ctx echo.Context) (Err error) {
@@ -118,7 +117,7 @@ func (h *HandlersStruct) HandleEditProfileUserPicture(ctx echo.Context) (Err err
 	if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
 		return err
 	}
-	if _, err := h.PUsecase.SetUserAvatarDir(strconv.Itoa(int(user.ID)), fileName); err != nil {
+	if _, err := h.PUsecase.SetUserAvatarDir(user.ID, fileName); err != nil {
 		return err
 	}
 	data := h.PUsecase.SetJSONData(nil, ctx.Get("token").(string),"profile picture has been successfully saved")

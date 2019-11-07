@@ -843,3 +843,15 @@ func (RS *ReposStruct) UpdateUser(user models.User) (int, error) {
 	}
 	return int(rowsEdit), nil
 }
+
+func (RS *ReposStruct) UpdateUserAvatar(fileName string, idUser uint64) (int, error) {
+	result, err := RS.DataBase.Exec(consts.UPDATEUserAvatarDirByID, fileName, idUser)
+	if err != nil {
+		return 0, err
+	}
+	rowsEdit, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsEdit), nil
+}

@@ -90,7 +90,6 @@ func (USC *UseStruct) AddNewUser(username, email, password string) (uint64, erro
 }
 
 func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
-	var params []interface{}
 	if newUser.Username != "" {
 		user.Username = newUser.Username
 	}
@@ -119,7 +118,6 @@ func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) 
 	if newUser.Status != "" {
 		user.Status = newUser.Status
 	}
-
 	editUsers, err := USC.PRepository.UpdateUser(user)
 	if err != nil {
 		return 0, err
@@ -127,10 +125,8 @@ func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) 
 	return editUsers, nil
 }
 
-func (USC *UseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
-	var params []interface{}
-	params = append(params, fileName, idUser)
-	editUsers, err := USC.PRepository.Update(consts.UPDATEUserAvatarDirByID, params)
+func (USC *UseStruct) SetUserAvatarDir(idUser uint64, fileName string) (int, error) {
+	editUsers, err := USC.PRepository.UpdateUserAvatar(fileName, idUser)
 	if err != nil {
 		return 0, err
 	}

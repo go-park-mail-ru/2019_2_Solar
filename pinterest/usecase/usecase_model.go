@@ -40,7 +40,7 @@ type UseInterface interface {
 	CheckBoardData(newBoard models.NewBoard) error
 	CheckPinData(newPin models.NewPin) error
 
-	SetUserAvatarDir(idUser, fileName string) (int, error)
+	SetUserAvatarDir(idUser uint64, fileName string) (int, error)
 	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
 
 	AddNewUser(username, email, password string) (uint64, error)

@@ -58,4 +58,5 @@ type ReposInterface interface {
 	InsertComment(pinID uint64, commentText string, userID uint64, createdTime time.Time) (uint64, error)
 	SelectIDUsernameEmailUser(username, email string) (Users []models.UserUnique, Err error)
 	UpdateUser(user models.User) (int, error)
+	UpdateUserAvatar(fileName string, idUser uint64) (int, error)
 }
