@@ -800,3 +800,12 @@ func (RS *ReposStruct) SelectSubscribePinsDisplayByNumber(userId uint64, first, 
 	}
 	return pins, nil
 }
+
+func (RS *ReposStruct) InsertComment(pinID uint64, commentText string, userID uint64, createdTime time.Time) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTComment, pinID, commentText, userID, createdTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}

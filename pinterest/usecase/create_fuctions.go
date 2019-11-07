@@ -196,10 +196,8 @@ func (USC *UseStruct) AddNotice(notice models.Notice) (uint64, error) {
 	return lastID, nil
 }
 
-func (USC *UseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
-	var params []interface{}
-	params = append(params, pinID, newComment.Text, userID, time.Now())
-	_, err := USC.PRepository.Insert(consts.INSERTComment, params)
+func (USC *UseStruct) AddComment(pinID, userID uint64, newComment models.NewComment) error {
+	_, err := USC.PRepository.InsertComment(pinID, newComment.Text, userID, time.Now())
 	if err != nil {
 		return err
 	}

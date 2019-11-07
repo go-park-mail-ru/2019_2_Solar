@@ -242,8 +242,11 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 		return err
 	}
 	comment := models.NewComment{Text: newComment.Text}
-
-	if err := h.PUsecase.AddComment(pinID, user.ID, comment); err != nil {
+	intPinId, err := strconv.Atoi(pinID)
+	if err != nil {
+		return err
+	}
+	if err := h.PUsecase.AddComment(uint64(intPinId), user.ID, comment); err != nil {
 		return err
 	}
 	body := struct {
