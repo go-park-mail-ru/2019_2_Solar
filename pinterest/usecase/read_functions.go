@@ -143,24 +143,18 @@ func (USC *UseStruct) GetNewPins() ([]models.PinDisplay, error) {
 	return pins, nil
 }
 
-func (USC *UseStruct) GetMyPins(userID uint64) ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userID)
+func (USC *UseStruct) GetMyPins(userID uint64) ([]models.PinDisplay, error) {
 	pins, err := USC.PRepository.SelectMyPinsDisplayByNumber(userID, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userID)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTSubscribePinsByNumber, params)
+func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectSubscribePinsDisplayByNumber(userID, 0, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }

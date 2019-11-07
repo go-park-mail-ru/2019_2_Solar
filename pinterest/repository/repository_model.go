@@ -54,4 +54,5 @@ type ReposInterface interface {
 	SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error)
 	SelectNewPinsDisplayByNumber(first, last int) (Pins []models.PinDisplay, Err error)
 	SelectMyPinsDisplayByNumber(userId uint64, number int) (Pins []models.PinDisplay, Err error)
+	SelectSubscribePinsDisplayByNumber(userId uint64, first, last int) (Pins []models.PinDisplay, Err error)
 }

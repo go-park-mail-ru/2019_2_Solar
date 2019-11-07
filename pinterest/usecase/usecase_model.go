@@ -55,8 +55,8 @@ type UseInterface interface {
 	//GetPins(boardID uint64) ([]models.Pin, error)
 	GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error)
 	GetNewPins() ([]models.PinDisplay, error)
-	GetMyPins(userID uint64) ([]models.PinForMainPage, error)
-	GetSubscribePins(userID uint64) ([]models.PinForMainPage, error)
+	GetMyPins(userID uint64) ([]models.PinDisplay, error)
+	GetSubscribePins(userID uint64) ([]models.PinDisplay, error)
 
 	AddComment(pinID string, userID uint64, newComment models.NewComment) error
 	GetComments(pinID uint64) ([]models.CommentDisplay, error)

@@ -1183,7 +1183,7 @@ func TestUseStruct_GetSubscribePins(t *testing.T) {
 		var params []interface{}
 		params = append(params, consts.NumberOfPinsOnPage, userID)
 
-		repo.EXPECT().SelectIDDirPins(consts.SELECTSubscribePinsByNumber, params).Return(expPins, nil)
+		repo.EXPECT().SelectIDDirPins(consts.SELECTSubscribePinsDisplayByNumber, params).Return(expPins, nil)
 
 		pins, err := us.GetSubscribePins(userID)
 

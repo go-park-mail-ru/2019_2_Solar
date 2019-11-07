@@ -43,12 +43,12 @@ const (
 		"from sunrise.pin WHERE isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
 	//SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
 	//	"from sunrise.pin WHERE owner_id = $2 AND isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
-	SELECTMyPinsDisplayByNumber = "SELECT p.id, p.pindir, p.title FROM sunrise.pin as p WHERE p.isdeleted = false and p.owner_id = $2 LIMIT $1;"
-	SELECTSubscribePinsByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
-		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $2 " +
+	SELECTMyPinsDisplayByNumber        = "SELECT p.id, p.pindir, p.title FROM sunrise.pin as p WHERE p.isdeleted = false and p.owner_id = $2 LIMIT $1;"
+	SELECTSubscribePinsDisplayByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime desc) " +
+		"from sunrise.pin join sunrise.subscribe as s on s.subscriber_id = $3 " +
 		"AND s.followee_id = pin.owner_id " +
 		"AND isdeleted = false) as p " +
-		"WHERE p.ROW_NUMBER BETWEEN 0 AND $1;"
+		"WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
 	SELECTCommentsByPinId = "SELECT c.text, u.username, c.created_time FROM sunrise.comment as c join sunrise.pin as p on p.id = $1 " +
 		"join sunrise.user as u on u.id = p.owner_id where c.pin_id = $1"
 

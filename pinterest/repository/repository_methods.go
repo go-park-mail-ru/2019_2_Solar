@@ -777,3 +777,26 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 	}
 	return pins, nil
 }
+
+func (RS *ReposStruct) SelectSubscribePinsDisplayByNumber(userId uint64, first, last int) (Pins []models.PinDisplay, Err error) {
+	pins := make([]models.PinDisplay, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTSubscribePinsDisplayByNumber, first, last, userId)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
