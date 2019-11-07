@@ -856,7 +856,6 @@ func (RS *ReposStruct) UpdateUserAvatar(fileName string, idUser uint64) (int, er
 	return int(rowsEdit), nil
 }
 
-
 func (RS *ReposStruct) SelectPinsByTag(tag string) (Pins []models.PinDisplay, Err error) {
 	pins := make([]models.PinDisplay, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTPinsByTag, tag)
@@ -915,4 +914,13 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 		usersSlice = append(usersSlice, user)
 	}
 	return usersSlice, nil
+}
+
+func (RS *ReposStruct) InsertSubscribe(userID uint64, followeeName string) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, userID, followeeName).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }

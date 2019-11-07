@@ -48,7 +48,7 @@ func (h *HandlersStruct) HandleCreateSubscribe(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 	followeeName := ctx.Param("username")
-	if err := h.PUsecase.AddSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
+	if err := h.PUsecase.AddSubscribe(user.ID, followeeName); err != nil {
 		return err
 	}
 	body := struct {

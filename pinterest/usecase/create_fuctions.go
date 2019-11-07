@@ -18,7 +18,6 @@ import (
 	"time"
 )
 
-
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
 	USC.Mu = mu
@@ -82,7 +81,7 @@ func (USC *UseStruct) AddNewUser(username, email, password string) (uint64, erro
 		return 0, err
 	}
 	hashPassword := HashPassword(password, salt)
-	lastID, err := USC.PRepository. InsertUser(username, email, salt, hashPassword, time.Now())
+	lastID, err := USC.PRepository.InsertUser(username, email, salt, hashPassword, time.Now())
 	if err != nil {
 		return 0, err
 	}
@@ -199,10 +198,10 @@ func (USC *UseStruct) AddComment(pinID, userID uint64, newComment models.NewComm
 	return nil
 }
 
-func (USC *UseStruct) AddSubscribe(userID, followeeName string) error {
+func (USC *UseStruct) AddSubscribe(userID uint64, followeeName string) error {
 	var params []interface{}
 	params = append(params, userID, followeeName)
-	_, err := USC.PRepository.Insert(consts.INSERTSubscribeByName, params)
+	_, err := USC.PRepository.InsertSubscribe(userID, followeeName)
 	if err != nil {
 		return err
 	}
