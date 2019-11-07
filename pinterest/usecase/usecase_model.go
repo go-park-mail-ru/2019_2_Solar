@@ -26,7 +26,7 @@ type UseInterface interface {
 
 	GetUserByUsername(username string) (models.AnotherUser, error)
 	GetUserByEmail(email string) (models.User, error)
-	GetUserIDByEmail(email string) (string, error)
+	GetUserIDByEmail(email string) (uint64, error)
 
 	GetAllUsers() ([]models.AnotherUser, error)
 	ComparePassword(password, salt, loginPassword string) error

@@ -6,19 +6,15 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
-	var str []string
-	var params []interface{}
-	params = append(params, email)
-	var err error
-	str, err = USC.PRepository.SelectOneCol(consts.SELECTUserIDByEmail, params)
+func (USC *UseStruct) GetUserIDByEmail(email string) (uint64, error) {
+	userSlice, err := USC.PRepository.SelectUsersByEmail(email)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	if len(str) != 1 {
-		return "", errors.New("several users or no one user")
+	if len(userSlice) != 1 {
+		return 0, errors.New("several users or no one user")
 	}
-	return str[0], nil
+	return userSlice[0].ID, nil
 }
 
 func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, error) {

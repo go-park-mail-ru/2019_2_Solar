@@ -12,7 +12,7 @@ type ReposStruct struct {
 }
 
 type ReposInterface interface {
-	Update(executeQuery string, params []interface{}) (int, error)
+/*	Update(executeQuery string, params []interface{}) (int, error)
 	Insert(executeQuery string, params []interface{}) (string, error)
 
 	SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error)
@@ -33,7 +33,7 @@ type ReposInterface interface {
 
 	SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error)
 
-	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)
+	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)*/
 	//-----------------------------------------------------
 	SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error)
 	SelectUsersByEmail(email string) (Users []models.User, Err error)
@@ -63,4 +63,5 @@ type ReposInterface interface {
 	SelectUsersByUsername(username string) (Users []models.User, Err error)
 	InsertSubscribe(userID uint64, followeeName string) (uint64, error)
 	DeleteSubscribeByName(userID uint64, followeeName string) error
+	InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error)
 }

@@ -932,3 +932,12 @@ func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string)
 	}
 	return nil
 }
+
+func (RS *ReposStruct) InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, message.IdSender, message.UserNameRecipient, message.Message, createdTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}

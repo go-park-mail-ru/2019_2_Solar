@@ -2,8 +2,8 @@ package webSocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/gorilla/websocket"
 	"log"
@@ -68,12 +68,10 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		}
 		newChatMessage := models.NewChatMessage{}
 		json.Unmarshal(message, newChatMessage)
-		var params1 []interface{}
-		params1 = append(params1, newChatMessage.IdSender, newChatMessage.UserNameRecipient, newChatMessage.Message, time.Now())
-		_, _ = PRepository.Insert(consts.INSERTChatMessage, params1)
-		var params2 []interface{}
-		params2 = append(params2, newChatMessage.IdSender, newChatMessage.UserNameRecipient)
-		idRecipient, _ := PRepository.SelectFullUser(consts.SELECTUsersByUsername, params2)
+		_, err = PRepository.InsertChatMessage(newChatMessage, time.Now())
+		fmt.Println(err)
+		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
+		fmt.Println(err)
 		chatMessage := models.ChatMessage{
 			IdSender:    newChatMessage.IdSender,
 			IdRecipient: idRecipient[0].ID,
