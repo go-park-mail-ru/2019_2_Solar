@@ -51,7 +51,7 @@ type UseInterface interface {
 	GetMyBoards(UserID uint64) ([]models.Board, error)
 
 	AddPin(newPin models.Pin) (uint64, error)
-	GetPin(pinID string) (models.Pin, error)
+	GetPin(pinID uint64) (models.Pin, error)
 	//GetPins(boardID uint64) ([]models.Pin, error)
 	GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error)
 	GetNewPins() ([]models.PinForMainPage, error)

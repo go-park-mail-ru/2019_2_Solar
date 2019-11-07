@@ -89,12 +89,8 @@ func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
 	return anotherUsers, nil
 }
 
-func (USC *UseStruct) GetPin(pinID string) (models.Pin, error) {
-	var err error
-	var params []interface{}
-	params = append(params, pinID)
-
-	pin, err := USC.PRepository.SelectPin(consts.SELECTPinByID, params)
+func (USC *UseStruct) GetPin(pinID uint64) (models.Pin, error) {
+	pin, err := USC.PRepository.SelectPinsById(pinID)
 	if err != nil {
 		return pin[0], err
 	}

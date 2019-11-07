@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -116,11 +117,15 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	if id == "" {
 		return errors.New("incorrect id")
 	}
-	pin, err := h.PUsecase.GetPin(id)
+	intId, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 	}
-	comments, err := h.PUsecase.GetComments(id)
+	pin, err := h.PUsecase.GetPin(uint64(intId))
+	if err != nil {
+		return err
+	}
+	comments, err := h.PUsecase.GetComments(uint64(intId))
 	if err != nil {
 		return err
 	}

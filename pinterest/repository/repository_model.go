@@ -50,4 +50,5 @@ type ReposInterface interface {
 	SelectAllUsers() (Users []models.User, Err error)
 	InsertNotice(notice models.Notice) (uint64, error)
 	InsertPin(pin models.Pin) (uint64, error)
+	SelectPinsById(pinId uint64) (Pins []models.Pin, Err error)
 }

@@ -685,3 +685,28 @@ func (RS *ReposStruct) InsertPin(pin models.Pin) (uint64, error) {
 	}
 	return id, nil
 }
+
+
+func (RS *ReposStruct) SelectPinsById(pinId uint64) (Pins []models.Pin, Err error) {
+	pins := make([]models.Pin, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTPinByID, pinId)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.Pin{}
+		err := rows.Scan(&scanPin.ID, &scanPin.OwnerID, &scanPin.AuthorID, &scanPin.BoardID, &scanPin.Title,
+			&scanPin.Description, &scanPin.PinDir, &scanPin.CreatedTime, &scanPin.IsDeleted)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
