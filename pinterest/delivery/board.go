@@ -134,7 +134,7 @@ func (h *HandlersStruct) HandleGetMyBoards(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 
-	boards, err := h.PUsecase.GetBoards(uint64(user.ID))
+	boards, err := h.PUsecase.GetMyBoards(uint64(user.ID))
 	if err != nil {
 		return err
 	}

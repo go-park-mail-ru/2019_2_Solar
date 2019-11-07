@@ -45,6 +45,7 @@ type ReposInterface interface {
 	//DeleteSubscribeByName()
 	InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error)
 	SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error)
+	SelectBoardsByOwnerId(ownerId uint64) (Boards []models.Board, Err error)
 	SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error)
 
 }
