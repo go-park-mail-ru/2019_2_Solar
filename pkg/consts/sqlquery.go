@@ -18,7 +18,7 @@ const (
 		" as s where s.cookiesvalue = $1"
 	SELECTUserByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"
-	SELECTUserByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
+	SELECTUsersByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.email = $1"
 
 	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"

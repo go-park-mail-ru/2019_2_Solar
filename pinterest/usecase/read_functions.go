@@ -50,16 +50,15 @@ func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, er
 }
 
 func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
-	var userSlice []models.User
-	var params []interface{}
-	params = append(params, email)
-	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByEmail, params)
+	userSlice, err := USC.PRepository.SelectUsersByEmail(email)
 	if err != nil {
 		return models.User{}, err
 	}
-	if len(userSlice) != 1 {
-		return models.User{}, errors.New("several users or no one user")
+	if len(userSlice) == 0 {
+		return models.User{}, errors.New("user not found")
+	}
+	if len(userSlice) > 1 {
+		return models.User{}, errors.New("several same users")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	return userSlice[0], nil

@@ -36,6 +36,7 @@ type ReposInterface interface {
 	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)
 	//-----------------------------------------------------
 	SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error)
+	SelectUsersByEmail(email string) (Users []models.User, Err error)
 	SelectCookiesByCookieValue(cookieValue string) (Cookies []models.UserCookie, Err error)
 	InsertUser(username, email, salt string, hashPassword []byte , createdTime time.Time) (uint64, error)
 	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
