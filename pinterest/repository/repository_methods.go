@@ -831,3 +831,15 @@ func (RS *ReposStruct) SelectIDUsernameEmailUser(username, email string) (Users 
 	}
 	return userUniqueSlice, nil
 }
+
+func (RS *ReposStruct) UpdateUser(user models.User) (int, error) {
+	result, err := RS.DataBase.Exec(consts.UPDATEUserByID, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
+	if err != nil {
+		return 0, err
+	}
+	rowsEdit, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsEdit), nil
+}
