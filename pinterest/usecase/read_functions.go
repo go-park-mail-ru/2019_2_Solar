@@ -89,12 +89,12 @@ func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
 	return anotherUsers, nil
 }
 
-func (USC *UseStruct) GetPin(pinID uint64) (models.Pin, error) {
+func (USC *UseStruct) GetPin(pinID uint64) (models.FullPin, error) {
 	pin, err := USC.PRepository.SelectPinsById(pinID)
 	if err != nil {
 		return pin[0], err
 	}
-	USC.Sanitizer.SanitPin(&pin[0])
+	USC.Sanitizer.SanitFullPin(&pin[0])
 	return pin[0], nil
 }
 

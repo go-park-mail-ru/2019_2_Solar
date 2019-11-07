@@ -5,10 +5,9 @@ const (
 	SELECTUserIDUsernameEmailByUsernameOrEmail = "SELECT u.id, u.username, u.email from sunrise.user as u where u.username = $1 OR u.email = $2"
 	SELECTAllUsers                             = "SELECT * from sunrise.user"
 	UPDATEUserByID                             = "UPDATE sunrise_db.sunrise.user SET username = $1, name = $2, 	surname = $3," +
-
 		" hashpassword = $4,email = $5, age = $6, status = $7 where id = $8"
 	UPDATEUserAvatarDirByID = "UPDATE sunrise_db.sunrise.user SET avatardir = $1 where id = $2"
-	INSERTUser     = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
+	INSERTUser              = "INSERT INTO sunrise.user (username, email, hashpassword, salt, created_time)	values ($1,$2,$3,$4,$5) RETURNING id"
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
@@ -32,13 +31,12 @@ const (
 
 	INSERTPin = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime)" +
 		" VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"
-	SELECTPinByID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title," +
-		" p.description, p.pindir, p.createdTime, p.isDeleted " +
-		"FROM sunrise.pin as p WHERE p.id = $1"
+	SELECTPinByID = "SELECT p.id, o.username, a.username, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted " +
+		"FROM sunrise.pin as p join sunrise.user as a on p.author_id = a.id join sunrise.user as o on p.owner_id = o.id WHERE p.id = $1"
 	SELECTPinsByBoardID = "SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title," +
 		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
-	SELECTPinsDisplayByBoardId = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.board_id = $1"
+	SELECTPinsDisplayByBoardId   = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.board_id = $1"
 	SELECTNewPinsDisplayByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime desc) " +
 		"from sunrise.pin WHERE isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
 	//SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +

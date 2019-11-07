@@ -135,6 +135,18 @@ type Pin struct {
 	IsDeleted   bool      `json:"is_deleted"`
 }
 
+type FullPin struct {
+	ID             uint64    `json:"id"`
+	OwnerUsername  string    `json:"owner_username"`
+	AuthorUsername string    `json:"author_username"`
+	BoardID        uint64    `json:"board_id"`
+	PinDir         string    `json:"pin_dir"`
+	Title          string    `json:"title"`
+	Description    string    `json:"description"`
+	CreatedTime    time.Time `json:"created_time"`
+	IsDeleted      bool      `json:"is_deleted"`
+}
+
 type NewNotice struct {
 	Message string `json:"message"`
 }

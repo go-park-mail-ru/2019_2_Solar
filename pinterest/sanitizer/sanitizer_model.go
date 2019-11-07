@@ -16,4 +16,5 @@ type SanitInterface interface {
 	SanitComment(comment *models.CommentDisplay)
 	SanitBoard(board *models.Board)
 	SanitPinDisplay(pin *models.PinDisplay)
+	SanitFullPin(pin *models.FullPin)
 }

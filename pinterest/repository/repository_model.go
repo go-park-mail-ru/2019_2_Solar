@@ -50,7 +50,7 @@ type ReposInterface interface {
 	SelectAllUsers() (Users []models.User, Err error)
 	InsertNotice(notice models.Notice) (uint64, error)
 	InsertPin(pin models.Pin) (uint64, error)
-	SelectPinsById(pinId uint64) (Pins []models.Pin, Err error)
+	SelectPinsById(pinId uint64) (Pins []models.FullPin, Err error)
 	SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error)
 	SelectNewPinsDisplayByNumber(first, last int) (Pins []models.PinDisplay, Err error)
 	SelectMyPinsDisplayByNumber(userId uint64, number int) (Pins []models.PinDisplay, Err error)

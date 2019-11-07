@@ -36,6 +36,14 @@ func (San *SanitStruct) SanitBoard(board *models.Board) {
 	board.Description = San.sanit.Sanitize(board.Description)
 	board.Category = San.sanit.Sanitize(board.Category)
 }
+
 func (San *SanitStruct) SanitPinDisplay(pin *models.PinDisplay) {
 	pin.Title = San.sanit.Sanitize(pin.Title)
+}
+
+func (San *SanitStruct) SanitFullPin(pin *models.FullPin) {
+	pin.Title = San.sanit.Sanitize(pin.Title)
+	pin.Description = San.sanit.Sanitize(pin.Description)
+	pin.AuthorUsername = San.sanit.Sanitize(pin.AuthorUsername)
+	pin.OwnerUsername = San.sanit.Sanitize(pin.OwnerUsername)
 }

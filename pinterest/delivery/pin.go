@@ -130,7 +130,7 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pin  models.Pin `json:"pins"`
+		Pin  models.FullPin `json:"pins"`
 		Comments []models.CommentDisplay `json:"comments"`
 		Info  string     `json:"info"`
 	}{pin, comments ,"OK"}
