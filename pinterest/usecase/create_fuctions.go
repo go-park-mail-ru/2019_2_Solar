@@ -181,15 +181,11 @@ func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
 func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	var params []interface{}
 	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTPin, params)
+	lastID, err := USC.PRepository.InsertPin(Pin)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
 func (USC *UseStruct) AddNotice(notice models.Notice) (uint64, error) {

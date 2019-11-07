@@ -676,3 +676,12 @@ func (RS *ReposStruct) InsertNotice(notice models.Notice) (uint64, error) {
 	}
 	return id, nil
 }
+
+func (RS *ReposStruct) InsertPin(pin models.Pin) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTPin, pin.OwnerID, pin.AuthorID, pin.BoardID, pin.Title, pin.Description, pin.PinDir, pin.CreatedTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
