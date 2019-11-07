@@ -527,3 +527,26 @@ func (RS *ReposStruct) DeleteSessionByKey(cookieValue string) error {
 	}
 	return nil
 }
+
+func (RS *ReposStruct) SelectCategoryByName(categoryName string) (categories []string, Err error) {
+	categories = make([]string, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTCategoryByName, categoryName)
+	if err != nil {
+		return categories, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	var category *string
+	for rows.Next() {
+		err := rows.Scan(&category)
+		if err != nil {
+			return categories, err
+		}
+
+		categories = append(categories, *category)
+	}
+	return categories, nil
+}

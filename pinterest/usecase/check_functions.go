@@ -116,7 +116,7 @@ func CheckPinDescription(description string) error {
 func (USC *UseStruct) CheckBoardCategory(category string) error {
 	var params []interface{}
 	params = append(params, category)
-	categories, err := USC.PRepository.SelectCategory(consts.SELECTCategoryByName, params)
+	categories, err := USC.PRepository.SelectCategoryByName(category)
 	if err != nil {
 		return err
 	}

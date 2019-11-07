@@ -41,4 +41,5 @@ type ReposInterface interface {
 	InsertUser(username, email, salt string, hashPassword []byte, createdTime time.Time) (uint64, error)
 	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
 	DeleteSessionByKey(cookieValue string) error
+	SelectCategoryByName(categoryName string) (categories []string, Err error)
 }
