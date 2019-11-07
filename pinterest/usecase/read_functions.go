@@ -147,7 +147,7 @@ func (USC *UseStruct) GetMyPins(userID uint64) ([]models.PinForMainPage, error) 
 	var err error
 	var params []interface{}
 	params = append(params, consts.NumberOfPinsOnPage, userID)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTMyPinsByNumber, params)
+	pins, err := USC.PRepository.SelectMyPinsDisplayByNumber(userID, consts.NumberOfPinsOnPage)
 	if err != nil {
 		return []models.PinForMainPage{}, err
 	}

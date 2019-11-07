@@ -182,8 +182,6 @@ func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-
-	//jsonStruct := models.JSONResponse{Body: jsonPin}
 	body := struct {
 		Pins  []models.PinForMainPage `json:"pins"`
 		Info  string     `json:"info"`
