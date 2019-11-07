@@ -15,4 +15,5 @@ type SanitInterface interface {
 	SanitPinForSearchResult(pin *models.PinForSearchResult)
 	SanitComment(comment *models.CommentForSend)
 	SanitBoard(board *models.Board)
+	SanitPinDisplay(pin *models.PinDisplay)
 }
