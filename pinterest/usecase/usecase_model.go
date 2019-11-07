@@ -52,7 +52,7 @@ type UseInterface interface {
 
 	AddPin(newPin models.Pin) (uint64, error)
 	GetPin(pinID string) (models.Pin, error)
-	GetPins(boardID uint64) ([]models.Pin, error)
+	//GetPins(boardID uint64) ([]models.Pin, error)
 	GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error)
 	GetNewPins() ([]models.PinForMainPage, error)
 	GetMyPins(userID uint64) ([]models.PinForMainPage, error)

@@ -65,9 +65,7 @@ func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
 }
 
 func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
-	var err error
-
-	users, err := USC.PRepository.SelectFullUser(consts.SELECTAllUsers, nil)
+	users, err := USC.PRepository.SelectAllUsers()
 	if err != nil {
 		return []models.AnotherUser{}, err
 	}

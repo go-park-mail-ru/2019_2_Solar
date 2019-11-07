@@ -23,6 +23,7 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 	h.PUsecase.CreateClient(ws, user.ID)
+
 	body := models.BodyInfo{Info: "OK"}
 	jsonStruct := models.JSONResponse{Body: body}
 	if err := ctx.JSON(200, jsonStruct); err != nil {
