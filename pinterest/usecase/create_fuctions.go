@@ -192,18 +192,12 @@ func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	return uint64(id), nil
 }
 
-func (USC *UseStruct) AddNotice(Notice models.Notice) (uint64, error) {
-	var params []interface{}
-	params = append(params, Notice.UserID, Notice.ReceiverID, Notice.Message, Notice.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTNotice, params)
+func (USC *UseStruct) AddNotice(notice models.Notice) (uint64, error) {
+	lastID, err := USC.PRepository.InsertNotice(notice)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
 func (USC *UseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {

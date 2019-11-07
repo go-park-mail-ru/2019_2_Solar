@@ -667,3 +667,12 @@ func (RS *ReposStruct) SelectAllUsers() (Users []models.User, Err error) {
 	}
 	return usersSlice, nil
 }
+
+func (RS *ReposStruct) InsertNotice(notice models.Notice) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTNotice, notice.UserID, notice.ReceiverID, notice.Message, notice.CreatedTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
