@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
@@ -22,29 +23,42 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		var user []models.User
-		var params []interface{}
-		params = append(params, cookie.Value)
 		user, err = dbWorker.SelectUserByCookieValue(cookie.Value)
-		if err != nil || len(user) != 1 {
+		if err != nil {
 			return err
+		}
+		if len(user) == 0 {
+			return errors.New("cookie not found")
+		}
+		if len(user) > 1 {
+			return errors.New("several same cookies")
 		}
 
 		var userCookie []models.UserCookie
 		userCookie, err = dbWorker.SelectCookiesByCookieValue(cookie.Value)
-		if err != nil || len(userCookie) != 1 {
+		if err != nil {
 			return err
 		}
+		if len(user) == 0 {
+			return errors.New("cookie not found")
+		}
+		if len(user) > 1 {
+			return errors.New("several same cookies")
+		}
+
 		if userCookie[0].Expiration.Before(time.Now()) {
 			//delete Coockie!!!!
 			return next(ctx)
 		}
 
+		var params []interface{}
+		params = append(params, cookie.Value)
 		var userSessions []models.UserSession
 		userSessions, err = dbWorker.SelectSessions(consts.SELECTSessionByCookieValue, params)
 
 		sess := functions.Session{
 			UserID: uint(userSessions[0].UserID),
-			ID: string(userSessions[0].ID),
+			ID:     string(userSessions[0].ID),
 		}
 
 		if ctx.Request().URL.Path != "/login" &&
