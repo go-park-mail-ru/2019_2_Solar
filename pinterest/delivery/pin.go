@@ -175,7 +175,7 @@ func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetMyPins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	//jsonStruct := models.JSONResponse{Body: jsonPin}
@@ -205,7 +205,7 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 	var pins []models.PinForMainPage
 	pins, err := h.PUsecase.GetSubscribePins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
 	body := struct {
 		Pins  []models.PinForMainPage `json:"pins"`
