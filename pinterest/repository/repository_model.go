@@ -20,7 +20,7 @@ type ReposInterface interface {
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
 	//SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
 	//DeleteSession(executeQuery string, params []interface{}) error
-	DeleteSubscribe(executeQuery string, params []interface{}) error
+	//DeleteSubscribe(executeQuery string, params []interface{}) error
 
 	SelectCategory(executeQuery string, params []interface{}) ([]string, error)
 
@@ -62,4 +62,5 @@ type ReposInterface interface {
 	SelectPinsByTag(tag string) (Pins []models.PinDisplay, Err error)
 	SelectUsersByUsername(username string) (Users []models.User, Err error)
 	InsertSubscribe(userID uint64, followeeName string) (uint64, error)
+	DeleteSubscribeByName(userID uint64, followeeName string) error
 }

@@ -64,7 +64,7 @@ type UseInterface interface {
 	AddNotice(newNotice models.Notice) (uint64, error)
 
 	AddSubscribe(userID uint64, followeeName string) error
-	RemoveSubscribe(userID, followeeName string) error
+	RemoveSubscribe(userID uint64, followeeName string) error
 
 	ExtractFormatFile(fileName string) (string, error)
 	RemoveOldUserSession(sessionKey string) error

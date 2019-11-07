@@ -924,3 +924,11 @@ func (RS *ReposStruct) InsertSubscribe(userID uint64, followeeName string) (uint
 	}
 	return id, nil
 }
+
+func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string) error {
+	_, err := RS.DataBase.Query(consts.DELETESubscribeByName, userID, followeeName)
+	if err != nil {
+		return err
+	}
+	return nil
+}

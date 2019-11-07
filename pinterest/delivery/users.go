@@ -5,7 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
@@ -74,7 +73,7 @@ func (h *HandlersStruct) HandleDeleteSubscribe(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 	followeeName := ctx.Param("username")
-	if err := h.PUsecase.RemoveSubscribe(strconv.FormatUint(user.ID, 10), followeeName); err != nil {
+	if err := h.PUsecase.RemoveSubscribe(user.ID, followeeName); err != nil {
 		return err
 	}
 	body := struct {
