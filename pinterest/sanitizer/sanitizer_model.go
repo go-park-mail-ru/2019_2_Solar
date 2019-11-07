@@ -13,7 +13,7 @@ type SanitInterface interface {
 	SanitUser(user *models.User)
 	SanitPin(pin *models.Pin)
 	SanitPinForSearchResult(pin *models.PinForSearchResult)
-	SanitComment(comment *models.CommentForSend)
+	SanitComment(comment *models.CommentDisplay)
 	SanitBoard(board *models.Board)
 	SanitPinDisplay(pin *models.PinDisplay)
 }

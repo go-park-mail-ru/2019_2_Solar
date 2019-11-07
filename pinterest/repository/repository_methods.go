@@ -338,8 +338,8 @@ func (RS *ReposStruct) SelectIDDirPins(executeQuery string, params []interface{}
 	return pins, nil
 }
 
-func (RS *ReposStruct) SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error) {
-	var comments []models.CommentForSend
+func (RS *ReposStruct) SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentDisplay, Err error) {
+	var comments []models.CommentDisplay
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
 		return comments, err
@@ -349,7 +349,7 @@ func (RS *ReposStruct) SelectComments(executeQuery string, params []interface{})
 			Err = err
 		}
 	}()
-	scanComment := models.CommentForSend{}
+	scanComment := models.CommentDisplay{}
 	for rows.Next() {
 		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.CreatedTime)
 		if err != nil {
@@ -686,7 +686,6 @@ func (RS *ReposStruct) InsertPin(pin models.Pin) (uint64, error) {
 	return id, nil
 }
 
-
 func (RS *ReposStruct) SelectPinsById(pinId uint64) (Pins []models.Pin, Err error) {
 	pins := make([]models.Pin, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTPinByID, pinId)
@@ -709,4 +708,26 @@ func (RS *ReposStruct) SelectPinsById(pinId uint64) (Pins []models.Pin, Err erro
 		pins = append(pins, scanPin)
 	}
 	return pins, nil
+}
+
+func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error) {
+	var comments []models.CommentDisplay
+	rows, err := RS.DataBase.Query(consts.SELECTCommentsByPinId, pinId)
+	if err != nil {
+		return comments, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	scanComment := models.CommentDisplay{}
+	for rows.Next() {
+		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.CreatedTime)
+		if err != nil {
+			return comments, err
+		}
+		comments = append(comments, scanComment)
+	}
+	return comments, nil
 }

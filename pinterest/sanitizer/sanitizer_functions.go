@@ -26,7 +26,7 @@ func (San *SanitStruct) SanitPinForSearchResult(pin *models.PinForSearchResult) 
 	pin.Title = San.sanit.Sanitize(pin.Title)
 }
 
-func (San *SanitStruct) SanitComment(comment *models.CommentForSend) {
+func (San *SanitStruct) SanitComment(comment *models.CommentDisplay) {
 	comment.Text = San.sanit.Sanitize(comment.Text)
 	comment.Author = San.sanit.Sanitize(comment.Author)
 }

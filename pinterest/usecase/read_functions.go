@@ -168,13 +168,13 @@ func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinForMainPage, 
 	return pins, nil
 }
 
-func (USC *UseStruct) GetComments(pinID string) ([]models.CommentForSend, error) {
+func (USC *UseStruct) GetComments(pinID uint64) ([]models.CommentDisplay, error) {
 	var err error
 	var params []interface{}
 	params = append(params, pinID)
-	comments, err := USC.PRepository.SelectComments(consts.SELECTComments, params)
+	comments, err := USC.PRepository.SelectCommentsByPinId(pinID)
 	if err != nil {
-		return []models.CommentForSend{}, err
+		return []models.CommentDisplay{}, err
 	}
 	for _, comment := range comments {
 		USC.Sanitizer.SanitComment(&comment)

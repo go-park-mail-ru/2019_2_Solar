@@ -59,7 +59,7 @@ type UseInterface interface {
 	GetSubscribePins(userID uint64) ([]models.PinForMainPage, error)
 
 	AddComment(pinID string, userID uint64, newComment models.NewComment) error
-	GetComments(pinID string) ([]models.CommentForSend, error)
+	GetComments(pinID uint64) ([]models.CommentDisplay, error)
 
 	AddNotice(newNotice models.Notice) (uint64, error)
 

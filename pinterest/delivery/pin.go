@@ -131,7 +131,7 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	}
 	body := struct {
 		Pin  models.Pin `json:"pins"`
-		Comments []models.CommentForSend `json:"comments"`
+		Comments []models.CommentDisplay `json:"comments"`
 		Info  string     `json:"info"`
 	}{pin, comments ,"OK"}
 	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}

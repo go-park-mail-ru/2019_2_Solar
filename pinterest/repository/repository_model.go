@@ -28,7 +28,7 @@ type ReposInterface interface {
 
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
 	SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
-	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentForSend, Err error)
+	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentDisplay, Err error)
 	SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error)
 
 	SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error)
@@ -51,4 +51,5 @@ type ReposInterface interface {
 	InsertNotice(notice models.Notice) (uint64, error)
 	InsertPin(pin models.Pin) (uint64, error)
 	SelectPinsById(pinId uint64) (Pins []models.Pin, Err error)
+	SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error)
 }
