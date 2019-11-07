@@ -550,3 +550,12 @@ func (RS *ReposStruct) SelectCategoryByName(categoryName string) (categories []s
 	}
 	return categories, nil
 }
+
+func (RS *ReposStruct) InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTBoard, ownerID, title, description, category, createdTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}

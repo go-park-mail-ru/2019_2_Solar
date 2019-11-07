@@ -171,17 +171,11 @@ func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err e
 }
 
 func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
-	var params []interface{}
-	params = append(params, Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTBoard, params)
+	lastID, err := USC.PRepository.InsertBoard(Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
 func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {

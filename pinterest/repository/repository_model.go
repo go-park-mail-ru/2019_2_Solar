@@ -42,4 +42,6 @@ type ReposInterface interface {
 	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
 	DeleteSessionByKey(cookieValue string) error
 	SelectCategoryByName(categoryName string) (categories []string, Err error)
+	//DeleteSubscribeByName()
+	InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error)
 }
