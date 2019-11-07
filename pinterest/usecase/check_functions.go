@@ -8,7 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 )
 
-func (USC *UseStruct) CheckRegData(newUser *models.UserReg) error {
+func (USC *UseStruct) CheckRegDataValidation(newUser *models.UserReg) error {
 	if err := EmailCheck(newUser.Email); err != nil {
 		return err
 	}

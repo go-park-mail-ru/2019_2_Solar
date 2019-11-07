@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"strconv"
+	"time"
 )
 
 func (RS *ReposStruct) DataBaseInit() error {
@@ -405,7 +406,7 @@ func (RS *ReposStruct) SelectBoards(executeQuery string, params []interface{}) (
 }
 
 //-----------------------------------------------------------------------------
-func (RS *ReposStruct) SelectUserByCookieValue(cookieValue string) (Users []models.User, Err error) {
+func (RS *ReposStruct) SelectUsersByCookieValue(cookieValue string) (Users []models.User, Err error) {
 	usersSlice := make([]models.User, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTUserByCookieValue, cookieValue)
 	if err != nil {
@@ -462,4 +463,13 @@ func (RS *ReposStruct) SelectCookiesByCookieValue(cookieValue string) (Cookies [
 		userCookiesSlice = append(userCookiesSlice, userCookie)
 	}
 	return userCookiesSlice, nil
+}
+
+func (RS *ReposStruct) InsertUser(username, email, salt string, hashPassword []byte, createdTime time.Time) (uint64, error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTRegistration, username, email, hashPassword, salt, createdTime).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }

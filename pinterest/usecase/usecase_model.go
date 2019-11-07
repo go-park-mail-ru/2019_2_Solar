@@ -31,7 +31,7 @@ type UseInterface interface {
 	GetAllUsers() ([]models.AnotherUser, error)
 	ComparePassword(password, salt, loginPassword string) error
 
-	CheckRegData(newUser *models.UserReg) error
+	CheckRegDataValidation(newUser *models.UserReg) error
 	CheckRegUsernameEmailIsUnique(username, email string) error
 
 	CheckProfileData(newProfileUser *models.EditUserProfile) error
@@ -43,7 +43,7 @@ type UseInterface interface {
 	SetUserAvatarDir(idUser, fileName string) (int, error)
 	SetUser(newUser models.EditUserProfile, user models.User) (int, error)
 
-	AddNewUser(username, email, password string) (string, error)
+	AddNewUser(username, email, password string) (uint64, error)
 	AddNewUserSession(userID string) (http.Cookie, error)
 
 	AddBoard(newBoard models.Board) (uint64, error)

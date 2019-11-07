@@ -23,7 +23,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		var user []models.User
-		user, err = dbWorker.SelectUserByCookieValue(cookie.Value)
+		user, err = dbWorker.SelectUsersByCookieValue(cookie.Value)
 		if err != nil {
 			return err
 		}

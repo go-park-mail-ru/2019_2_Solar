@@ -28,7 +28,7 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	if err := h.PUsecase.CheckRegData(newUserReg); err != nil {
+	if err := h.PUsecase.CheckRegDataValidation(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
