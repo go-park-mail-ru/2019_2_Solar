@@ -73,7 +73,7 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		_, _ = PRepository.Insert(consts.INSERTChatMessage, params1)
 		var params2 []interface{}
 		params2 = append(params2, newChatMessage.IdSender, newChatMessage.UserNameRecipient)
-		idRecipient, _ := PRepository.SelectFullUser(consts.SELECTUserByUsername, params2)
+		idRecipient, _ := PRepository.SelectFullUser(consts.SELECTUsersByUsername, params2)
 		chatMessage := models.ChatMessage{
 			IdSender:    newChatMessage.IdSender,
 			IdRecipient: idRecipient[0].ID,

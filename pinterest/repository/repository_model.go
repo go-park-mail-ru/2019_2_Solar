@@ -60,4 +60,5 @@ type ReposInterface interface {
 	UpdateUser(user models.User) (int, error)
 	UpdateUserAvatar(fileName string, idUser uint64) (int, error)
 	SelectPinsByTag(tag string) (Pins []models.PinDisplay, Err error)
+	SelectUsersByUsername(username string) (Users []models.User, Err error)
 }

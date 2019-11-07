@@ -22,11 +22,7 @@ func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
 }
 
 func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, error) {
-	var userSlice []models.User
-	var params []interface{}
-	params = append(params, username)
-	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
+	userSlice, err := USC.PRepository.SelectUsersByUsername(username)
 	if err != nil {
 		return models.AnotherUser{}, err
 	}

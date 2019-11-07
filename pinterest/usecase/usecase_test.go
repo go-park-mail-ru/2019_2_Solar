@@ -882,7 +882,7 @@ func TestUseStruct_GetUserByUsername(t *testing.T) {
 		var params []interface{}
 		params = append(params, username)
 
-		repo.EXPECT().SelectFullUser(consts.SELECTUserByUsername, params).Return(selectedUsers, nil)
+		repo.EXPECT().SelectFullUser(consts.SELECTUsersByUsername, params).Return(selectedUsers, nil)
 
 		user, err := us.GetUserByUsername(username)
 

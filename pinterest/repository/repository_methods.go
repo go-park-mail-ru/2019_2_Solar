@@ -879,3 +879,40 @@ func (RS *ReposStruct) SelectPinsByTag(tag string) (Pins []models.PinDisplay, Er
 	}
 	return pins, nil
 }
+
+func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.User, Err error) {
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTUsersByUsername, username)
+	if err != nil {
+		return usersSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime)
+		if err != nil {
+			return usersSlice, err
+		}
+		user := models.User{
+			ID:          dbuser.ID,
+			Username:    dbuser.Username,
+			Name:        dbuser.Name.String,
+			Surname:     dbuser.Surname.String,
+			Password:    dbuser.Password,
+			Email:       dbuser.Email,
+			Age:         uint(dbuser.Age.Int32),
+			Status:      dbuser.Status.String,
+			AvatarDir:   dbuser.AvatarDir.String,
+			IsActive:    dbuser.IsActive,
+			Salt:        dbuser.Salt,
+			CreatedTime: dbuser.CreatedTime,
+		}
+		usersSlice = append(usersSlice, user)
+	}
+	return usersSlice, nil
+}
