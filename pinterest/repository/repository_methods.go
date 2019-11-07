@@ -140,7 +140,7 @@ func (RS *ReposStruct) SelectFullUser(executeQuery string, params []interface{})
 	return usersSlice, nil
 }
 
-func (RS *ReposStruct) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
+/*func (RS *ReposStruct) SelectIDUsernameEmailUser(executeQuery string, params []interface{}) (Sl []models.UserUnique, Err error) {
 	userUniqueSlice := make([]models.UserUnique, 0)
 	rows, err := RS.DataBase.Query(executeQuery, params...)
 	if err != nil {
@@ -160,7 +160,7 @@ func (RS *ReposStruct) SelectIDUsernameEmailUser(executeQuery string, params []i
 		userUniqueSlice = append(userUniqueSlice, user)
 	}
 	return userUniqueSlice, nil
-}
+}*/
 
 /*func (RS *ReposStruct) SelectUserCookies(executeQuery string, params []interface{}) (Sl []models.UserCookie, Err error) {
 	userCookiesSlice := make([]models.UserCookie, 0)
@@ -808,4 +808,26 @@ func (RS *ReposStruct) InsertComment(pinID uint64, commentText string, userID ui
 		return 0, err
 	}
 	return id, nil
+}
+
+func (RS *ReposStruct) SelectIDUsernameEmailUser(username, email string) (Users []models.UserUnique, Err error) {
+	userUniqueSlice := make([]models.UserUnique, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, username, email)
+	if err != nil {
+		return userUniqueSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		user := models.UserUnique{}
+		err := rows.Scan(&user.ID, &user.Username, &user.Email)
+		if err != nil {
+			return userUniqueSlice, err
+		}
+		userUniqueSlice = append(userUniqueSlice, user)
+	}
+	return userUniqueSlice, nil
 }

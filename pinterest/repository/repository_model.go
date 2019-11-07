@@ -18,7 +18,7 @@ type ReposInterface interface {
 	SelectFullUser(executeQuery string, params []interface{}) ([]models.User, error)
 	//SelectUserCookies(executeQuery string, params []interface{}) ([]models.UserCookie, error)
 	SelectOneCol(executeQuery string, params []interface{}) ([]string, error)
-	SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
+	//SelectIDUsernameEmailUser(executeQuery string, params []interface{}) ([]models.UserUnique, error)
 	//DeleteSession(executeQuery string, params []interface{}) error
 	DeleteSubscribe(executeQuery string, params []interface{}) error
 
@@ -56,4 +56,5 @@ type ReposInterface interface {
 	SelectMyPinsDisplayByNumber(userId uint64, number int) (Pins []models.PinDisplay, Err error)
 	SelectSubscribePinsDisplayByNumber(userId uint64, first, last int) (Pins []models.PinDisplay, Err error)
 	InsertComment(pinID uint64, commentText string, userID uint64, createdTime time.Time) (uint64, error)
+	SelectIDUsernameEmailUser(username, email string) (Users []models.UserUnique, Err error)
 }

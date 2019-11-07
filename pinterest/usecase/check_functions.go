@@ -3,7 +3,6 @@ package usecase
 import (
 	"bytes"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 )
@@ -130,7 +129,7 @@ func (USC *UseStruct) CheckRegUsernameEmailIsUnique(username, email string) erro
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
-	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(username, email)
 	if err != nil {
 		return err
 	}
@@ -214,7 +213,7 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, newUsername, newEmail)
-	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(newUsername, newEmail)
 	if err != nil {
 		return err
 	}
@@ -233,7 +232,7 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 }
 
 func (USC *UseStruct) ComparePassword(password, salt, loginPassword string) error {
-	if  bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
+	if bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
 		return nil
 	}
 	return errors.New("different passwords")
