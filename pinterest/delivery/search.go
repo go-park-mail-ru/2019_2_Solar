@@ -27,7 +27,7 @@ func (h *HandlersStruct) HandlerFindPinByTag(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pins  []models.PinForSearchResult `json:"pins"`
+		Pins  []models.PinDisplay `json:"pins"`
 		Info  string     `json:"info"`
 	}{pins, "OK"}
 	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}

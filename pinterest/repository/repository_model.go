@@ -29,7 +29,7 @@ type ReposInterface interface {
 	SelectPin(executeQuery string, params []interface{}) ([]models.Pin, error)
 	SelectIDDirPins(executeQuery string, params []interface{}) (Pins []models.PinForMainPage, Err error)
 	SelectComments(executeQuery string, params []interface{}) (Comments []models.CommentDisplay, Err error)
-	SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error)
+	//SelectPinsByTag(executeQuery string, params []interface{}) (Pins []models.PinForSearchResult, Err error)
 
 	SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error)
 
@@ -59,4 +59,5 @@ type ReposInterface interface {
 	SelectIDUsernameEmailUser(username, email string) (Users []models.UserUnique, Err error)
 	UpdateUser(user models.User) (int, error)
 	UpdateUserAvatar(fileName string, idUser uint64) (int, error)
+	SelectPinsByTag(tag string) (Pins []models.PinDisplay, Err error)
 }
