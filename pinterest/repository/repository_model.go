@@ -33,4 +33,6 @@ type ReposInterface interface {
 	SelectSessions(executeQuery string, params []interface{}) (Sessions []models.UserSession, Err error)
 
 	SelectBoards(executeQuery string, params []interface{}) (Boards []models.Board, Err error)
+	//-----------------------------------------------------
+	SelectUserByCookieValue(cookieValue string) (Users []models.User, Err error)
 }

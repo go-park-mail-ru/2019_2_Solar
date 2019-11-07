@@ -24,7 +24,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		var user []models.User
 		var params []interface{}
 		params = append(params, cookie.Value)
-		user, err = dbWorker.SelectFullUser(consts.SELECTUserByCookieValue, params)
+		user, err = dbWorker.SelectUserByCookieValue(cookie.Value)
 		if err != nil || len(user) != 1 {
 			return err
 		}
