@@ -79,7 +79,11 @@ type UseInterface interface {
 
 	CreateClient(conn *websocket.Conn, userId uint64)
 
+
 	GetMySubscribeByUsername(userId uint64, username string) (bool, error)
+
+	AddTags(description string, pinID uint64) error
+
 
 
 }

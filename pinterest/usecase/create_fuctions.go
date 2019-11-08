@@ -9,11 +9,13 @@ import (
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -205,5 +207,40 @@ func (USC *UseStruct) AddSubscribe(userID uint64, followeeName string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (USC *UseStruct) AddTags(description string, pinID uint64) error {
+	tags := validation.FindTags.FindAllString(description, -1)
+	for i := 0; i < len(tags); i++ {
+		//strings.Re
+		tags[i] = strings.TrimPrefix(tags[i], "#")
+	}
+	uniqueTags, err := USC.PRepository.SelectAllTags()
+	if err != nil {
+		return err
+	}
+
+	alredyExitstflag := false
+	for _, tag := range  tags {
+		for _, uniqueTag := range uniqueTags {
+			if uniqueTag == tag {
+				alredyExitstflag = true
+			}
+		}
+		if alredyExitstflag != true {
+			if err := USC.PRepository.InsertTag(tag); err != nil {
+				return err
+			}
+		}
+		alredyExitstflag = false
+	}
+
+	for _, tag := range  tags {
+		if err := USC.PRepository.InsertPinAndTag(pinID, tag); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
