@@ -73,4 +73,10 @@ const (
 
 	SELECTNoticesByUserID = "SELECT n.id, n.user_id, n.receiver_id, n.message, n.createdtime, isread FROM sunrise.notice as n " +
 		"WHERE n.receiver_id = $1 and n.isread = false;"
+
+	SELECTTagAll = "SELECT t.name from sunrise.tag as t;"
+	INSERTTag = "INSERT INTO sunrise.tag (name)" +
+		" VALUES ($1) RETURNING name"
+	INSERTPinAndTag = "INSERT INTO sunrise.pinandtag (pin_id, tag_name)" +
+" VALUES ($1,$2) RETURNING id"
 )

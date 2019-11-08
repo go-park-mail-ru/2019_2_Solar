@@ -662,3 +662,43 @@ func (RS *ReposStruct) SelectSessionsByCookieValue(cookieValue string) (Sessions
 	}
 	return userSessionsSlice, nil
 }
+
+func (RS *ReposStruct) SelectAllTags() (Tag []string, Err error) {
+	tags := make([]string, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTTagAll)
+	if err != nil {
+		return tags, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		var scanTag string
+		err := rows.Scan(&scanTag)
+		if err != nil {
+			return tags, err
+		}
+		tags = append(tags, scanTag)
+	}
+	return tags, nil
+}
+
+func (RS *ReposStruct) InsertTag (TagName string) (Err error) {
+	var name string
+	err := RS.DataBase.QueryRow(consts.INSERTTag, TagName).Scan(&name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (RS *ReposStruct) InsertPinAndTag (PinID uint64, TagName string) (Err error) {
+	var id uint64
+	err := RS.DataBase.QueryRow(consts.INSERTPinAndTag, PinID, TagName).Scan(&id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

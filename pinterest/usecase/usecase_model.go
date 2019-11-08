@@ -79,7 +79,7 @@ type UseInterface interface {
 
 	CreateClient(conn *websocket.Conn, userId uint64)
 
-
+	AddTags(description string, pinID uint64) error
 
 
 }
