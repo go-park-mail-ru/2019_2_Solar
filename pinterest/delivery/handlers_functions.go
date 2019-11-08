@@ -27,6 +27,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 
 	e.POST("/board", h.HandleCreateBoard)
 	e.GET("/board/:id", h.HandleGetBoard)
+	e.GET("/board/list/my", h.HandleGetMyBoards)
 
 	e.POST("/pin", h.HandleCreatePin)
 	e.POST("/pin/:id/comment", h.HandleCreateComment)
@@ -36,6 +37,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
 
 	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
+	e.GET( "/notice", h.HandleGetNotices)
 
 	e.GET("/chat", h.HandleUpgradeWebSocket)
 

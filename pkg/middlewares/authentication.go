@@ -1,8 +1,8 @@
 package middlewares
 
 import (
+	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
@@ -17,34 +17,50 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(ctx)
 		}
 		dbWorker := repository.ReposStruct{}
+		defer func() {
+			dbWorker.CloseDB()
+		}()
 		err = dbWorker.NewDataBaseWorker()
 		if err != nil {
 			return err
 		}
 		var user []models.User
-		var params []interface{}
-		params = append(params, cookie.Value)
-		user, err = dbWorker.SelectFullUser(consts.SELECTUserByCookieValue, params)
-		if err != nil || len(user) != 1 {
+		user, err = dbWorker.SelectUsersByCookieValue(cookie.Value)
+		if err != nil {
 			return err
+		}
+		if len(user) == 0 {
+			return errors.New("cookie not found")
+		}
+		if len(user) > 1 {
+			return errors.New("several same cookies")
 		}
 
 		var userCookie []models.UserCookie
-		userCookie, err = dbWorker.SelectUserCookies(consts.SELECTCookiesExpirationByCookieValue, params)
-		if err != nil || len(userCookie) != 1 {
+		userCookie, err = dbWorker.SelectCookiesByCookieValue(cookie.Value)
+		if err != nil {
 			return err
 		}
+		if len(user) == 0 {
+			return errors.New("cookie not found")
+		}
+		if len(user) > 1 {
+			return errors.New("several same cookies")
+		}
+
 		if userCookie[0].Expiration.Before(time.Now()) {
 			//delete Coockie!!!!
 			return next(ctx)
 		}
 
 		var userSessions []models.UserSession
-		userSessions, err = dbWorker.SelectSessions(consts.SELECTSessionByCookieValue, params)
-
+		userSessions, err = dbWorker.SelectSessionsByCookieValue(cookie.Value)
+		if err != nil {
+			return err
+		}
 		sess := functions.Session{
 			UserID: uint(userSessions[0].UserID),
-			ID: string(userSessions[0].ID),
+			ID:     string(userSessions[0].ID),
 		}
 
 		if ctx.Request().URL.Path != "/login" &&
@@ -58,7 +74,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		token, err := tokens.Create(&sess, time.Now().Add(24*time.Hour).Unix())
+		token, err := tokens.Create(&sess, time.Now().Add(30*time.Minute).Unix())
 		if err != nil {
 			return err
 		}

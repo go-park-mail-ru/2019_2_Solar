@@ -50,15 +50,15 @@ func (h *HandlersStruct) HandleCreateBoard(ctx echo.Context) (Err error) {
 
 	data := struct {
 		CSRFToken string `json:"csrf_token"`
-		Body struct {
+		Body      struct {
 			Board models.Board `json:"board"`
 			Info  string       `json:"info"`
 		} `json:"body"`
-	}{	CSRFToken: ctx.Get("token").(string),
+	}{CSRFToken: ctx.Get("token").(string),
 		Body: struct {
-		Board models.Board `json:"board"`
-		Info  string       `json:"info"`
-	}{Info: "data successfully saved", Board: board}}
+			Board models.Board `json:"board"`
+			Info  string       `json:"info"`
+		}{Info: "data successfully saved", Board: board}}
 
 	if err := encoder.Encode(data); err != nil {
 		return err
@@ -94,24 +94,62 @@ func (h *HandlersStruct) HandleGetBoard(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	pins, err := h.PUsecase.GetPins(uint64(boardID))
+	pins, err := h.PUsecase.GetPinsDisplay(uint64(boardID))
 	if err != nil {
 		return err
 	}
 
 	data := struct {
 		CSRFToken string `json:"csrf_token"`
-		Body struct {
-			Board models.Board `json:"board"`
-			Pins  []models.Pin `json:"pins"`
-			Info  string       `json:"info"`
+		Body      struct {
+			Board models.Board        `json:"board"`
+			Pins  []models.PinDisplay `json:"pins"`
+			Info  string              `json:"info"`
 		} `json:"body"`
-	}{  CSRFToken: ctx.Get("token").(string),
+	}{CSRFToken: ctx.Get("token").(string),
 		Body: struct {
-		Board models.Board `json:"board"`
-		Pins  []models.Pin `json:"pins"`
-		Info  string       `json:"info"`
-	}{Info: "OK", Board: board, Pins: pins}}
+			Board models.Board        `json:"board"`
+			Pins  []models.PinDisplay `json:"pins"`
+			Info  string              `json:"info"`
+		}{Info: "OK", Board: board, Pins: pins}}
+
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetMyBoards(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+
+	boards, err := h.PUsecase.GetMyBoards(user.ID)
+	if err != nil {
+		return err
+	}
+
+	data := struct {
+		CSRFToken string `json:"csrf_token"`
+		Body      struct {
+			Boards []models.Board `json:"boards"`
+			Info   string         `json:"info"`
+		} `json:"body"`
+	}{CSRFToken: ctx.Get("token").(string),
+		Body: struct {
+			Boards []models.Board `json:"boards"`
+			Info   string         `json:"info"`
+		}{Info: "OK", Boards: boards}}
 
 	if err := encoder.Encode(data); err != nil {
 		return err

@@ -71,3 +71,32 @@ func (h *HandlersStruct) HandleCreateNotice(ctx echo.Context) (Err error) {
 
 	return nil
 }
+
+
+func (h *HandlersStruct) HandleGetNotices(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	var notices []models.Notice
+	notices, err := h.PUsecase.GetMyNotices(user.ID)
+	if err != nil {
+		return err
+	}
+	body := struct {
+		Notices  []models.Notice `json:"notices"`
+		Info  string     `json:"info"`
+	}{notices, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
+	return nil
+}

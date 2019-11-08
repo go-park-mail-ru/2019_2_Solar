@@ -9,15 +9,16 @@ import (
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
-
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
@@ -29,7 +30,7 @@ func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 	return nil
 }
 
-func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
+func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
 	sessionKeyValue, err := GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
@@ -39,9 +40,7 @@ func (USC UseStruct) AddNewUserSession(userID string) (http.Cookie, error) {
 	cookieSessionKey.Value = sessionKeyValue
 	cookieSessionKey.Path = "/"
 	cookieSessionKey.Expires = time.Now().Add(365 * 24 * time.Hour)
-	var params []interface{}
-	params = append(params, userID, cookieSessionKey.Value, cookieSessionKey.Expires)
-	_, err = USC.PRepository.Insert(consts.INSERTSession, params)
+	_, err = USC.PRepository.InsertSession(userID, cookieSessionKey.Value, cookieSessionKey.Expires)
 	if err != nil {
 		return *cookieSessionKey, err
 	}
@@ -78,23 +77,20 @@ func SecureRandomBytes(length int) ([]byte, error) {
 	return randomBytes, nil
 }
 
-func (USC *UseStruct) AddNewUser(username, email, password string) (string, error) {
+func (USC *UseStruct) AddNewUser(username, email, password string) (uint64, error) {
 	salt, err := GenSessionKey(10)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	var params []interface{}
 	hashPassword := HashPassword(password, salt)
-	params = append(params, username, email, hashPassword, salt, time.Now())
-	lastID, err := USC.PRepository.Insert(consts.INSERTRegistration, params)
+	lastID, err := USC.PRepository.InsertUser(username, email, salt, hashPassword, time.Now())
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return lastID, nil
 }
 
 func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) (int, error) {
-	var params []interface{}
 	if newUser.Username != "" {
 		user.Username = newUser.Username
 	}
@@ -123,19 +119,15 @@ func (USC *UseStruct) SetUser(newUser models.EditUserProfile, user models.User) 
 	if newUser.Status != "" {
 		user.Status = newUser.Status
 	}
-
-	params = append(params, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
-	editUsers, err := USC.PRepository.Update(consts.UPDATEUserByID, params)
+	editUsers, err := USC.PRepository.UpdateUser(user)
 	if err != nil {
 		return 0, err
 	}
 	return editUsers, nil
 }
 
-func (USC *UseStruct) SetUserAvatarDir(idUser, fileName string) (int, error) {
-	var params []interface{}
-	params = append(params, fileName, idUser)
-	editUsers, err := USC.PRepository.Update(consts.UPDATEUserAvatarDirByID, params)
+func (USC *UseStruct) SetUserAvatarDir(idUser uint64, fileName string) (int, error) {
+	editUsers, err := USC.PRepository.UpdateUserAvatar(fileName, idUser)
 	if err != nil {
 		return 0, err
 	}
@@ -175,63 +167,80 @@ func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err e
 }
 
 func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
-	var params []interface{}
-	params = append(params, Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTBoard, params)
+	lastID, err := USC.PRepository.InsertBoard(Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
 func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
 	var params []interface{}
 	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTPin, params)
+	lastID, err := USC.PRepository.InsertPin(Pin)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
-func (USC *UseStruct) AddNotice(Notice models.Notice) (uint64, error) {
-	var params []interface{}
-	params = append(params, Notice.UserID, Notice.ReceiverID, Notice.Message, Notice.CreatedTime)
-	lastID, err := USC.PRepository.Insert(consts.INSERTNotice, params)
+func (USC *UseStruct) AddNotice(notice models.Notice) (uint64, error) {
+	lastID, err := USC.PRepository.InsertNotice(notice)
 	if err != nil {
 		return 0, err
 	}
-	id, err := strconv.Atoi(lastID)
-	if err != nil {
-		return 0, nil
-	}
-	return uint64(id), nil
+	return lastID, nil
 }
 
-func (USC *UseStruct) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
-	var params []interface{}
-	params = append(params, pinID, newComment.Text, userID, time.Now())
-	_, err := USC.PRepository.Insert(consts.INSERTComment, params)
+func (USC *UseStruct) AddComment(pinID, userID uint64, newComment models.NewComment) error {
+	_, err := USC.PRepository.InsertComment(pinID, newComment.Text, userID, time.Now())
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (USC *UseStruct) AddSubscribe(userID, followeeName string) error {
+func (USC *UseStruct) AddSubscribe(userID uint64, followeeName string) error {
 	var params []interface{}
 	params = append(params, userID, followeeName)
-	_, err := USC.PRepository.Insert(consts.INSERTSubscribeByName, params)
+	_, err := USC.PRepository.InsertSubscribe(userID, followeeName)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (USC *UseStruct) AddTags(description string, pinID uint64) error {
+	tags := validation.FindTags.FindAllString(description, -1)
+	for i := 0; i < len(tags); i++ {
+		//strings.Re
+		tags[i] = strings.TrimPrefix(tags[i], "#")
+	}
+	uniqueTags, err := USC.PRepository.SelectAllTags()
+	if err != nil {
+		return err
+	}
+
+	alredyExitstflag := false
+	for _, tag := range  tags {
+		for _, uniqueTag := range uniqueTags {
+			if uniqueTag == tag {
+				alredyExitstflag = true
+			}
+		}
+		if alredyExitstflag != true {
+			if err := USC.PRepository.InsertTag(tag); err != nil {
+				return err
+			}
+		}
+		alredyExitstflag = false
+	}
+
+	for _, tag := range  tags {
+		if err := USC.PRepository.InsertPinAndTag(pinID, tag); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

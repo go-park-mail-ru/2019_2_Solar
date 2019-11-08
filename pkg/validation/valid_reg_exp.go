@@ -23,4 +23,6 @@ var (
 
 	PinTitle       = regexp.MustCompile(`^.{3,30}$`)
 	PinDescription = regexp.MustCompile(`^.{0,200}$`)
+
+	FindTags = regexp.MustCompile(`#\w+`)
 )

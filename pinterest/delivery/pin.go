@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -76,6 +77,7 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddPin(pin)
+	err = h.PUsecase.AddTags(pin.Description, lastID)
 	if err != nil {
 		return err
 	}
@@ -116,18 +118,25 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 	if id == "" {
 		return errors.New("incorrect id")
 	}
-	pin, err := h.PUsecase.GetPin(id)
+	intId, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 	}
-	comments, err := h.PUsecase.GetComments(id)
+	pin, err := h.PUsecase.GetPin(uint64(intId))
 	if err != nil {
 		return err
 	}
-	var body []interface{}
-	body = append(body, pin, comments)
-	jsonStruct := models.JSONResponse{Body: body}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	comments, err := h.PUsecase.GetComments(uint64(intId))
+	if err != nil {
+		return err
+	}
+	body := struct {
+		Pin  models.FullPin `json:"pins"`
+		Comments []models.CommentDisplay `json:"comments"`
+		Info  string     `json:"info"`
+	}{pin, comments ,"OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 
@@ -141,13 +150,17 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/jsonStruct")
-	var pins []models.PinForMainPage
+	var pins []models.PinDisplay
 	pins, err := h.PUsecase.GetNewPins()
 	if err != nil {
-		return nil
+		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinDisplay `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -165,13 +178,17 @@ func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	var pins []models.PinForMainPage
+	var pins []models.PinDisplay
 	pins, err := h.PUsecase.GetMyPins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinDisplay `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -189,13 +206,17 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
-	var pins []models.PinForMainPage
+	var pins []models.PinDisplay
 	pins, err := h.PUsecase.GetSubscribePins(user.ID)
 	if err != nil {
-		return nil
+		return err
 	}
-	jsonStruct := models.JSONResponse{Body: pins}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	body := struct {
+		Pins  []models.PinDisplay `json:"pins"`
+		Info  string     `json:"info"`
+	}{pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil
@@ -222,13 +243,18 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 		return err
 	}
 	comment := models.NewComment{Text: newComment.Text}
-
-	if err := h.PUsecase.AddComment(pinID, user.ID, comment); err != nil {
+	intPinId, err := strconv.Atoi(pinID)
+	if err != nil {
 		return err
 	}
-	info := "data successfully saved"
-	jsonStruct := models.JSONResponse{Body: info}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
+	if err := h.PUsecase.AddComment(uint64(intPinId), user.ID, comment); err != nil {
+		return err
+	}
+	body := struct {
+		Info  string     `json:"info"`
+	}{"data successfully saved"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil

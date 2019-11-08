@@ -26,8 +26,7 @@ func (San *SanitStruct) SanitPinForSearchResult(pin *models.PinForSearchResult) 
 	pin.Title = San.sanit.Sanitize(pin.Title)
 }
 
-
-func (San *SanitStruct) SanitComment(comment *models.CommentForSend) {
+func (San *SanitStruct) SanitComment(comment *models.CommentDisplay) {
 	comment.Text = San.sanit.Sanitize(comment.Text)
 	comment.Author = San.sanit.Sanitize(comment.Author)
 }
@@ -36,4 +35,15 @@ func (San *SanitStruct) SanitBoard(board *models.Board) {
 	board.Title = San.sanit.Sanitize(board.Title)
 	board.Description = San.sanit.Sanitize(board.Description)
 	board.Category = San.sanit.Sanitize(board.Category)
+}
+
+func (San *SanitStruct) SanitPinDisplay(pin *models.PinDisplay) {
+	pin.Title = San.sanit.Sanitize(pin.Title)
+}
+
+func (San *SanitStruct) SanitFullPin(pin *models.FullPin) {
+	pin.Title = San.sanit.Sanitize(pin.Title)
+	pin.Description = San.sanit.Sanitize(pin.Description)
+	pin.AuthorUsername = San.sanit.Sanitize(pin.AuthorUsername)
+	pin.OwnerUsername = San.sanit.Sanitize(pin.OwnerUsername)
 }
