@@ -397,11 +397,13 @@ func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.Co
 		}
 	}()
 	scanComment := models.CommentDisplay{}
+	var scanNullString sql.NullString
 	for rows.Next() {
-		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.AuthorPicture, &scanComment.CreatedTime)
+		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanNullString, &scanComment.CreatedTime)
 		if err != nil {
 			return comments, err
 		}
+		scanComment.AuthorPicture = scanNullString.String
 		comments = append(comments, scanComment)
 	}
 	return comments, nil
