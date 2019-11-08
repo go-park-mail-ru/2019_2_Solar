@@ -173,9 +173,10 @@ type Comment struct {
 }
 
 type CommentDisplay struct {
-	Text        string    `json:"text"`
-	CreatedTime time.Time `json:"created_time"`
-	Author      string    `json:"author_username"`
+	Text          string    `json:"text"`
+	CreatedTime   time.Time `json:"created_time"`
+	Author        string    `json:"author_username"`
+	AuthorPicture string    `json:"author_dir"`
 }
 
 type NewChatMessage struct {

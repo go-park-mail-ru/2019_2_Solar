@@ -398,7 +398,7 @@ func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.Co
 	}()
 	scanComment := models.CommentDisplay{}
 	for rows.Next() {
-		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.CreatedTime)
+		err := rows.Scan(&scanComment.Text, &scanComment.Author, &scanComment.AuthorPicture, &scanComment.CreatedTime)
 		if err != nil {
 			return comments, err
 		}
