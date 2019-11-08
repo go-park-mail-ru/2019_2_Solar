@@ -47,7 +47,7 @@ const (
 		"AND s.followee_id = pin.owner_id " +
 		"AND isdeleted = false) as p " +
 		"WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
-	SELECTCommentsByPinId = "SELECT c.text, u.username, c.created_time FROM sunrise.comment as c join sunrise.pin as p on p.id = $1 " +
+	SELECTCommentsByPinId = "SELECT c.text, u.username, u.avatardir, c.created_time FROM sunrise.comment as c join sunrise.pin as p on p.id = $1 " +
 		"join sunrise.user as u on u.id = p.owner_id where c.pin_id = $1"
 
 	INSERTNotice          = "INSERT INTO sunrise.notice (user_id, receiver_id, message, createdTime) VALUES ($1,$2,$3,$4) RETURNING id"
