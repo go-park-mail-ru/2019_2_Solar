@@ -152,9 +152,7 @@ func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinDisplay, erro
 }
 
 func (USC *UseStruct) GetComments(pinID uint64) ([]models.CommentDisplay, error) {
-	var err error
-	var params []interface{}
-	params = append(params, pinID)
+
 	comments, err := USC.PRepository.SelectCommentsByPinId(pinID)
 	if err != nil {
 		return []models.CommentDisplay{}, err
@@ -166,15 +164,24 @@ func (USC *UseStruct) GetComments(pinID uint64) ([]models.CommentDisplay, error)
 }
 
 func (USC *UseStruct) GetMyNotices(userID uint64) ([]models.Notice, error) {
-	var err error
-	var params []interface{}
-	params = append(params, userID)
+
 	notices, err := USC.PRepository.SelectNoticesByUserID(userID)
 	if err != nil {
 		return []models.Notice{}, err
 	}
-/*	for _, notice := range notices {
+	/*	for _, notice := range notices {
 		USC.Sanitizer.SanitComment(&notice)
 	}*/
 	return notices, nil
+}
+
+func (USC *UseStruct) GetMySubscribeByUsername(userId uint64, username string) (bool, error) {
+	subscribeSlice, err := USC.PRepository.SelectMySubscribeByUsername(userId, username)
+	if err != nil {
+		return false, err
+	}
+	if len(subscribeSlice) == 0 {
+		return false, nil
+	}
+	return true, nil
 }

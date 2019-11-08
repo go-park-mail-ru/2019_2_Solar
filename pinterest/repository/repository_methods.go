@@ -446,7 +446,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		err := rows.Scan(&scanPin.ID,  &scanPin.PinDir, &scanPin.Title)
 		if err != nil {
 			return pins, err
 		}
@@ -663,6 +663,28 @@ func (RS *ReposStruct) SelectSessionsByCookieValue(cookieValue string) (Sessions
 		userSessionsSlice = append(userSessionsSlice, userSession)
 	}
 	return userSessionsSlice, nil
+}
+
+func (RS *ReposStruct) SelectMySubscribeByUsername(userId uint64, username string) (Subscribes []models.Subscribe, Err error) {
+	subscribesSlice := make([]models.Subscribe, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTMySubscribeByUsername, userId, username)
+	if err != nil {
+		return subscribesSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		subscribe := models.Subscribe{}
+		err := rows.Scan(&subscribe.Id, &subscribe.IdSubscriber, &subscribe.FolloweeId)
+		if err != nil {
+			return subscribesSlice, err
+		}
+		subscribesSlice = append(subscribesSlice, subscribe)
+	}
+	return subscribesSlice, nil
 }
 
 func (RS *ReposStruct) SelectAllTags() (Tag []string, Err error) {

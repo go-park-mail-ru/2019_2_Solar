@@ -43,9 +43,13 @@ type ReposInterface interface {
 	SelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
 
 	SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error)
+
+	SelectMySubscribeByUsername(userId uint64, username string) (Subscribes []models.Subscribe, Err error)
+
 	SelectAllTags() (Tag []string, Err error)
 
 	InsertTag(Tag string) (Err error)
 
 	InsertPinAndTag (PinID uint64, TagName string) (Err error)
+
 }
