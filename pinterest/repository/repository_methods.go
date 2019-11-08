@@ -72,12 +72,19 @@ func (RS *ReposStruct) NewDataBaseWorker() error {
 	if err != nil {
 		return err
 	}
-	RS.DataBase.SetMaxOpenConns(10)
+	RS.DataBase.SetMaxOpenConns(100)
 	err = RS.DataBase.Ping()
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (RS *ReposStruct) CloseDB() error {
+	if err := RS.DataBase.Close(); err != nil {
+		return err
+	}
 	return nil
 }
 

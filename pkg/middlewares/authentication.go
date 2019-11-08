@@ -17,6 +17,9 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(ctx)
 		}
 		dbWorker := repository.ReposStruct{}
+		defer func() {
+			dbWorker.CloseDB()
+		}()
 		err = dbWorker.NewDataBaseWorker()
 		if err != nil {
 			return err
