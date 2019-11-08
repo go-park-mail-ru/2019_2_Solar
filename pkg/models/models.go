@@ -43,16 +43,17 @@ type EditUserProfile struct {
 }
 
 type AnotherUser struct {
-	ID        uint64 `json:"id"`
-	Username  string `json:"username"`
-	Name      string `json:"name"`
-	Surname   string `json:"surname"`
-	Password  string `json:"-"`
-	Email     string `json:"-"`
-	Age       uint   `json:"age"`
-	Status    string `json:"status"`
-	AvatarDir string `json:"avatar_dir"`
-	IsActive  bool   `json:"is_active"`
+	ID         uint64 `json:"id"`
+	Username   string `json:"username"`
+	Name       string `json:"name"`
+	Surname    string `json:"surname"`
+	Password   string `json:"-"`
+	Email      string `json:"-"`
+	Age        uint   `json:"age"`
+	Status     string `json:"status"`
+	AvatarDir  string `json:"avatar_dir"`
+	IsActive   bool   `json:"is_active"`
+	IsFollowee bool   `json:"is_followee"`
 }
 
 type User struct {
@@ -191,4 +192,10 @@ type ChatMessage struct {
 	Message     string    `json:"text"`
 	SendTime    time.Time `json:"send_time"`
 	IsDeleted   bool      `json:"is_deleted"`
+}
+
+type Subscribe struct {
+	Id           uint64
+	IdSubscriber uint64
+	FolloweeId   uint64
 }

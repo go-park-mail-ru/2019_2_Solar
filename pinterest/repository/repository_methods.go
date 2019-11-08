@@ -664,3 +664,25 @@ func (RS *ReposStruct) SelectSessionsByCookieValue(cookieValue string) (Sessions
 	}
 	return userSessionsSlice, nil
 }
+
+func (RS *ReposStruct) SelectMySubscribeByUsername(userId uint64, username string) (Subscribes []models.Subscribe, Err error) {
+	subscribesSlice := make([]models.Subscribe, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTMySubscribeByUsername, userId, username)
+	if err != nil {
+		return subscribesSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		subscribe := models.Subscribe{}
+		err := rows.Scan(&subscribe.Id, &subscribe.IdSubscriber, &subscribe.FolloweeId)
+		if err != nil {
+			return subscribesSlice, err
+		}
+		subscribesSlice = append(subscribesSlice, subscribe)
+	}
+	return subscribesSlice, nil
+}
