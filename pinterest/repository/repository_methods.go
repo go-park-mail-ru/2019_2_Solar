@@ -453,6 +453,30 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 	return pins, nil
 }
 
+func (RS *ReposStruct)  SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
+	notices := make([]models.Notice, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTNoticesByUserID, userId)
+	if err != nil {
+		return notices, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanNotice := models.Notice{}
+		err := rows.Scan(&scanNotice.ID, &scanNotice.UserID, &scanNotice.ReceiverID,
+			&scanNotice.Message, &scanNotice.CreatedTime, &scanNotice.IsRead)
+		if err != nil {
+			return notices, err
+		}
+		notices = append(notices, scanNotice)
+	}
+	return notices, nil
+}
+
 func (RS *ReposStruct) SelectSubscribePinsDisplayByNumber(userId uint64, first, last int) (Pins []models.PinDisplay, Err error) {
 	pins := make([]models.PinDisplay, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTSubscribePinsDisplayByNumber, first, last, userId)

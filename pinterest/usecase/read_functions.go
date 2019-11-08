@@ -164,3 +164,17 @@ func (USC *UseStruct) GetComments(pinID uint64) ([]models.CommentDisplay, error)
 	}
 	return comments, nil
 }
+
+func (USC *UseStruct) GetMyNotices(userID uint64) ([]models.Notice, error) {
+	var err error
+	var params []interface{}
+	params = append(params, userID)
+	notices, err := USC.PRepository.SelectNoticesByUserID(userID)
+	if err != nil {
+		return []models.Notice{}, err
+	}
+/*	for _, notice := range notices {
+		USC.Sanitizer.SanitComment(&notice)
+	}*/
+	return notices, nil
+}
