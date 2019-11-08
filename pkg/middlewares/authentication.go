@@ -52,7 +52,9 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		var userSessions []models.UserSession
 		userSessions, err = dbWorker.SelectSessionsByCookieValue(cookie.Value)
-
+		if err != nil {
+			return err
+		}
 		sess := functions.Session{
 			UserID: uint(userSessions[0].UserID),
 			ID:     string(userSessions[0].ID),

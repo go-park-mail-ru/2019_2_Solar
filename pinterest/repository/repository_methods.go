@@ -629,12 +629,12 @@ func (RS *ReposStruct) SelectSessionsByCookieValue(cookieValue string) (Sessions
 		}
 	}()
 	for rows.Next() {
-		userCookie := models.UserSession{}
-		err := rows.Scan(&userCookie.Value, &userCookie.Expiration)
+		userSession := models.UserSession{}
+		err := rows.Scan(&userSession.ID, &userSession.UserID)
 		if err != nil {
 			return userSessionsSlice, err
 		}
-		userSessionsSlice = append(userSessionsSlice, userCookie)
+		userSessionsSlice = append(userSessionsSlice, userSession)
 	}
 	return userSessionsSlice, nil
 }
