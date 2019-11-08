@@ -444,7 +444,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
 		if err != nil {
 			return pins, err
 		}
