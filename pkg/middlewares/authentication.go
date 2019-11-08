@@ -71,7 +71,7 @@ func AuthenticationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		token, err := tokens.Create(&sess, time.Now().Add(24*time.Hour).Unix())
+		token, err := tokens.Create(&sess, time.Now().Add(30*time.Minute).Unix())
 		if err != nil {
 			return err
 		}
