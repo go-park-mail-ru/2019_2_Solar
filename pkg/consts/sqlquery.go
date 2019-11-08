@@ -70,4 +70,7 @@ const (
 
 	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersession as s " +
 		"WHERE s.cookiesvalue = $1;"
+
+	SELECTNoticesByUserID = "SELECT n.id, n.user_id, n.receiver_id, n.message, n.createdtime, isread FROM sunrise.notice as n " +
+		"WHERE n.receiver_id = $1 and n.isread = false;"
 )

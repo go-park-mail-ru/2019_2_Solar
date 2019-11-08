@@ -37,6 +37,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface)
 	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
 
 	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
+	e.GET( "/notice", h.HandleGetNotices)
 
 	e.GET("/chat", h.HandleUpgradeWebSocket)
 

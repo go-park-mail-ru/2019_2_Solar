@@ -62,6 +62,7 @@ type UseInterface interface {
 	GetComments(pinID uint64) ([]models.CommentDisplay, error)
 
 	AddNotice(newNotice models.Notice) (uint64, error)
+	GetMyNotices(userID uint64) ([]models.Notice, error)
 
 	AddSubscribe(userID uint64, followeeName string) error
 	RemoveSubscribe(userID uint64, followeeName string) error
