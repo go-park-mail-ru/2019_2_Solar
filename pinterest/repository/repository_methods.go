@@ -455,7 +455,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 	return pins, nil
 }
 
-func (RS *ReposStruct) SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
+func (RS *ReposStruct)  SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
 	notices := make([]models.Notice, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTNoticesByUserID, userId)
 	if err != nil {
