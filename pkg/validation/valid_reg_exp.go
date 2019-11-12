@@ -6,7 +6,7 @@ import (
 
 var (
 	EmailIsCorrect    = regexp.MustCompile(`^.+@.+\..+$`)
-	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]+$`)
+	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]{3,30}$`)
 
 	PasswordIsCorrect       = regexp.MustCompile(`^[\w\d0-9]{8,30}$`)
 	PasswordHasDownCaseChar = regexp.MustCompile(`^.*[a-z]+.*$`)
