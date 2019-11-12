@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -28,7 +27,7 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	if err := h.PUsecase.CheckRegData(newUserReg); err != nil {
+	if err := h.PUsecase.CheckRegDataValidation(newUserReg); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
@@ -86,7 +85,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
-	cookies, err := h.PUsecase.AddNewUserSession(strconv.Itoa(int(User.ID)))
+	cookies, err := h.PUsecase.AddNewUserSession(User.ID)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}

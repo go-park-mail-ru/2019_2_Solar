@@ -6,27 +6,19 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC *UseStruct) GetUserIDByEmail(email string) (string, error) {
-	var str []string
-	var params []interface{}
-	params = append(params, email)
-	var err error
-	str, err = USC.PRepository.SelectOneCol(consts.SELECTUserIDByEmail, params)
+func (USC *UseStruct) GetUserIDByEmail(email string) (uint64, error) {
+	userSlice, err := USC.PRepository.SelectUsersByEmail(email)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	if len(str) != 1 {
-		return "", errors.New("several users or no one user")
+	if len(userSlice) != 1 {
+		return 0, errors.New("several users or no one user")
 	}
-	return str[0], nil
+	return userSlice[0].ID, nil
 }
 
 func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, error) {
-	var userSlice []models.User
-	var params []interface{}
-	params = append(params, username)
-	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByUsername, params)
+	userSlice, err := USC.PRepository.SelectUsersByUsername(username)
 	if err != nil {
 		return models.AnotherUser{}, err
 	}
@@ -50,25 +42,22 @@ func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, er
 }
 
 func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
-	var userSlice []models.User
-	var params []interface{}
-	params = append(params, email)
-	var err error
-	userSlice, err = USC.PRepository.SelectFullUser(consts.SELECTUserByEmail, params)
+	userSlice, err := USC.PRepository.SelectUsersByEmail(email)
 	if err != nil {
 		return models.User{}, err
 	}
-	if len(userSlice) != 1 {
-		return models.User{}, errors.New("several users or no one user")
+	if len(userSlice) == 0 {
+		return models.User{}, errors.New("user not found")
+	}
+	if len(userSlice) > 1 {
+		return models.User{}, errors.New("several same users")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	return userSlice[0], nil
 }
 
 func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
-	var err error
-
-	users, err := USC.PRepository.SelectFullUser(consts.SELECTAllUsers, nil)
+	users, err := USC.PRepository.SelectAllUsers()
 	if err != nil {
 		return []models.AnotherUser{}, err
 	}
@@ -92,90 +81,107 @@ func (USC *UseStruct) GetAllUsers() ([]models.AnotherUser, error) {
 	return anotherUsers, nil
 }
 
-func (USC *UseStruct) GetPin(pinID string) (models.Pin, error) {
-	var err error
-	var params []interface{}
-	params = append(params, pinID)
-
-	pin, err := USC.PRepository.SelectPin(consts.SELECTPinByID, params)
+func (USC *UseStruct) GetPin(pinID uint64) (models.FullPin, error) {
+	pin, err := USC.PRepository.SelectPinsById(pinID)
 	if err != nil {
 		return pin[0], err
 	}
-	USC.Sanitizer.SanitPin(&pin[0])
+	USC.Sanitizer.SanitFullPin(&pin[0])
 	return pin[0], nil
 }
 
 func (USC *UseStruct) GetBoard(boardID uint64) (models.Board, error) {
-	var err error
-	var params []interface{}
-	params = append(params, boardID)
-
-	board, err := USC.PRepository.SelectBoard(consts.SELECTBoardByID, params)
+	board, err := USC.PRepository.SelectBoardsByID(boardID)
 	if err != nil {
-		return board, err
+		return models.Board{}, err
 	}
-	USC.Sanitizer.SanitBoard(&board)
-	return board, nil
+	if len(board) == 0 {
+		return models.Board{}, errors.New("board not found")
+	}
+	if len(board) > 1 {
+		return models.Board{}, errors.New("several same boards")
+	}
+	USC.Sanitizer.SanitBoard(&board[0])
+	return board[0], nil
 }
 
-func (USC *UseStruct) GetPins(boardID uint64) ([]models.Pin, error) {
-	var err error
-	var params []interface{}
-	params = append(params, boardID)
-
-	pins, err := USC.PRepository.SelectPin(consts.SELECTPinsByBoardID, params)
+func (USC *UseStruct) GetMyBoards(UserID uint64) ([]models.Board, error) {
+	boards, err := USC.PRepository.SelectBoardsByOwnerId(UserID)
 	if err != nil {
-		return []models.Pin{}, err
+		return boards, err
+	}
+	for _, board := range boards {
+		USC.Sanitizer.SanitBoard(&board)
+	}
+	return boards, nil
+}
+
+func (USC *UseStruct) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectPinsDisplayByBoardId(boardID)
+	if err != nil {
+		return []models.PinDisplay{}, err
 	}
 	for _, pin := range pins {
-		USC.Sanitizer.SanitPin(&pin)
+		USC.Sanitizer.SanitPinDisplay(&pin)
 	}
 	return pins, nil
 }
 
-func (USC *UseStruct) GetNewPins() ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTNewPinsByNumber, params)
+func (USC *UseStruct) GetNewPins() ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(0, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UseStruct) GetMyPins(userID uint64) ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userID)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTMyPinsByNumber, params)
+func (USC *UseStruct) GetMyPins(userID uint64) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectMyPinsDisplayByNumber(userID, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinForMainPage, error) {
-	var err error
-	var params []interface{}
-	params = append(params, consts.NumberOfPinsOnPage, userID)
-	pins, err := USC.PRepository.SelectIDDirPins(consts.SELECTSubscribePinsByNumber, params)
+func (USC *UseStruct) GetSubscribePins(userID uint64) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectSubscribePinsDisplayByNumber(userID, 0, consts.NumberOfPinsOnPage)
 	if err != nil {
-		return []models.PinForMainPage{}, err
+		return []models.PinDisplay{}, err
 	}
 	return pins, nil
 }
 
-func (USC *UseStruct) GetComments(pinID string) ([]models.CommentForSend, error) {
-	var err error
-	var params []interface{}
-	params = append(params, pinID)
-	comments, err := USC.PRepository.SelectComments(consts.SELECTComments, params)
+func (USC *UseStruct) GetComments(pinID uint64) ([]models.CommentDisplay, error) {
+
+	comments, err := USC.PRepository.SelectCommentsByPinId(pinID)
 	if err != nil {
-		return []models.CommentForSend{}, err
+		return []models.CommentDisplay{}, err
 	}
 	for _, comment := range comments {
 		USC.Sanitizer.SanitComment(&comment)
 	}
 	return comments, nil
+}
+
+func (USC *UseStruct) GetMyNotices(userID uint64) ([]models.Notice, error) {
+
+	notices, err := USC.PRepository.SelectNoticesByUserID(userID)
+	if err != nil {
+		return []models.Notice{}, err
+	}
+	/*	for _, notice := range notices {
+		USC.Sanitizer.SanitComment(&notice)
+	}*/
+	return notices, nil
+}
+
+func (USC *UseStruct) GetMySubscribeByUsername(userId uint64, username string) (bool, error) {
+	subscribeSlice, err := USC.PRepository.SelectMySubscribeByUsername(userId, username)
+	if err != nil {
+		return false, err
+	}
+	if len(subscribeSlice) == 0 {
+		return false, nil
+	}
+	return true, nil
 }

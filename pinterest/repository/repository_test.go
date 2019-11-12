@@ -191,7 +191,7 @@ func TestReposStruct_ReadOneCol(t *testing.T) {
 	}
 
 	mock.
-		ExpectQuery("SELECT u.id from sunrise.users as u where").
+		ExpectQuery("SELECT u.id from sunrise.user as u where").
 		WithArgs(email).
 		WillReturnRows(rows)
 
@@ -544,7 +544,7 @@ func TestReposStruct_SelectSessions(t *testing.T) {
 	var cookieValue string = "val"
 
 	mock.
-		ExpectQuery("SELECT s.id, s.userid FROM sunrise.usersessions as s WHERE").
+		ExpectQuery("SELECT s.id, s.userid FROM sunrise.usersession as s WHERE").
 		WithArgs(cookieValue).
 		WillReturnRows(rows)
 
@@ -591,7 +591,7 @@ func TestReposStruct_SelectIDUsernameEmailUser(t *testing.T) {
 	var email = "vova@mail.com"
 
 	mock.
-		ExpectQuery("SELECT u.id, u.username, u.email from sunrise.users as u where").
+		ExpectQuery("SELECT u.id, u.username, u.email from sunrise.user as u where").
 		WithArgs(username, email).
 		WillReturnRows(rows)
 

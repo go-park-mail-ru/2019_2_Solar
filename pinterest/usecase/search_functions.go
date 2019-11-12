@@ -1,20 +1,16 @@
 package usecase
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 )
 
-func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinForSearchResult, error) {
-	var err error
-	var params []interface{}
-	params = append(params, tag)
-	pins, err := USC.PRepository.SelectPinsByTag(consts.SELECTPinsByTag, params)
+func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectPinsByTag(tag)
 	if err != nil {
-		return []models.PinForSearchResult{}, err
+		return []models.PinDisplay{}, err
 	}
 	for _, pin := range pins {
-		USC.Sanitizer.SanitPinForSearchResult(&pin)
+		USC.Sanitizer.SanitPinDisplay(&pin)
 	}
 	return pins, nil
 }

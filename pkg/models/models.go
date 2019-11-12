@@ -43,16 +43,17 @@ type EditUserProfile struct {
 }
 
 type AnotherUser struct {
-	ID        uint64 `json:"id"`
-	Username  string `json:"username"`
-	Name      string `json:"name"`
-	Surname   string `json:"surname"`
-	Password  string `json:"-"`
-	Email     string `json:"-"`
-	Age       uint   `json:"age"`
-	Status    string `json:"status"`
-	AvatarDir string `json:"avatar_dir"`
-	IsActive  bool   `json:"is_active"`
+	ID         uint64 `json:"id"`
+	Username   string `json:"username"`
+	Name       string `json:"name"`
+	Surname    string `json:"surname"`
+	Password   string `json:"-"`
+	Email      string `json:"-"`
+	Age        uint   `json:"age"`
+	Status     string `json:"status"`
+	AvatarDir  string `json:"avatar_dir"`
+	IsActive   bool   `json:"is_active"`
+	IsFollowee bool   `json:"is_followee"`
 }
 
 type User struct {
@@ -77,7 +78,7 @@ type DataJSON struct {
 }
 
 type OutJSON struct {
-	CSRFToken string 	  `json:"csrf_token"`
+	CSRFToken string      `json:"csrf_token"`
 	BodyJSON  interface{} `json:"body"`
 }
 
@@ -107,10 +108,17 @@ type NewPin struct {
 type PinForMainPage struct {
 	ID        uint64 `json:"id"`
 	PinDir    string `json:"pin_dir"`
+	Title     string `json:"title"`
 	IsDeleted bool   `json:"is_deleted"`
 }
 
 type PinForSearchResult struct {
+	ID     uint64 `json:"id"`
+	PinDir string `json:"pin_dir"`
+	Title  string `json:"title"`
+}
+
+type PinDisplay struct {
 	ID     uint64 `json:"id"`
 	PinDir string `json:"pin_dir"`
 	Title  string `json:"title"`
@@ -126,6 +134,18 @@ type Pin struct {
 	Description string    `json:"description"`
 	CreatedTime time.Time `json:"created_time"`
 	IsDeleted   bool      `json:"is_deleted"`
+}
+
+type FullPin struct {
+	ID             uint64    `json:"id"`
+	OwnerUsername  string    `json:"owner_username"`
+	AuthorUsername string    `json:"author_username"`
+	BoardID        uint64    `json:"board_id"`
+	PinDir         string    `json:"pin_dir"`
+	Title          string    `json:"title"`
+	Description    string    `json:"description"`
+	CreatedTime    time.Time `json:"created_time"`
+	IsDeleted      bool      `json:"is_deleted"`
 }
 
 type NewNotice struct {
@@ -153,10 +173,11 @@ type Comment struct {
 	AuthorID    uint64    `json:"author_id"`
 }
 
-type CommentForSend struct {
-	Text        string    `json:"text"`
-	CreatedTime time.Time `json:"created_time"`
-	Author      string    `json:"author_username"`
+type CommentDisplay struct {
+	Text          string    `json:"text"`
+	CreatedTime   time.Time `json:"created_time"`
+	Author        string    `json:"author_username"`
+	AuthorPicture string    `json:"author_dir"`
 }
 
 type NewChatMessage struct {
@@ -171,4 +192,10 @@ type ChatMessage struct {
 	Message     string    `json:"text"`
 	SendTime    time.Time `json:"send_time"`
 	IsDeleted   bool      `json:"is_deleted"`
+}
+
+type Subscribe struct {
+	Id           uint64
+	IdSubscriber uint64
+	FolloweeId   uint64
 }

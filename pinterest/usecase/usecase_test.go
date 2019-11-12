@@ -882,7 +882,7 @@ func TestUseStruct_GetUserByUsername(t *testing.T) {
 		var params []interface{}
 		params = append(params, username)
 
-		repo.EXPECT().SelectFullUser(consts.SELECTUserByUsername, params).Return(selectedUsers, nil)
+		repo.EXPECT().SelectFullUser(consts.SELECTUsersByUsername, params).Return(selectedUsers, nil)
 
 		user, err := us.GetUserByUsername(username)
 
@@ -1183,7 +1183,7 @@ func TestUseStruct_GetSubscribePins(t *testing.T) {
 		var params []interface{}
 		params = append(params, consts.NumberOfPinsOnPage, userID)
 
-		repo.EXPECT().SelectIDDirPins(consts.SELECTSubscribePinsByNumber, params).Return(expPins, nil)
+		repo.EXPECT().SelectIDDirPins(consts.SELECTSubscribePinsDisplayByNumber, params).Return(expPins, nil)
 
 		pins, err := us.GetSubscribePins(userID)
 

@@ -3,12 +3,11 @@ package usecase
 import (
 	"bytes"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 )
 
-func (USC *UseStruct) CheckRegData(newUser *models.UserReg) error {
+func (USC *UseStruct) CheckRegDataValidation(newUser *models.UserReg) error {
 	if err := EmailCheck(newUser.Email); err != nil {
 		return err
 	}
@@ -22,7 +21,7 @@ func (USC *UseStruct) CheckRegData(newUser *models.UserReg) error {
 }
 
 func UsernameCheck(username string) error {
-	if len(username) >= 1 && len(username) <= 30 && validation.UsernameIsCorrect.MatchString(username) {
+	if len(username) >= 3 && len(username) <= 30 && validation.UsernameIsCorrect.MatchString(username) {
 		return nil
 	}
 	return errors.New("incorrect username")
@@ -47,9 +46,6 @@ func PasswordCheck(password string) error {
 	}
 	if !validation.PasswordHasDownCaseChar.MatchString(password) {
 		return errors.New("password has not symbol in down case")
-	}
-	if !validation.PasswordHasSpecChar.MatchString(password) {
-		return errors.New("password has not special symbol")
 	}
 	if !validation.PasswordIsCorrect.MatchString(password) {
 		return errors.New("incorrect password")
@@ -116,7 +112,7 @@ func CheckPinDescription(description string) error {
 func (USC *UseStruct) CheckBoardCategory(category string) error {
 	var params []interface{}
 	params = append(params, category)
-	categories, err := USC.PRepository.SelectCategory(consts.SELECTCategoryByName, params)
+	categories, err := USC.PRepository.SelectCategoryByName(category)
 	if err != nil {
 		return err
 	}
@@ -130,7 +126,7 @@ func (USC *UseStruct) CheckRegUsernameEmailIsUnique(username, email string) erro
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, username, email)
-	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(username, email)
 	if err != nil {
 		return err
 	}
@@ -214,7 +210,7 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 	var userSlice []models.UserUnique
 	var params []interface{}
 	params = append(params, newUsername, newEmail)
-	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	userSlice, err := USC.PRepository.SelectIDUsernameEmailUser(newUsername, newEmail)
 	if err != nil {
 		return err
 	}
@@ -233,7 +229,7 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 }
 
 func (USC *UseStruct) ComparePassword(password, salt, loginPassword string) error {
-	if  bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
+	if bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
 		return nil
 	}
 	return errors.New("different passwords")
