@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
-	"github.com/goware/emailx"
 )
 
 func (USC *UseStruct) CheckRegDataValidation(newUser *models.UserReg) error {
@@ -29,10 +28,10 @@ func UsernameCheck(username string) error {
 }
 
 func EmailCheck(email string) error {
-	if err := emailx.ValidateFast(email); err != nil {
-		return err
+	if validation.EmailIsCorrect.MatchString(email) {
+		return nil
 	}
-	return nil
+	return errors.New("incorrect email")
 }
 
 func PasswordCheck(password string) error {
