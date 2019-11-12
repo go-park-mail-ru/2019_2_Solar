@@ -47,9 +47,6 @@ func PasswordCheck(password string) error {
 	if !validation.PasswordHasDownCaseChar.MatchString(password) {
 		return errors.New("password has not symbol in down case")
 	}
-	if !validation.PasswordHasSpecChar.MatchString(password) {
-		return errors.New("password has not special symbol")
-	}
 	if !validation.PasswordIsCorrect.MatchString(password) {
 		return errors.New("incorrect password")
 	}

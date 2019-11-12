@@ -5,13 +5,12 @@ import (
 )
 
 var (
-	EmailIsCorrect    = regexp.MustCompile(`^\w+@\w+\.\w+$`)
-	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]*$`)
+	EmailIsCorrect    = regexp.MustCompile(`^.+@.+\..+$`)
+	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]+$`)
 
-	PasswordIsCorrect       = regexp.MustCompile(`^[\w\d!?_#&^%]{8,30}$`)
+	PasswordIsCorrect       = regexp.MustCompile(`^[\w\d0-9]{8,30}$`)
 	PasswordHasDownCaseChar = regexp.MustCompile(`^.*[a-z]+.*$`)
 	PasswordHasAperCaseChar = regexp.MustCompile(`^.*[A-Z]+.*$`)
-	PasswordHasSpecChar     = regexp.MustCompile(`^.*[!?_#&^%]+.*$`)
 
 	NameIsCorrect    = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
 	SurnameIsCorrect = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
