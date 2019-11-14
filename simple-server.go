@@ -7,33 +7,35 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	customMiddlewares "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
+	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"sync"
 )
 
 func main() {
 	e := echo.New()
-	e.Use(customMiddlewares.CORSMiddleware)
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
-	e.Use(customMiddlewares.PanicMiddleware)
+	middlewares := customMiddleware.MiddlewareStruct{}
+	middlewares.NewMiddleware(e)
+	//e.Use(customMiddleware.CORSMiddleware)
+	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
+	//e.Use(customMiddleware.PanicMiddleware)
 	//e.Use(customMiddleware.AccessLogMiddleware)
-	e.Use(customMiddlewares.AuthenticationMiddleware)
-	e.HTTPErrorHandler = customMiddlewares.CustomHTTPErrorHandler
-	e.Static("/static", "static")
+	//e.Use(customMiddleware.AuthenticationMiddleware)
+	//e.HTTPErrorHandler = customMiddleware.CustomHTTPErrorHandler
 
+	e.Static("/static", "static")
 
 	handlers := delivery.HandlersStruct{}
 	var mutex sync.Mutex
 	rep := repository.ReposStruct{}
 	err := rep.DataBaseInit()
 	if err != nil {
+		e.Logger.Error("can't connect to database " + err.Error())
 		return
 	}
-	san :=  sanitizer.SanitStruct{}
+	san := sanitizer.SanitStruct{}
 	san.NewSanitizer()
-	hub       :=  webSocket.HubStruct{}
+	hub := webSocket.HubStruct{}
 	hub.NewHub()
 
 	useCase := usecase.UseStruct{}
