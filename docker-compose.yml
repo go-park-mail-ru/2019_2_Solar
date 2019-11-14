@@ -16,6 +16,8 @@ services:
   web:
     depends_on:
       - db
+    links:
+      - db
     build: .
     ports:
       - "8080:8080"

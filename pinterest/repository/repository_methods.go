@@ -500,7 +500,7 @@ func (RS *ReposStruct) SelectSubscribePinsDisplayByNumber(userId uint64, first, 
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title, )
 		if err != nil {
 			return pins, err
 		}
