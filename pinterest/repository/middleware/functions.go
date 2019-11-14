@@ -72,7 +72,7 @@ func (MRS *MRepositoryStruct) SelectSessionsByCookieValue(cookieValue string) (S
 	}()
 	for rows.Next() {
 		userSession := models.UserSession{}
-		err := rows.Scan(&userSession.ID, &userSession.UserID)
+		err := rows.Scan(&userSession.ID, &userSession.UserID, &userSession.Value, &userSession.Expiration)
 		if err != nil {
 			return userSessionsSlice, err
 		}

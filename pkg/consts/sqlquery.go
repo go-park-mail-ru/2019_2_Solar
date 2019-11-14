@@ -68,7 +68,7 @@ const (
 		"JOIN sunrise.pinandtag as pt ON p.id = pt.pin_id " +
 		"WHERE pt.tag_name = $1 AND p.isdeleted = false;"
 
-	SELECTSessionByCookieValue = "SELECT s.id, s.userid FROM sunrise.usersession as s " +
+	SELECTSessionByCookieValue = "SELECT s.id, s.userid, s.cookiesvalue, s.cookiesexpiration FROM sunrise.usersession as s " +
 		"WHERE s.cookiesvalue = $1;"
 	SELECTMySubscribeByUsername = "SELECT s.id, s.subscriber_id, s.followee_id FROM sunrise.subscribe as s " +
 		"join sunrise.user as u on u.id = s.followee_id WHERE s.subscriber_id = $1 AND u.username = $2;"
