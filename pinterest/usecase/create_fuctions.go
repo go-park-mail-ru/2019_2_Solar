@@ -21,13 +21,12 @@ import (
 )
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
-	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
+	san *sanitizer.SanitStruct, hub webSocket.HubStruct) {
 	USC.Mu = mu
 	USC.PRepository = rep
 	USC.Sanitizer = san
 	USC.Hub = hub
 	go USC.Hub.Run()
-	return nil
 }
 
 func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
