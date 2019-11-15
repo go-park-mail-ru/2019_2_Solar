@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func PanicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (MS *MiddlewareStruct) PanicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
 		defer func() {
 			if panicErr := recover(); panicErr != nil {
@@ -18,7 +18,7 @@ func PanicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func CustomHTTPErrorHandler(err error, ctx echo.Context) {
+func (MS *MiddlewareStruct) CustomHTTPErrorHandler(err error, ctx echo.Context) {
 	var jsonError error
 	switch err := errors.Cause(err); err.(type) {
 	case *echo.HTTPError:

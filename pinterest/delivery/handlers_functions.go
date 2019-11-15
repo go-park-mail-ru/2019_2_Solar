@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, usecase usecase.UseInterface) error {
-	h.PUsecase = usecase
+func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface) error {
+	h.PUsecase = useCase
 
 	e.GET("/", h.HandleEmpty)
 
