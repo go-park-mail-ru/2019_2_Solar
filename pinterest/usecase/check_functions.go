@@ -41,11 +41,11 @@ func PasswordCheck(password string) error {
 	if len(password) > 30 {
 		return errors.New("too long password")
 	}
-	if !validation.PasswordHasAperCaseChar.MatchString(password) {
-		return errors.New("password has not symbol in upper case")
+	if !validation.PasswordHasChar.MatchString(password) {
+		return errors.New("password has not char")
 	}
-	if !validation.PasswordHasDownCaseChar.MatchString(password) {
-		return errors.New("password has not symbol in down case")
+	if !validation.PasswordHasNumber.MatchString(password) {
+		return errors.New("password has not number")
 	}
 	if !validation.PasswordIsCorrect.MatchString(password) {
 		return errors.New("incorrect password")
