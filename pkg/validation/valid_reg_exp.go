@@ -9,7 +9,7 @@ var (
 	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]{3,30}$`)
 
 	PasswordIsCorrect       = regexp.MustCompile(`^.{8,30}$`)
-	PasswordHasChar 		= regexp.MustCompile(`^.*[A-za-z]+.*$`)
+	PasswordHasChar 		= regexp.MustCompile(`^.*[A-Za-z]+.*$`)
 	PasswordHasNumber 		= regexp.MustCompile(`^.*[0-9]+.*$`)
 
 	NameIsCorrect    = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
