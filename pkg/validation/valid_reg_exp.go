@@ -8,9 +8,9 @@ var (
 	EmailIsCorrect    = regexp.MustCompile(`^.+@.+\..+$`)
 	UsernameIsCorrect = regexp.MustCompile(`^[\w\d]{3,30}$`)
 
-	PasswordIsCorrect       = regexp.MustCompile(`^[\w\d0-9]{8,30}$`)
-	PasswordHasDownCaseChar = regexp.MustCompile(`^.*[a-z]+.*$`)
-	PasswordHasAperCaseChar = regexp.MustCompile(`^.*[A-Z]+.*$`)
+	PasswordIsCorrect       = regexp.MustCompile(`^.{8,30}$`)
+	PasswordHasChar 		= regexp.MustCompile(`^.*[A-za-z]+.*$`)
+	PasswordHasNumber 		= regexp.MustCompile(`^.*[0-9]+.*$`)
 
 	NameIsCorrect    = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
 	SurnameIsCorrect = regexp.MustCompile(`^[^\d_!@#$%^&*,.:~|\\\/\<\>=\+\?"'\[\]\{\}]*$`)
