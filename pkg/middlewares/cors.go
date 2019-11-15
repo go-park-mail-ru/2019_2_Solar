@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func CORSMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (MS *MiddlewareStruct) CORSMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		ctx.Response().Header().Set("Content-Type", "*")
 		ctx.Response().Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
