@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="" />
+    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/chat.go" beforeDir="false" afterPath="$PROJECT_DIR$/support_server/support/delivery/chat.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/web_socket/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/support_server/support/web_socket/client.go" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +33,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -38,6 +42,7 @@
   </component>
   <component name="ProjectId" id="1T9AGpWk6xpd1tGkzLOe64Fg05v" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
@@ -64,7 +69,16 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build simple-server.go">
+  <component name="RunManager" selected="Go Build.go build simple-server.go (1)">
+    <configuration name="go build simple-server.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="2019_2_Solar" />
+      <working_directory value="$PROJECT_DIR$/support_server" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/support_server/simple-server.go" />
+      <package value="2019_2_Solar" />
+      <directory value="$PROJECT_DIR$/" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build simple-server.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="2019_2_Solar" />
       <working_directory value="$PROJECT_DIR$" />
@@ -72,17 +86,6 @@
       <filePath value="$PROJECT_DIR$/simple-server.go" />
       <package value="github.com/go-park-mail-ru/2019_2_Solar" />
       <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestReposStruct_SelectIDUsernameEmailUser in github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="2019_2_Solar" />
-      <working_directory value="$PROJECT_DIR$/pinterest/repository" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestReposStruct_SelectIDUsernameEmailUser$" />
       <method v="2" />
     </configuration>
     <configuration name="go test github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -117,11 +120,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build simple-server.go (1)" />
         <item itemvalue="Go Build.go build simple-server.go" />
         <item itemvalue="Go Test.go test github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery" />
         <item itemvalue="Go Test.go test github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase" />
         <item itemvalue="Go Test.go test github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository" />
-        <item itemvalue="Go Test.TestReposStruct_SelectIDUsernameEmailUser in github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository" />
       </list>
     </recent_temporary>
   </component>
@@ -369,9 +372,19 @@
           <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/support_server/support/delivery/autorization.go</url>
+          <line>2</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/support_server/pkg/middlewares/init.go</url>
           <line>2</line>
           <option name="timeStamp" value="148" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pinterest_server/pkg/middlewares/cors.go</url>
+          <line>2</line>
+          <option name="timeStamp" value="151" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
