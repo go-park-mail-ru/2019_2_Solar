@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/usecase"
 	"github.com/labstack/echo"
 )
 

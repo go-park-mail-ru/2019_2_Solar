@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
+	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/usecase/middleware"
 )
 
 type MiddlewareStruct struct {

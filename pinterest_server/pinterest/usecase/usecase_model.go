@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
-	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/repository"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/sanitizer"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/web_socket"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 	"github.com/gorilla/websocket"
 	"io"
 	"net/http"

@@ -3,8 +3,8 @@ package usecase
 import (
 	"bytes"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/validation"
 )
 
 func (USC *UseStruct) CheckRegDataValidation(newUser *models.UserReg) error {

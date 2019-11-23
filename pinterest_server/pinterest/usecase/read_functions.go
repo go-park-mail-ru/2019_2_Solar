@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 )
 
 func (USC *UseStruct) GetUserIDByEmail(email string) (uint64, error) {
