@@ -17,12 +17,12 @@ func (h *HandlersStruct) HandleGetActiveUsers(ctx echo.Context) (Err error) {
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
 
-	if admin := ctx.Get("Admin"); admin == nil {
-		if err := ctx.JSON(400, "not autorized"); err != nil {
-			return err
-		}
-		return nil
-	}
+	//if admin := ctx.Get("Admin"); admin == nil {
+	//	if err := ctx.JSON(400, "not autorized"); err != nil {
+	//		return err
+	//	}
+	//	return nil
+	//}
 
 	activeUsers, err := h.PUsecase.GetHubListActiveUsers()
 	if err != nil {
