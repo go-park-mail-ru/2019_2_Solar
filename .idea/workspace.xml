@@ -3,7 +3,33 @@
   <component name="ChangeListManager">
     <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pinterest_server/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/pinterest_server/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/coverage.out.tmp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/support_server/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/support_server/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/board.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/handlers_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/lists.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/notice.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/pin.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/profile.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/root.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/search.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/delivery/users.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/mocks/repository_mocks.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/mocks/usecase_mocks.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/repository/repository_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/sanitizer/sanitizer_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/sanitizer/sanitizer_model.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/chat_web_socket.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/check_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/create_fuctions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/delete_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/json_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/read_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/return.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/search_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/supporting_functions.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/support/usecase/usecase_test.go" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,7 +58,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -44,8 +70,9 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/pinterest_server" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
