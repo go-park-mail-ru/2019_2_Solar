@@ -15,5 +15,14 @@ type UseStruct struct {
 
 type UseInterface interface {
 	CreateClient(conn *websocket.Conn, userId uint64)
-	//ReturnHub() *webSocket.HubStruct
+	NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
+		hub webSocket.HubStruct)
+}
+
+func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
+	hub webSocket.HubStruct) {
+	USC.Mu = mu
+	USC.PRepository = rep
+	USC.Hub = hub
+	go USC.Hub.Run()
 }
