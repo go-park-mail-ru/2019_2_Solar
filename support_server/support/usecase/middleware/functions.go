@@ -2,7 +2,7 @@ package useCaseMiddleware
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository/middleware"
 )
 

@@ -1,6 +1,6 @@
 package delivery
 
-import (
+/*import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	"github.com/labstack/echo"
@@ -51,4 +51,4 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 		return err
 	}
 	return nil
-}
+}*/
