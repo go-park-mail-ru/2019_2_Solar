@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/consts"
 	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/middlewares"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/delivery"
@@ -43,13 +42,12 @@ func main() {
 		e.Logger.Error("can't connect to database " + err.Error())
 		return
 	}
-	san := sanitizer.SanitStruct{}
-	san.NewSanitizer()
+
 	hub := webSocket.HubStruct{}
 	hub.NewHub()
 
 	useCase := usecase.UseStruct{}
-	useCase.NewUseCase(&mutex, &rep, &san, hub)
+	useCase.NewUseCase(&mutex, &rep, hub)
 	err = handlers.NewHandlers(e, &useCase)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
