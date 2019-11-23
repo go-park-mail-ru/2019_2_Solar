@@ -23,6 +23,8 @@ type UseInterface interface {
 	GetAdminByLogin(login string) (Admin models.Admin, Err error)
 	CompareAdminPassword(password string, autorizedPassword string) (Err error)
 	AddNewAdminSession(adminID uint64) (Cookie http.Cookie, Err error)
+
+	GetHubListActiveUsers() (Data webSocket.HubStruct, Err error)
 }
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
