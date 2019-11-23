@@ -39,7 +39,7 @@ func (h *HubStruct) Run() {
 			}
 		case chatMessage := <-h.Broadcast:
 			for client := range h.Clients {
-				if client.UserId == chatMessage.IdRecipient {
+				if client.User.ID == chatMessage.IdRecipient {
 					select {
 					case client.Send <- chatMessage:
 					default:

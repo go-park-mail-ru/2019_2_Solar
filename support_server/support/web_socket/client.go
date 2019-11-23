@@ -41,12 +41,12 @@ var Upgrader = websocket.Upgrader{
 // Client is a middleman between the websocket connection and the Hub.
 type Client struct {
 	Hub    *HubStruct
-	UserId uint64
 	// The websocket connection.
 	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
 	Send chan models.ChatMessage
+	User models.User
 }
 
 // ReadPump pumps messages from the websocket connection to the Hub.
@@ -77,22 +77,29 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		err = json.Unmarshal(message, newChatMessage)
 		fmt.Println(err)
 
-		newChatMessage.IdSender = c.UserId
+		newChatMessage.IdSender = c.User.ID
+		fmt.Println(newChatMessage.UserNameRecipient)
 		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
-		fmt.Println(err)
-		_, err = PRepository.InsertSupportChatMessage(*newChatMessage, time.Now())
-		fmt.Println(err)
+		if len (idRecipient) != 1 {
+			fmt.Println(len(idRecipient))
+			fmt.Println(err)
+			break
+		}
 
 		chatMessage := models.ChatMessage{
-			IdSender:    newChatMessage.IdSender,
+			UserNameSender:    newChatMessage.UserNameRecipient,
 			IdRecipient: idRecipient[0].ID,
 			Message:     newChatMessage.Message,
 			SendTime:    time.Now(),
 			IsDeleted:   false,
 		}
+		_, err = PRepository.InsertSupportChatMessage(chatMessage,newChatMessage.IdSender)
+		fmt.Println(err)
+
+
 		fmt.Println("Under send", chatMessage)
 		for client:= range c.Hub.Clients {
-			if client.UserId == chatMessage.IdRecipient {
+			if client.User.ID == chatMessage.IdRecipient {
 				client.Send <-chatMessage
 			}
 		}

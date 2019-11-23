@@ -15,9 +15,11 @@ func (RS *ReposStruct) InsertAdminSession(adminID uint64, cookieValue string, co
 	return id, nil
 }
 
-func (RS *ReposStruct) InsertSupportChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error) {
+func (RS *ReposStruct) InsertSupportChatMessage(message models.ChatMessage, idSender uint64) (uint64, error) {
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTSupportChatMessage, message.IdSender, message.UserNameRecipient, message.Message, createdTime).Scan(&id)
+
+
+	err := RS.DataBase.QueryRow(consts.INSERTSupportChatMessage, idSender, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
 	if err != nil {
 		return 0, err
 	}

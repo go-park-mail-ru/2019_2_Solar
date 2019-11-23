@@ -194,7 +194,7 @@ type NewChatMessage struct {
 }
 
 type ChatMessage struct {
-	IdSender    uint64    `json:"id_sender"`
+	UserNameSender    string    `json:"user_name_sender"`
 	IdRecipient uint64    `json:"id_recipient"`
 	Message     string    `json:"text"`
 	SendTime    time.Time `json:"send_time"`

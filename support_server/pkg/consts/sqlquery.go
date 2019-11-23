@@ -59,7 +59,7 @@ const (
 
 	INSERTChatMessage = "INSERT INTO sunrise.chat_message (sender_id, receiver_id, text, send_time) " +
 		"SELECT $1, u.id, $3, $4 from sunrise.user as u where u.username = $2 RETURNING id"
-	INSERTSupportChatMessage = "INSERT INTO sunrise.chat_message (sender_id, receiver_id, text, send_time) " +
+	INSERTSupportChatMessage = "INSERT INTO sunrise.support_chat (sender_id, receiver_id, text, sender_time) " +
 		"VALUES ($1,$2,$3,$4) RETURNING id"
 
 	DELETESubscribeByName = "DELETE FROM sunrise.subscribe as s WHERE s.subscriber_id = $1 and s.followee_id IN " +

@@ -28,7 +28,7 @@ func (use *UseStruct) GetAdminByLogin(login string) (Admin models.Admin, Err err
 func (use *UseStruct) GetHubListActiveUsers() ([]uint64, error) {
 	var clientSlice []uint64
 	for client:=range use.Hub.Clients {
-		clientSlice = append(clientSlice, client.UserId)
+		clientSlice = append(clientSlice, client.User.ID)
 	}
 
 	return clientSlice, nil
