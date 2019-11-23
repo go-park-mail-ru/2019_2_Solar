@@ -17,12 +17,12 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 
 		user, err := MS.MUsecase.GetUserByCookieValue(cookie.Value)
 		if err != nil {
-			return err
+			return next(ctx) //err
 		}
 
 		userSession, err := MS.MUsecase.GetSessionsByCookieValue(cookie.Value)
 		if err != nil {
-			return err
+			return next(ctx)//err
 		}
 
 		userCookie := models.UserCookie{
