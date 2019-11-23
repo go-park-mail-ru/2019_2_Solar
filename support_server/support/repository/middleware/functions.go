@@ -59,6 +59,33 @@ func (MRS *MRepositoryStruct) SelectUsersByCookieValue(cookieValue string) (User
 	return usersSlice, nil
 }
 
+func (MRS *MRepositoryStruct) SelectAdminByCookieValue(cookieValue string) (Users []models.Admin, Err error) {
+	adminsSlice := make([]models.Admin, 0)
+	rows, err := MRS.DataBase.Query(consts.SELECTAdminByCookieValue, cookieValue)
+	if err != nil {
+		return adminsSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		scanAdmin := models.Admin{}
+		err := rows.Scan(&scanAdmin.ID, &scanAdmin.Login, &scanAdmin.Password)
+		if err != nil {
+			return adminsSlice, err
+		}
+		admin := models.Admin{
+			ID:          scanAdmin.ID,
+			Login: 		 scanAdmin.Login,
+			Password:    scanAdmin.Password,
+		}
+		adminsSlice = append(adminsSlice, admin)
+	}
+	return adminsSlice, nil
+}
+
 func (MRS *MRepositoryStruct) SelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error) {
 	userSessionsSlice := make([]models.UserSession, 0)
 	rows, err := MRS.DataBase.Query(consts.SELECTSessionByCookieValue, cookieValue)
@@ -79,4 +106,27 @@ func (MRS *MRepositoryStruct) SelectSessionsByCookieValue(cookieValue string) (S
 		userSessionsSlice = append(userSessionsSlice, userSession)
 	}
 	return userSessionsSlice, nil
+}
+
+func (MRS *MRepositoryStruct) SelectAdminSessionsByCookieValue(cookieValue string) (Sessions []models.AdminSession, Err error) {
+	adminSessionsSlice := make([]models.AdminSession, 0)
+	rows, err := MRS.DataBase.Query(consts.SELECTAdminSessionByCookieValue, cookieValue)
+	if err != nil {
+		return adminSessionsSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		adminSession := models.AdminSession{}
+		err := rows.Scan(&adminSession.ID, &adminSession.AdminID,
+			&adminSession.Value, &adminSession.Expiration)
+		if err != nil {
+			return adminSessionsSlice, err
+		}
+		adminSessionsSlice = append(adminSessionsSlice, adminSession)
+	}
+	return adminSessionsSlice, nil
 }

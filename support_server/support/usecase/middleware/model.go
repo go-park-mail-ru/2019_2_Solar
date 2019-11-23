@@ -12,6 +12,8 @@ type MUseCaseStruct struct {
 type MUseCaseInterface interface {
 	NewUseCase(rep repositoryMiddleware.MRepositoryInterface)
 	GetUserByCookieValue(cookieValue string) (models.User, error)
+	GetAdminByCookieValue(cookieValue string) (models.Admin, error)
 	//GetCookieByCookieValue(cookieValue string) (models.UserCookie, error)
 	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
+	GetAdminSessionsByCookieValue(cookieValue string) (models.AdminSession, error)
 }

@@ -15,6 +15,12 @@ type UserSession struct {
 	UserCookie
 }
 
+type AdminSession struct {
+	ID     uint64 `json:"-"`
+	AdminID uint64 `json:"-"`
+	UserCookie
+}
+
 type UserReg struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -198,4 +204,15 @@ type Subscribe struct {
 	Id           uint64
 	IdSubscriber uint64
 	FolloweeId   uint64
+}
+
+type Admin struct {
+	ID          uint64    `json:"-"`
+	Login    	string    `json:"login"`
+	Password    string    `json:"-"`
+}
+
+type AdminAutorize struct {
+	Login    	string    `json:"login"`
+	Password    string    `json:"password"`
 }
