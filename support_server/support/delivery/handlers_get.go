@@ -28,6 +28,8 @@ func (h *HandlersStruct) HandleGetActiveUsers(ctx echo.Context) (Err error) {
 		return err
 	}
 
+
+
 	if err := ctx.JSON(200, activeUsers); err != nil {
 		return err
 	}

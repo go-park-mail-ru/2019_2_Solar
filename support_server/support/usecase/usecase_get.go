@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
-	webSocket "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/web_socket"
 )
 
 func (use *UseStruct) GetAdminByLogin(login string) (Admin models.Admin, Err error) {
@@ -16,9 +15,12 @@ func (use *UseStruct) GetAdminByLogin(login string) (Admin models.Admin, Err err
 	return admin, nil
 }
 
-func (use *UseStruct) GetHubListActiveUsers() (Data map[*webSocket.Client]bool, Err error) {
-	activeUsers := use.Hub.Clients
+func (use *UseStruct) GetHubListActiveUsers() ([]uint64, error) {
+	var clientSlice []uint64
+	for client:=range use.Hub.Clients {
+		clientSlice = append(clientSlice, client.UserId)
+	}
 
-	return activeUsers, nil
+	return clientSlice, nil
 }
 
