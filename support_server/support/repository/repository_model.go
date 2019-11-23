@@ -54,6 +54,8 @@ type ReposInterface interface {
 
 	// ======
 
+	SelectUserByID(userID uint64) (User models.User, Err error)
+
 	SelectAdminByLogin(login string) (Admin models.Admin, Err error)
 
 	InsertAdminSession(adminID uint64, cookieValue string, cookieExpires time.Time) (LastID uint64, Err error)
