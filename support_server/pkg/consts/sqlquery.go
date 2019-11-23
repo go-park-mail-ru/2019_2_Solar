@@ -82,6 +82,9 @@ const (
 	INSERTPinAndTag = "INSERT INTO sunrise.pinandtag (pin_id, tag_name)" +
 " VALUES ($1,$2) RETURNING id"
 
+	SELECTUserByID = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.id = $1"
+
 	SELECTAdminByLogin = "SELECT a.id, a.login, a.password from sunrise.employee as a where a.login = $1;"
 
 	INSERTAdminSession = "INSERT INTO sunrise.employee_session (employee_id, cookie_value, cookie_expiration) " +

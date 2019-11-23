@@ -4,6 +4,16 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 )
 
+func (use *UseStruct) GetUserByID(userID uint64) (User models.User, Err error) {
+	user, err := use.PRepository.SelectUserByID(userID)
+	if err != nil {
+		return user, err
+	}
+
+
+	return user, nil
+}
+
 func (use *UseStruct) GetAdminByLogin(login string) (Admin models.Admin, Err error) {
 
 	admin, err := use.PRepository.SelectAdminByLogin(login)

@@ -20,6 +20,9 @@ type UseInterface interface {
 	NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 		hub webSocket.HubStruct)
 
+	GetUserByID(userID uint64) (User models.User, Err error)
+	//GetAllUsers() ([]models.AnotherUser, error)
+
 	GetAdminByLogin(login string) (Admin models.Admin, Err error)
 	CompareAdminPassword(password string, autorizedPassword string) (Err error)
 	AddNewAdminSession(adminID uint64) (Cookie http.Cookie, Err error)
