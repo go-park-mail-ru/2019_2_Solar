@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: "postgres"
+    container_name: "my_postgres"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=7396
+      - POSTGRES_DB=sunrise_db
+      - PG_TRUST_LOCALNET=true
+      - DB_PASS=7396
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  web:
+    depends_on:
+      - db
+    links:
+      - db
+    build: .
+    ports:
+      - "8080:8080"
+    restart: always
