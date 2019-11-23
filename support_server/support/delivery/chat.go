@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/web_socket"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
