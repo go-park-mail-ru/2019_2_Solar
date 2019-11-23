@@ -1,7 +1,7 @@
 package sanitizer
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 	"github.com/microcosm-cc/bluemonday"
 )
 

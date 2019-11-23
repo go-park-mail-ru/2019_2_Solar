@@ -3,7 +3,7 @@ package delivery
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"io"

@@ -3,8 +3,8 @@ package repository
 import (
 	_ "database/sql"
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 	_ "github.com/lib/pq"
 	"reflect"
 	"strconv"

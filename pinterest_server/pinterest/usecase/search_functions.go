@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 )
 
 func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinDisplay, error) {
