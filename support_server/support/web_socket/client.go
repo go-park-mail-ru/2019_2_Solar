@@ -59,19 +59,25 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
+	fmt.Println("TEst1")
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	fmt.Println("TEst2")
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	fmt.Println("TEst3")
 	for {
-		_, message, err := c.Conn.ReadMessage()
+		mtype, message, err := c.Conn.ReadMessage()
+		fmt.Println(mtype,"|", message,"|",err)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
+		fmt.Println(message)
 		newChatMessage := models.NewChatMessage{}
-		json.Unmarshal(message, newChatMessage)
+		err =json.Unmarshal(message, newChatMessage)
+		fmt.Println(err)
 		_, err = PRepository.InsertChatMessage(models.NewChatMessage(newChatMessage), time.Now())
 		fmt.Println(err)
 		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)

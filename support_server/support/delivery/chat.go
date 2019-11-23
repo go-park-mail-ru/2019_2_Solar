@@ -8,10 +8,10 @@ import (
 )
 
 func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
-	getUser := ctx.Get("User")
-	if getUser == nil {
+	//getUser := ctx.Get("User")
+/*	if getUser == nil {
 		return errors.New("not authorized")
-	}
+	}*/
 	ws, err := webSocket.Upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {
 		return err
@@ -21,7 +21,8 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 			Err = errors.Wrap(Err, err.Error())
 		}
 	}()
-	user := getUser.(models.User)
+	user := models.User{ID:1}
+	//user.ID = 1
 	h.PUsecase.CreateClient(ws, user.ID)
 
 /*	body := models.BodyInfo{Info: "OK"}
