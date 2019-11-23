@@ -39,7 +39,9 @@ type ReposInterface interface {
 	SelectUsersByUsername(username string) (Users []models.User, Err error)
 	InsertSubscribe(userID uint64, followeeName string) (uint64, error)
 	DeleteSubscribeByName(userID uint64, followeeName string) error
-	InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error)
+
+	InsertSupportChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error)
+
 	SelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
 
 	SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error)

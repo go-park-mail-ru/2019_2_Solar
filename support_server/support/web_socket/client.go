@@ -80,7 +80,7 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		newChatMessage.IdSender = c.UserId
 		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
 		fmt.Println(err)
-		//_, err = PRepository.InsertChatMessage(*newChatMessage, time.Now())
+		_, err = PRepository.InsertSupportChatMessage(*newChatMessage, time.Now())
 		fmt.Println(err)
 
 		chatMessage := models.ChatMessage{
