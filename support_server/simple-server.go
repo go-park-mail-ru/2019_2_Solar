@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/support/delivery"
-	"github.com/go-park-mail-ru/2019_2_Solar/support/repository"
-	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/repository/middleware"
-	"github.com/go-park-mail-ru/2019_2_Solar/support/sanitizer"
-	"github.com/go-park-mail-ru/2019_2_Solar/support/usecase"
-	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/usecase/middleware"
-	webSocket "github.com/go-park-mail-ru/2019_2_Solar/support/web_socket"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/consts"
+	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/middlewares"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/delivery"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository"
+	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository/middleware"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/usecase"
+	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/usecase/middleware"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/web_socket"
 	"github.com/labstack/echo"
 	"sync"
 )

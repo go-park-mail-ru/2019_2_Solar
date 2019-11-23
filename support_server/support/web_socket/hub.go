@@ -1,6 +1,6 @@
 package webSocket
 
-import "github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+import "github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 
 type HubStruct struct {
 	// Registered Clients.

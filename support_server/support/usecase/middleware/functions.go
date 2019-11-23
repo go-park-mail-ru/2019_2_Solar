@@ -2,8 +2,8 @@ package useCaseMiddleware
 
 import (
 	"errors"
-	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/repository/middleware"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository/middleware"
 )
 
 func (MU *MUseCaseStruct) GetUserByCookieValue(cookieValue string) (models.User, error) {

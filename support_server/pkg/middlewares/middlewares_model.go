@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/usecase/middleware"
+	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/usecase/middleware"
 )
 
 type MiddlewareStruct struct {

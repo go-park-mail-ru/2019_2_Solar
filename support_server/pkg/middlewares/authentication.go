@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/support/pkg/functions"
-	"github.com/go-park-mail-ru/2019_2_Solar/support/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/functions"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	"github.com/labstack/echo"
 	"time"
 )

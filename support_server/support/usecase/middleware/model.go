@@ -1,8 +1,8 @@
 package useCaseMiddleware
 
 import (
-	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/repository/middleware"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository/middleware"
 )
 
 type MUseCaseStruct struct {

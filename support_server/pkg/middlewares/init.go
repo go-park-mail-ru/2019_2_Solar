@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support/support_server/usecase/middleware"
-	"github.com/go-park-mail-ru/2019_2_Solar/support/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/consts"
+	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/usecase/middleware"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
