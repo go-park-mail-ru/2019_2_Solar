@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
-	models2 "github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository"
 	"github.com/gorilla/websocket"
 	"log"
@@ -73,7 +72,7 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		}
 		newChatMessage := models.NewChatMessage{}
 		json.Unmarshal(message, newChatMessage)
-		_, err = PRepository.InsertChatMessage(models2.NewChatMessage(newChatMessage), time.Now())
+		_, err = PRepository.InsertChatMessage(models.NewChatMessage(newChatMessage), time.Now())
 		fmt.Println(err)
 		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
 		fmt.Println(err)
