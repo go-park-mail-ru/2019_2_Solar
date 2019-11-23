@@ -10,7 +10,9 @@ func (USC *UseStruct) CreateClient(conn *websocket.Conn, userId uint64) {
 	client := &webSocket.Client{Hub: USC.ReturnHub(), Conn: conn, Send: make(chan models.ChatMessage), UserId: userId}
 	client.Hub.Register <- client
 	go client.ReadPump(USC.PRepository)
-	go client.WritePump()
+	//time.Sleep(1*time.Second)
+	client.WritePump()
+	//time.Sleep(1*time.Second)
 }
 
 func (USC *UseStruct) ReturnHub() *webSocket.HubStruct {

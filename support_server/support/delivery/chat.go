@@ -21,7 +21,7 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 			Err = errors.Wrap(Err, err.Error())
 		}
 	}()
-	user := models.User{ID:1}
+	user := models.User{ID:5}
 	//user.ID = 1
 	h.PUsecase.CreateClient(ws, user.ID)
 

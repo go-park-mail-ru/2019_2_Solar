@@ -59,37 +59,41 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
-	fmt.Println("TEst1")
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	fmt.Println("TEst2")
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
-	fmt.Println("TEst3")
 	for {
-		mtype, message, err := c.Conn.ReadMessage()
-		fmt.Println(mtype,"|", message,"|",err)
+		_, message, err := c.Conn.ReadMessage()
+		//fmt.Println(mtype,"|", message,"|",err)
 		if err != nil {
+			fmt.Println(err)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				fmt.Println(err)
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-		fmt.Println(message)
-		newChatMessage := models.NewChatMessage{}
-		err =json.Unmarshal(message, newChatMessage)
+		newChatMessage := new(models.NewChatMessage)
+		err = json.Unmarshal(message, newChatMessage)
 		fmt.Println(err)
-		_, err = PRepository.InsertChatMessage(models.NewChatMessage(newChatMessage), time.Now())
+		//_, err = PRepository.InsertChatMessage(*newChatMessage, time.Now())
 		fmt.Println(err)
-		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
+		//idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
 		fmt.Println(err)
 		chatMessage := models.ChatMessage{
 			IdSender:    newChatMessage.IdSender,
-			IdRecipient: idRecipient[0].ID,
+			IdRecipient: newChatMessage.IdSender,
 			Message:     newChatMessage.Message,
 			SendTime:    time.Now(),
 			IsDeleted:   false,
 		}
-		c.Hub.Broadcast <- chatMessage
+		fmt.Println("Under send", chatMessage)
+		for client:= range c.Hub.Clients {
+			if client.UserId == chatMessage.IdRecipient {
+				client.Send <-chatMessage
+			}
+		}
+		//c.Hub.Broadcast <- chatMessage
 	}
 }
 
@@ -107,14 +111,19 @@ func (c *Client) WritePump() {
 	for {
 		select {
 		case message, ok := <-c.Send:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			fmt.Println(message, " ", ok)
+			err:= c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			fmt.Println("Send error1: ", err)
 			if !ok {
 				// The Hub closed the channel.
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-			c.Conn.WriteJSON(message)
+			fmt.Println(message)
+			err = c.Conn.WriteJSON(message)
+			fmt.Println("Send error: ", err)
 		case <-ticker.C:
+			fmt.Println("Ping")
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
