@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/pinterest_server/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/pinterest_server/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pinterest_server/pinterest/repository/middleware/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/pinterest_server/pinterest/repository/middleware/functions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pinterest_server/pinterest/repository/middleware/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/pinterest_server/pinterest/repository/middleware/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pinterest_server/pinterest/repository/repository_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/support_server/support/web_socket/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/support_server/support/web_socket/client.go" afterDir="false" />
-    </list>
+    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
