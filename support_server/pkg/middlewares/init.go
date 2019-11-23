@@ -13,6 +13,6 @@ func (MS *MiddlewareStruct) NewMiddleware(e *echo.Echo, mRep useCaseMiddleware.M
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
 	e.Use(MS.PanicMiddleware)
 	e.Use(MS.AuthenticationMiddleware)
-	e.Use(MS.AuthenticationAdminMiddleware)
+	//e.Use(MS.AuthenticationAdminMiddleware)
 	e.HTTPErrorHandler = MS.CustomHTTPErrorHandler
 }

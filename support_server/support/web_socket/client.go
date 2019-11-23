@@ -47,7 +47,6 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	Send chan models.ChatMessage
-	Role string
 }
 
 // ReadPump pumps messages from the websocket connection to the Hub.
@@ -79,16 +78,14 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		fmt.Println(err)
 
 		newChatMessage.IdSender = c.UserId
-		if c.Role == "admin" {
-			idRecipient, err := PRepository.SelectAdminByUsername(newChatMessage.UserNameRecipient)
-		}
+		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
 		fmt.Println(err)
 		//_, err = PRepository.InsertChatMessage(*newChatMessage, time.Now())
 		fmt.Println(err)
 
 		chatMessage := models.ChatMessage{
 			IdSender:    newChatMessage.IdSender,
-			IdRecipient: newChatMessage.IdSender,
+			IdRecipient: idRecipient[0].ID,
 			Message:     newChatMessage.Message,
 			SendTime:    time.Now(),
 			IsDeleted:   false,

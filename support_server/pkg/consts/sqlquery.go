@@ -11,12 +11,12 @@ const (
 	INSERTSession           = "INSERT INTO sunrise.usersession (userid, cookiesvalue, cookiesexpiration)	values ($1,$2,$3) RETURNING id"
 
 	SELECTUserByCookieValue = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U JOIN sunrise.usersession as s on U.id = s.userid " +
+		" U.avatardir, U.isactive, U.salt, U.created_time, U.role from sunrise.User as U JOIN sunrise.usersession as s on U.id = s.userid " +
 		"where s.cookiesvalue = $1"
 	SELECTCookiesByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
 		" as s where s.cookiesvalue = $1"
 	SELECTUsersByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"
+		" U.avatardir, U.isactive, U.salt, U.created_time, U.role from sunrise.User as U where U.username = $1"
 	SELECTUsersByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.email = $1"
 

@@ -64,10 +64,9 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 	}
 }
 
-
+/*
 func (MS *MiddlewareStruct) AuthenticationAdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		//tokens, _ := functions.NewAesCryptHashToken("qsRY2e4hcM5T7X984E9WQ5uZ8Nty7fxB")
 		cookie, err := ctx.Cookie("admin_session_key")
 		if err != nil {
 			return next(ctx)
@@ -97,4 +96,4 @@ func (MS *MiddlewareStruct) AuthenticationAdminMiddleware(next echo.HandlerFunc)
 		ctx.Set("Cookie", adminCookie)
 		return next(ctx)
 	}
-}
+}*/

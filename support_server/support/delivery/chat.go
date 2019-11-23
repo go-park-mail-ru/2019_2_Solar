@@ -9,15 +9,8 @@ import (
 
 func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 	getUser := ctx.Get("User")
-	getAdmin := ctx.Get("Admin")
-	if getAdmin == nil && getUser == nil {
+	if getUser == nil {
 		return errors.New("not authorized")
-	}
-	role := ""
-	if getAdmin == nil {
-		role = "admin"
-	} else {
-		role = "user"
 	}
 	ws, err := webSocket.Upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {
@@ -29,7 +22,7 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 		}
 	}()
 	user := models.User{ID:getUser.(models.User).ID}
-	h.PUsecase.CreateClient(ws, user.ID, role)
+	h.PUsecase.CreateClient(ws, user.ID)
 
 /*	body := models.BodyInfo{Info: "OK"}
 	jsonStruct := models.JSONResponse{Body: body}

@@ -18,4 +18,5 @@ type DBUser struct {
 	IsActive    bool
 	Salt        string
 	CreatedTime time.Time
+	Role string
 }

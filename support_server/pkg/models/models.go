@@ -75,6 +75,7 @@ type User struct {
 	IsActive    bool      `json:"is_active"`
 	Salt        string    `json:"-"`
 	CreatedTime time.Time `json:"created_time"`
+	Role string `json:"role"`
 }
 
 type DataJSON struct {

@@ -601,7 +601,7 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 	for rows.Next() {
 		dbuser := models.DBUser{}
 		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
-			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime)
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime, &dbuser.Role)
 		if err != nil {
 			return usersSlice, err
 		}
@@ -618,6 +618,7 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 			IsActive:    dbuser.IsActive,
 			Salt:        dbuser.Salt,
 			CreatedTime: dbuser.CreatedTime,
+			Role:dbuser.Role,
 		}
 		usersSlice = append(usersSlice, user)
 	}
