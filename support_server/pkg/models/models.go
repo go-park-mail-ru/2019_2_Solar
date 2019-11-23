@@ -199,3 +199,14 @@ type Subscribe struct {
 	IdSubscriber uint64
 	FolloweeId   uint64
 }
+
+type Admin struct {
+	ID          uint64    `json:"-"`
+	Login    	string    `json:"login"`
+	Password    string    `json:"-"`
+}
+
+type AdminAutorize struct {
+	Login    	string    `json:"login"`
+	Password    string    `json:"password"`
+}

@@ -52,4 +52,10 @@ type ReposInterface interface {
 
 	InsertPinAndTag (PinID uint64, TagName string) (Err error)
 
+	// ======
+
+	SelectAdminByLogin(login string) (Admin models.Admin, Err error)
+
+	InsertAdminSession(adminID uint64, cookieValue string, cookieExpires time.Time) (LastID uint64, Err error)
+
 }

@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"github.com/go-park-mail-ru/2019_2_Solar/support_server/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/support_server/support/repository"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/support_server/support/web_socket"
 	"github.com/gorilla/websocket"
+	"net/http"
 	"sync"
 )
 
@@ -17,6 +19,10 @@ type UseInterface interface {
 	CreateClient(conn *websocket.Conn, userId uint64)
 	NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 		hub webSocket.HubStruct)
+
+	GetAdminByLogin(login string) (Admin models.Admin, Err error)
+	CompareAdminPassword(password string, autorizedPassword string) (Err error)
+	AddNewAdminSession(adminID uint64) (Cookie http.Cookie, Err error)
 }
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
