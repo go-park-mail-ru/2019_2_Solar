@@ -2,7 +2,7 @@ package repositoryMiddleware
 
 import (
 	"database/sql"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/models"
 )
 
 type MRepositoryStruct struct {

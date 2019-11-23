@@ -1,4 +1,4 @@
-module github.com/go-park-mail-ru/2019_2_Solar/tree/hackatoon/pinterest_server
+module github.com/go-park-mail-ru/2019_2_Solar/pinterest_server
 
 go 1.13
 
