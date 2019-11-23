@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/delivery"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
-	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository/middleware"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
-	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
-	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
-	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/delivery"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/repository"
+	repositoryMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/repository/middleware"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/sanitizer"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/usecase"
+	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/usecase/middleware"
+	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pinterest/web_socket"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/consts"
+	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest_server/pkg/middlewares"
 	"github.com/labstack/echo"
 	"sync"
 )
