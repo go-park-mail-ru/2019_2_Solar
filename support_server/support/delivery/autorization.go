@@ -18,7 +18,7 @@ func (h *HandlersStruct) HandleLoginAdmin(ctx echo.Context) (Err error) {
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
 
-	if user := ctx.Get("User"); user != nil {
+	if admin := ctx.Get("Admin"); admin != nil {
 		if err := ctx.JSON(400, "already autorized"); err != nil {
 			return err
 		}

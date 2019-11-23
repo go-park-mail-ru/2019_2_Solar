@@ -86,5 +86,12 @@ const (
 
 	INSERTAdminSession = "INSERT INTO sunrise.employee_session (employee_id, cookie_value, cookie_expiration) " +
 		"values ($1,$2,$3) RETURNING id"
+
+	SELECTAdminByCookieValue = "SELECT employee_id, cookie_value, cookie_expiration from sunrise.employee as U " +
+		"JOIN sunrise.employee_session as s on U.id = s.employee_id " +
+		"where s.cookie_value = $1"
+
+	SELECTAdminSessionByCookieValue = "SELECT s.id, s.employee_id, s.cookie_value, s.cookie_expiration FROM sunrise.employee_session as s " +
+		"WHERE s.cookie_value = $1;"
 )
 

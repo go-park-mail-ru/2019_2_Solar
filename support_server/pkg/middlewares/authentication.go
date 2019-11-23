@@ -63,3 +63,38 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 		return next(ctx)
 	}
 }
+
+
+func (MS *MiddlewareStruct) AuthenticationAdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		//tokens, _ := functions.NewAesCryptHashToken("qsRY2e4hcM5T7X984E9WQ5uZ8Nty7fxB")
+		cookie, err := ctx.Cookie("admin_session_key")
+		if err != nil {
+			return next(ctx)
+		}
+
+		admin, err := MS.MUsecase.GetAdminByCookieValue(cookie.Value)
+		if err != nil {
+			return err
+		}
+
+		adminSession, err := MS.MUsecase.GetAdminSessionsByCookieValue(cookie.Value)
+		if err != nil {
+			return err
+		}
+
+		adminCookie := models.UserCookie{
+			Value:      adminSession.Value,
+			Expiration: adminSession.Expiration,
+		}
+
+		if adminCookie.Expiration.Before(time.Now()) {
+			//delete Coockie!!!!
+			return next(ctx)
+		}
+
+		ctx.Set("Admin", admin)
+		ctx.Set("Cookie", adminCookie)
+		return next(ctx)
+	}
+}

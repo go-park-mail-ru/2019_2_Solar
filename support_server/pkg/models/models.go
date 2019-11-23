@@ -15,6 +15,12 @@ type UserSession struct {
 	UserCookie
 }
 
+type AdminSession struct {
+	ID     uint64 `json:"-"`
+	AdminID uint64 `json:"-"`
+	UserCookie
+}
+
 type UserReg struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
