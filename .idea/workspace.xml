@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="" />
+    <list default="true" id="91e3642d-7897-4e19-86cd-de7ac26ac3b2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support_server/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/support_server/go.mod" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +48,11 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/pinterest_server" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pinterest_server" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -363,17 +371,12 @@
           <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/simple-server.go</url>
-          <line>2</line>
-          <option name="timeStamp" value="146" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/support/support/delivery/autorization.go</url>
+          <url>file://$PROJECT_DIR$/support_server/support/delivery/autorization.go</url>
           <line>2</line>
           <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/support/pkg/middlewares/init.go</url>
+          <url>file://$PROJECT_DIR$/support_server/pkg/middlewares/init.go</url>
           <line>2</line>
           <option name="timeStamp" value="148" />
         </line-breakpoint>
