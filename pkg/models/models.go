@@ -181,17 +181,17 @@ type CommentDisplay struct {
 }
 
 type NewChatMessage struct {
-	IdSender          uint64 `json:"id_sender"`
+	//IdSender          uint64 `json:"id_sender"`
 	UserNameRecipient string `json:"username_recipient"`
 	Message           string `json:"text"`
 }
 
 type ChatMessage struct {
-	IdSender    uint64    `json:"id_sender"`
-	IdRecipient uint64    `json:"id_recipient"`
-	Message     string    `json:"text"`
-	SendTime    time.Time `json:"send_time"`
-	IsDeleted   bool      `json:"is_deleted"`
+	UserNameSender string    `json:"user_name_sender"`
+	IdRecipient    uint64    `json:"id_recipient"`
+	Message        string    `json:"text"`
+	SendTime       time.Time `json:"send_time"`
+	IsDeleted      bool      `json:"is_deleted"`
 }
 
 type Subscribe struct {
@@ -201,6 +201,6 @@ type Subscribe struct {
 }
 
 type Category struct {
-	ID int 	`json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }

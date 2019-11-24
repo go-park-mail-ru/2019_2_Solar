@@ -1,6 +1,9 @@
 package webSocket
 
-import "github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+import (
+	"fmt"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
+)
 
 type HubStruct struct {
 	// Registered Clients.
@@ -27,6 +30,7 @@ func (h *HubStruct) Run() {
 	for {
 		select {
 		case client := <-h.Register:
+			fmt.Println("RegUser")
 			h.Clients[client] = true
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
@@ -35,7 +39,7 @@ func (h *HubStruct) Run() {
 			}
 		case chatMessage := <-h.Broadcast:
 			for client := range h.Clients {
-				if client.UserId == chatMessage.IdRecipient {
+				if client.User.ID == chatMessage.IdRecipient {
 					select {
 					case client.Send <- chatMessage:
 					default:
