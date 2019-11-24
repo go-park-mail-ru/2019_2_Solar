@@ -23,6 +23,7 @@ type ReposInterface interface {
 	SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error)
 	SelectBoardsByOwnerId(ownerId uint64) (Boards []models.Board, Err error)
 	SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error)
+    SelectPinsDisplayByUsername(userID int) (Pins []models.PinDisplay, Err error)
 	SelectAllUsers() (Users []models.User, Err error)
 	InsertNotice(notice models.Notice) (uint64, error)
 	InsertPin(pin models.Pin) (uint64, error)

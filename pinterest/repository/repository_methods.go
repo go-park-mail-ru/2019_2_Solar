@@ -289,6 +289,29 @@ func (RS *ReposStruct) SelectPinsDisplayByBoardId(boardID uint64) (Pins []models
 	return pins, nil
 }
 
+func (RS *ReposStruct) SelectPinsDisplayByUsername(userID int) (Pins []models.PinDisplay, Err error) {
+	pins := make([]models.PinDisplay, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTPinsDisplayByUsername, userID)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
 func (RS *ReposStruct) SelectBoardsByOwnerId(boardId uint64) (Boards []models.Board, Err error) {
 	var boards []models.Board
 	rows, err := RS.DataBase.Query(consts.SELECTBoardsByOwnerId, boardId)

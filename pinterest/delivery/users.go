@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
@@ -28,16 +27,33 @@ func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 		}
 	}
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(ctx.Response())
 
 	userProfile, err := h.PUsecase.GetUserByUsername(username)
 	if err != nil {
 		return err
 	}
 	userProfile.IsFollowee = isFollowee
-	data := h.PUsecase.SetJSONData(userProfile, ctx.Get("token").(string), "OK")
-	err = encoder.Encode(data)
+
+	pins, err := h.PUsecase.GetPinsByUsername(int(userProfile.ID))
 	if err != nil {
+
+	}
+
+
+	//data := h.PUsecase.SetJSONData(userProfile, ctx.Get("token").(string), "OK")
+	//err = encoder.Encode(data)
+	//if err != nil {
+	//	return err
+	//}
+	//return nil
+
+	body := struct {
+		User models.AnotherUser `json:"user"`
+		Pins  []models.PinDisplay `json:"pins"`
+		Info  string     `json:"info"`
+	}{userProfile, pins, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
 	return nil

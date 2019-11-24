@@ -127,6 +127,17 @@ func (USC *UseStruct) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error
 	return pins, nil
 }
 
+func (USC *UseStruct) GetPinsByUsername(userID int) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectPinsDisplayByUsername(userID)
+	if err != nil {
+		return []models.PinDisplay{}, err
+	}
+	for _, pin := range pins {
+		USC.Sanitizer.SanitPinDisplay(&pin)
+	}
+	return pins, nil
+}
+
 func (USC *UseStruct) GetNewPins() ([]models.PinDisplay, error) {
 	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(0, consts.NumberOfPinsOnPage)
 	if err != nil {

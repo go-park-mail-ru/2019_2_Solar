@@ -37,6 +37,7 @@ const (
 		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
 	SELECTPinsDisplayByBoardId   = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.board_id = $1"
+	SELECTPinsDisplayByUsername   = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.owner_id = $1"
 	SELECTNewPinsDisplayByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime desc) " +
 		"from sunrise.pin WHERE isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
 	//SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
