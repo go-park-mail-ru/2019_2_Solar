@@ -233,6 +233,29 @@ func (RS *ReposStruct) SelectCategoryByName(categoryName string) (categories []s
 	return categories, nil
 }
 
+func (RS *ReposStruct) SelectCategories() (Categories []models.Category, Err error) {
+	categories := []models.Category{}
+	rows, err := RS.DataBase.Query(consts.SELECTCategories)
+	if err != nil {
+		return categories, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		scanCategory := models.Category{}
+		err := rows.Scan(&scanCategory.ID, &scanCategory.Name)
+		if err != nil {
+			return categories, err
+		}
+
+		categories = append(categories, scanCategory)
+	}
+	return categories, nil
+}
+
 func (RS *ReposStruct) InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTBoard, ownerID, title, description, category, createdTime).Scan(&id)

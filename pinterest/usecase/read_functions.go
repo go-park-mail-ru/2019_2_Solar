@@ -196,3 +196,12 @@ func (USC *UseStruct) GetMySubscribeByUsername(userId uint64, username string) (
 	}
 	return true, nil
 }
+
+func (USC *UseStruct) GetCategories() (Categories []models.Category, Err error) {
+	categories, err := USC.PRepository.SelectCategories()
+	if err != nil {
+		return categories, err
+	}
+
+	return categories, nil
+}

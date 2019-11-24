@@ -199,3 +199,8 @@ type Subscribe struct {
 	IdSubscriber uint64
 	FolloweeId   uint64
 }
+
+type Category struct {
+	ID int 	`json:"id"`
+	Name string `json:"name"`
+}

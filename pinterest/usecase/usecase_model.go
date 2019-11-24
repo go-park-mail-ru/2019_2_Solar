@@ -87,6 +87,6 @@ type UseInterface interface {
 
 	AddTags(description string, pinID uint64) error
 
-
+	GetCategories() (Categories []models.Category, Err error)
 
 }
