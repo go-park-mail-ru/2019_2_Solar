@@ -40,8 +40,8 @@ var Upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the Hub.
 type Client struct {
-	Hub    *HubStruct
-	UserId uint64
+	Hub  *HubStruct
+	User models.User
 	// The websocket connection.
 	Conn *websocket.Conn
 
@@ -60,30 +60,54 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 		c.Conn.Close()
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	err := c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	if err != nil {
+		return
+	}
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
+			fmt.Println(err)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				fmt.Println(err)
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-		newChatMessage := models.NewChatMessage{}
-		json.Unmarshal(message, newChatMessage)
-		_, err = PRepository.InsertChatMessage(newChatMessage, time.Now())
-		fmt.Println(err)
-		idRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
-		fmt.Println(err)
-		chatMessage := models.ChatMessage{
-			IdSender:    newChatMessage.IdSender,
-			IdRecipient: idRecipient[0].ID,
-			Message:     newChatMessage.Message,
-			SendTime:    time.Now(),
-			IsDeleted:   false,
+		newChatMessage := new(models.NewChatMessage)
+		err = json.Unmarshal(message, newChatMessage)
+		if err != nil {
+			fmt.Println(err)
+			break
 		}
-		c.Hub.Broadcast <- chatMessage
+
+		//newChatMessage.IdSender = c.User.ID
+		fmt.Println(newChatMessage.UserNameRecipient)
+		userRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
+		if len(userRecipient) != 1 {
+			fmt.Println(len(userRecipient))
+			fmt.Println(err)
+			break
+		}
+
+		chatMessage := models.ChatMessage{
+			UserNameSender: c.User.Username,
+			IdRecipient:    userRecipient[0].ID,
+			Message:        newChatMessage.Message,
+			SendTime:       time.Now(),
+			IsDeleted:      false,
+		}
+		_, err = PRepository.InsertChatMessage(chatMessage, c.User.ID)
+		fmt.Println(err)
+
+		fmt.Println("Under send", chatMessage)
+		for client := range c.Hub.Clients {
+			if client.User.ID == chatMessage.IdRecipient {
+				client.Send <- chatMessage
+			}
+		}
+		//c.Hub.Broadcast <- chatMessage
 	}
 }
 

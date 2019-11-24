@@ -22,12 +22,12 @@ func (h *HandlersStruct) HandleUpgradeWebSocket(ctx echo.Context) (Err error) {
 		}
 	}()
 	user := getUser.(models.User)
-	h.PUsecase.CreateClient(ws, user.ID)
+	h.PUsecase.CreateClient(ws, user)
 
-/*	body := models.BodyInfo{Info: "OK"}
-	jsonStruct := models.JSONResponse{Body: body}
-	if err := ctx.JSON(200, jsonStruct); err != nil {
-		return err
-	}*/
+	/*	body := models.BodyInfo{Info: "OK"}
+		jsonStruct := models.JSONResponse{Body: body}
+		if err := ctx.JSON(200, jsonStruct); err != nil {
+			return err
+		}*/
 	return nil
 }
