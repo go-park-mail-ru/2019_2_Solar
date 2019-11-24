@@ -670,6 +670,43 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 	return usersSlice, nil
 }
 
+func (RS *ReposStruct) SelectUsersByUsernameSearch(username string) (Users []models.User, Err error) {
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTUsersByUsernameSearch, "%" + username + "%")
+	if err != nil {
+		return usersSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime)
+		if err != nil {
+			return usersSlice, err
+		}
+		user := models.User{
+			ID:          dbuser.ID,
+			Username:    dbuser.Username,
+			Name:        dbuser.Name.String,
+			Surname:     dbuser.Surname.String,
+			Password:    dbuser.Password,
+			Email:       dbuser.Email,
+			Age:         uint(dbuser.Age.Int32),
+			Status:      dbuser.Status.String,
+			AvatarDir:   dbuser.AvatarDir.String,
+			IsActive:    dbuser.IsActive,
+			Salt:        dbuser.Salt,
+			CreatedTime: dbuser.CreatedTime,
+		}
+		usersSlice = append(usersSlice, user)
+	}
+	return usersSlice, nil
+}
+
 func (RS *ReposStruct) InsertSubscribe(userID uint64, followeeName string) (uint64, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, userID, followeeName).Scan(&id)

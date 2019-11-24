@@ -42,7 +42,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.GET("/chat", h.HandleUpgradeWebSocket)
 
 	e.GET( "/find/pins/by/tag/:tag", h.HandlerFindPinByTag)
-	e.GET( "/find/users/by/username/:username", h.HandlerFindPinByTag)
+	e.GET( "/find/users/by/username/:username", h.HandlerFindUserByUsername)
 
 	e.GET ("/categories", h.HandleGetCategories)
 

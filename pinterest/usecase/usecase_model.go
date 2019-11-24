@@ -79,6 +79,7 @@ type UseInterface interface {
 	ReturnHub() *webSocket.HubStruct
 	
 	SearchPinsByTag(tag string) ([]models.PinDisplay, error)
+	SearchUserByUsername(username string) (Users []models.User, Err error)
 
 	CreateClient(conn *websocket.Conn, userId uint64)
 

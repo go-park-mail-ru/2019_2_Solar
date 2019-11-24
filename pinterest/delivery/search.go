@@ -36,3 +36,37 @@ func (h *HandlersStruct) HandlerFindPinByTag(ctx echo.Context) (Err error) {
 	}
 	return nil
 }
+
+func (h *HandlersStruct) HandlerFindUserByUsername(ctx echo.Context) (Err error) {
+	ctx.Response()
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+
+	username := ctx.Param("username")
+
+	users, err := h.PUsecase.SearchUserByUsername(username)
+	if err != nil {
+		return err
+	}
+
+
+
+	body := struct {
+		Users []models.User `json:"users"`
+		Info  string     `json:"info"`
+	}{users, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
+	return nil
+}

@@ -20,6 +20,9 @@ const (
 	SELECTUsersByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.email = $1"
 
+	SELECTUsersByUsernameSearch = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
+		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username ILIKE $1"
+
 	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
