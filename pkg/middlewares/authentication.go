@@ -42,6 +42,7 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 
 		if ctx.Request().URL.Path != "/login" &&
 			ctx.Request().URL.Path != "/registration" &&
+			ctx.Request().URL.Path != "/logout" &&
 			ctx.Request().Method != "GET" {
 
 			CSRFToken := ctx.Request().Header.Get("csrf-token")

@@ -90,4 +90,6 @@ type UseInterface interface {
 
 	GetCategories() (Categories []models.Category, Err error)
 
+	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
+
 }

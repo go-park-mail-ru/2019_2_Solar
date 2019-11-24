@@ -194,6 +194,11 @@ type ChatMessage struct {
 	IsDeleted      bool      `json:"is_deleted"`
 }
 
+type OutputMessage struct {
+	Message        string    `json:"text"`
+	SendTime       time.Time `json:"send_time"`
+}
+
 type Subscribe struct {
 	Id           uint64
 	IdSubscriber uint64

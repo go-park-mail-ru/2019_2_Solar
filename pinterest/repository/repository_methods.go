@@ -816,3 +816,25 @@ func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error)
 	}
 	return nil
 }
+
+func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	chatMessageSlice := make([]models.OutputMessage, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTChatMessagesByUsersId, senderId, receiverId)
+	if err != nil {
+		return chatMessageSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+	for rows.Next() {
+		message := models.OutputMessage{}
+		err := rows.Scan(&message.Message, &message.SendTime)
+		if err != nil {
+			return chatMessageSlice, err
+		}
+		chatMessageSlice = append(chatMessageSlice, message)
+	}
+	return chatMessageSlice, nil
+}

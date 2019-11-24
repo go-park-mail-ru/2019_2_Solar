@@ -10,5 +10,5 @@ func (USC *UseStruct) CreateClient(conn *websocket.Conn, user models.User) {
 	client := &webSocket.Client{Hub: USC.ReturnHub(), Conn: conn, Send: make(chan models.ChatMessage), User: user}
 	client.Hub.Register <- client
 	go client.ReadPump(USC.PRepository)
-	go client.WritePump()
+	client.WritePump()
 }
