@@ -71,7 +71,7 @@ func (h *HandlersStruct) HandleGetMessages(ctx echo.Context) (Err error) {
 	}
 
 	body := struct {
-		Messages []models.OutputMessage `json:"categories"`
+		Messages []models.OutputMessage `json:"messages"`
 		Info     string                 `json:"info"`
 	}{messages, "OK"}
 
