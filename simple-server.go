@@ -84,23 +84,22 @@ func AuthServiceCreate() (auth services.AuthorizationServiceClient) {
 	// тут мы будем периодически опрашивать консул на предмет изменений
 	go runOnlineServiceDiscovery(servers)
 
-	ctx := context.Background()
-	step := 1
-	for {
-		// проверяем несуществуюущую сессию
-		// потому что сейчас между сервисами нет общения
-		// получаем загшулку
-		sess, err := sessManager.CheckSession(ctx,
-			&services.Cookie{
-				Key:                  "key",
-				Value:                "123",
-				Exp:                  "22:00",
-			})
-		fmt.Println("get sess", step, sess, err)
-
-		time.Sleep(1500 * time.Millisecond)
-		step++
+	testUserReg := services.UserReg{
+		Email:                "test@mail.ru",
+		Password:             "12314ghMEFnk123",
+		Username:             "Test",
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
 	}
+
+	serviceCtx  := context.Background()
+
+	cookie, err := sessManager.RegUser(serviceCtx, &testUserReg)
+	println(cookie, err)
+
+
+	return sessManager
 }
 
 func runOnlineServiceDiscovery(servers []string) {
@@ -152,6 +151,9 @@ func runOnlineServiceDiscovery(servers []string) {
 }
 
 func main() {
+
+	auth := AuthServiceCreate()
+
 	e := echo.New()
 	middlewares := customMiddleware.MiddlewareStruct{}
 	mRep := repositoryMiddleware.MRepositoryStruct{}
@@ -162,7 +164,7 @@ func main() {
 	}
 	mUseCase := useCaseMiddleware.MUseCaseStruct{}
 	mUseCase.NewUseCase(&mRep)
-	middlewares.NewMiddleware(e, &mUseCase)
+	middlewares.NewMiddleware(e, &mUseCase, auth)
 	//e.Use(customMiddleware.CORSMiddleware)
 	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
 	//e.Use(customMiddleware.PanicMiddleware)
@@ -184,11 +186,10 @@ func main() {
 	san.NewSanitizer()
 	hub := webSocket.HubStruct{}
 	hub.NewHub()
-	auth := AuthServiceCreate()
 
 	useCase := usecase.UseStruct{}
-	useCase.NewUseCase(&mutex, &rep, &san, hub, auth)
-	err = handlers.NewHandlers(e, &useCase)
+	useCase.NewUseCase(&mutex, &rep, &san, hub)
+	err = handlers.NewHandlers(e, &useCase, auth)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}

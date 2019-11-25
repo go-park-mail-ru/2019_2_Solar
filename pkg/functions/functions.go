@@ -7,7 +7,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/balancer"
+	consulapi "github.com/hashicorp/consul/api"
+	"google.golang.org/grpc/naming"
 	"io"
+	"log"
+	"strconv"
 	"time"
 )
 
@@ -25,6 +30,11 @@ type Session struct {
 	UserID uint
 	ID     string
 }
+
+var (
+	consul       *consulapi.Client
+	nameResolver *balancer.TestNameResolver
+)
 
 func NewAesCryptHashToken(secret string) (*CryptToken, error) {
 	key := []byte(secret)
@@ -99,4 +109,52 @@ func (tk *CryptToken) Check(s *Session, inputToken string) (bool, error) {
 	expected := TokenData{SessionID: s.ID, UserID: s.UserID}
 	td.Exp = 0
 	return td == expected, nil
+}
+
+func RunOnlineServiceDiscovery(servers []string) {
+	currAddrs := make(map[string]struct{}, len(servers))
+	for _, addr := range servers {
+		currAddrs[addr] = struct{}{}
+	}
+	ticker := time.Tick(5 * time.Second)
+	for _ = range ticker {
+		health, _, err := consul.Health().Service("authorization-service", "", false, nil)
+		if err != nil {
+			log.Fatalf("cant get alive services")
+		}
+
+		newAddrs := make(map[string]struct{}, len(health))
+		for _, item := range health {
+			addr := item.Service.Address +
+				":" + strconv.Itoa(item.Service.Port)
+			newAddrs[addr] = struct{}{}
+		}
+
+		var updates []*naming.Update
+		// проверяем что удалилось
+		for addr := range currAddrs {
+			if _, exist := newAddrs[addr]; !exist {
+				updates = append(updates, &naming.Update{
+					Op:   naming.Delete,
+					Addr: addr,
+				})
+				delete(currAddrs, addr)
+				fmt.Println("remove", addr)
+			}
+		}
+		// проверяем что добавилось
+		for addr := range newAddrs {
+			if _, exist := currAddrs[addr]; !exist {
+				updates = append(updates, &naming.Update{
+					Op:   naming.Add,
+					Addr: addr,
+				})
+				currAddrs[addr] = struct{}{}
+				fmt.Println("add", addr)
+			}
+		}
+		if len(updates) > 0 {
+			nameResolver.W.Inject(updates)
+		}
+	}
 }

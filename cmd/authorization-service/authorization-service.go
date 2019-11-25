@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_Solar/cmd/authorization-service/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/authorization-service/pinterest/delivery"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
@@ -17,7 +18,7 @@ import (
 )
 
 var (
-	grpcPort   = flag.Int("grpc", 8081, "listen addr")
+	grpcPort   = flag.Int("grpc", 8085, "listen addr")
 	consulAddr = flag.String("consul", "127.0.0.1:8500", "consul addr (8500 in original consul)")
 )
 
@@ -50,9 +51,10 @@ func main() {
 	hub := webSocket.HubStruct{}
 	hub.NewHub()
 
-
+	useCase := usecase.UseStruct{}
+	useCase.NewUseCase(&mutex, &rep, &san, hub)
 	services.RegisterAuthorizationServiceServer(server,
-		usecase.NewAuthorizationService(&mutex, &rep, &san, port))
+		delivery.NewAuthorizationService(&useCase, port))
 
 	config := consulapi.DefaultConfig()
 	config.Address = *consulAddr

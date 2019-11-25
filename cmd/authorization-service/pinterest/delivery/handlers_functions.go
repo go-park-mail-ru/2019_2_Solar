@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/cmd/authorization-service/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/labstack/echo"
 )
 
@@ -12,7 +12,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.POST("/login", h.HandleLoginUser)
 	e.POST("/logout", h.HandleLogoutUser)
 
-	e.GET()
+	//e.GET()
 
 	return nil
 }

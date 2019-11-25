@@ -92,4 +92,7 @@ type UseInterface interface {
 
 	GetCategories() (Categories []models.Category, Err error)
 
+	GetUserByCookieValue(cookieValue string) (models.User, error)
+	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
+
 }

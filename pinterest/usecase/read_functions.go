@@ -205,3 +205,31 @@ func (USC *UseStruct) GetCategories() (Categories []models.Category, Err error) 
 
 	return categories, nil
 }
+
+func (USC *UseStruct) GetUserByCookieValue(cookieValue string) (models.User, error) {
+	user, err := USC.PRepository.SelectUsersByCookieValue(cookieValue)
+	if err != nil {
+		return models.User{}, err
+	}
+	if len(user) == 0 {
+		return models.User{}, errors.New("cookie not found")
+	}
+	if len(user) > 1 {
+		return models.User{}, errors.New("several same cookies")
+	}
+	return user[0], nil
+}
+
+func (USC *UseStruct) GetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	userSession, err := USC.PRepository.SelectSessionsByCookieValue(cookieValue)
+	if err != nil {
+		return models.UserSession{}, err
+	}
+	if len(userSession) == 0 {
+		return models.UserSession{}, errors.New("cookie not found")
+	}
+	if len(userSession) > 1 {
+		return models.UserSession{}, errors.New("several same cookies")
+	}
+	return userSession[0], nil
+}

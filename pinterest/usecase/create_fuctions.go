@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
@@ -22,14 +21,12 @@ import (
 )
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
-	san *sanitizer.SanitStruct, hub webSocket.HubStruct, auth services.AuthorizationServiceClient) {
+	san *sanitizer.SanitStruct, hub webSocket.HubStruct) {
 	USC.Mu = mu
 	USC.PRepository = rep
 	USC.Sanitizer = san
 	USC.Hub = hub
 	go USC.Hub.Run()
-
-	USC.AuthSessManager = auth
 }
 
 func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
