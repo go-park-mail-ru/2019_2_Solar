@@ -33,7 +33,7 @@ func (h *HandlersStruct) ServiceLogoutUser(ctx echo.Context) (Err error) {
 	}
 
 	ctx2 := context.Background()
-	_, err = h.AuthSessManager.Client.LogoutUser(ctx2, &cookie)
+	_, err = h.AuthSessManager.LogoutUser(ctx2, &cookie)
 	if err != nil {
 		return err
 	}

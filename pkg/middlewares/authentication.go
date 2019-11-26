@@ -27,7 +27,7 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 		}
 
 		sctx := context.Background()
-		sUserSession, err := MS.MAuth.Client.CheckSession(sctx, &sCookie)
+		sUserSession, err := MS.MAuth.CheckSession(sctx, &sCookie)
 		if err != nil {
 			return err
 		}

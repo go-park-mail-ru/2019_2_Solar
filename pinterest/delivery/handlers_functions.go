@@ -2,8 +2,8 @@ package delivery
 
 import (
 	pinboard_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/pinboard-service/service_model"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/labstack/echo"
 )
 
@@ -16,11 +16,10 @@ import (
 //	nameResolver *balancer.TestNameResolver
 //)
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface, pinBoardService pinboard_service.PinBoardServiceClient) error {
+func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface, auth services.AuthorizationServiceClient, pinBoardService pinboard_service.PinBoardServiceClient) error {
 	h.PUsecase = useCase
 
-	h.AuthSessManager = functions.Auth{}
-	h.AuthSessManager.AuthServiceCreate()
+	h.AuthSessManager = auth
 	h.PinBoardService = pinBoardService
 
 

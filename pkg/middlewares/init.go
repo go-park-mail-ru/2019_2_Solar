@@ -1,9 +1,9 @@
 package middlewares
 
 import (
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -18,11 +18,10 @@ import (
 //)
 
 
-func (MS *MiddlewareStruct) NewMiddleware(e *echo.Echo, mRep useCaseMiddleware.MUseCaseInterface) {
+func (MS *MiddlewareStruct) NewMiddleware(e *echo.Echo, mRep useCaseMiddleware.MUseCaseInterface, auth services.AuthorizationServiceClient) {
 	MS.MUsecase = mRep
 
-	MS.MAuth = functions.Auth{}
-	MS.MAuth.AuthServiceCreate()
+	MS.MAuth = auth
 
 
 	e.Use(MS.CORSMiddleware)

@@ -44,7 +44,7 @@ func (h *HandlersStruct) ServiceRegUser(ctx echo.Context) (Err error) {
 	//serviceCtx := context.WithValue(context.Background(), "userReg", newUserReg)
 	ctx2 := context.Background()
 
-	cookie, err := h.AuthSessManager.Client.RegUser(ctx2, &sUserReg)
+	cookie, err := h.AuthSessManager.RegUser(ctx2, &sUserReg)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (h *HandlersStruct) ServiceLoginUser(ctx echo.Context) (Err error) {
 	}
 
 	ctx2 := context.Background()
-	cookie, err := h.AuthSessManager.Client.LoginUser(ctx2, &userLogin)
+	cookie, err := h.AuthSessManager.LoginUser(ctx2, &userLogin)
 	if err != nil {
 		return err
 	}
