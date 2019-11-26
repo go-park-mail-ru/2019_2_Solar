@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -8,7 +9,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/balancer"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	consulapi "github.com/hashicorp/consul/api"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/naming"
 	"io"
 	"log"
@@ -30,11 +33,6 @@ type Session struct {
 	UserID uint
 	ID     string
 }
-
-var (
-	consul       *consulapi.Client
-	nameResolver *balancer.TestNameResolver
-)
 
 func NewAesCryptHashToken(secret string) (*CryptToken, error) {
 	key := []byte(secret)
@@ -111,6 +109,124 @@ func (tk *CryptToken) Check(s *Session, inputToken string) (bool, error) {
 	return td == expected, nil
 }
 
+var (
+	consulAddr = "127.0.0.1:8500"
+)
+
+var (
+	consul       *consulapi.Client
+	nameResolver *balancer.TestNameResolver
+)
+
+type Auth struct {
+	 grpcConn *grpc.ClientConn
+	 Client services.AuthorizationServiceClient
+}
+
+func (auth *Auth) AuthServiceCreate() () {
+	var err error
+	config := consulapi.DefaultConfig()
+	config.Address = consulAddr
+	consul, err = consulapi.NewClient(config)
+
+	health, _, err := consul.Health().Service("authorization-service", "", false, nil)
+	if err != nil {
+		log.Fatalf("cant get alive services")
+	}
+
+	servers := []string{}
+	for _, item := range health {
+		addr := item.Service.Address +
+			":" + strconv.Itoa(item.Service.Port)
+		servers = append(servers, addr)
+	}
+
+	nameResolver = &balancer.TestNameResolver{
+		Addr: servers[0],
+	}
+
+	auth.grpcConn, err = grpc.Dial(
+		servers[0],
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+		grpc.WithBalancer(grpc.RoundRobin(nameResolver)),
+	)
+	if err != nil {
+		log.Fatalf("cant connect to grpc")
+	}
+
+	if len(servers) > 1 {
+		var updates []*naming.Update
+		for i := 1; i < len(servers); i++ {
+			updates = append(updates, &naming.Update{
+				Op:   naming.Add,
+				Addr: servers[i],
+			})
+		}
+		nameResolver.W.Inject(updates)
+	}
+
+	auth.Client = services.NewAuthorizationServiceClient(auth.grpcConn)
+
+	// тут мы будем периодически опрашивать консул на предмет изменений
+	go RunOnlineServiceDiscovery(servers)
+	//testUserReg := services.UserReg{
+	//	Email:                "test@mail.ru",
+	//	Password:             "12314ghMEFnk123",
+	//	Username:             "Test",
+	//	XXX_NoUnkeyedLiteral: struct{}{},
+	//	XXX_unrecognized:     nil,
+	//	XXX_sizecache:        0,
+	//}
+
+	//ctx := context.Background()
+	//step := 1
+	//for {
+	//	// проверяем несуществуюущую сессию
+	//	// потому что сейчас между сервисами нет общения
+	//	// получаем загшулку
+	//	sess, err := auth.Client.CheckSession(ctx,
+	//		&services.Cookie{
+	//			Key: "test",
+	//			Value: string(step),
+	//			Exp: time.Now().String(),
+	//		})
+	//	fmt.Println("get sess", step, sess, err)
+	//
+	//	time.Sleep(1500 * time.Millisecond)
+	//	step++
+	//}
+
+
+
+	//TestRun(auth.grpcConn)
+	//testRun(grcpConn)
+	//sessManager := services.NewAuthorizationServiceClient(grcpConn)
+
+	//return grcpConn
+}
+
+func TestRun(grcpConn *grpc.ClientConn) {
+	auth := services.NewAuthorizationServiceClient(grcpConn)
+	ctx := context.Background()
+	step := 1
+	for {
+		// проверяем несуществуюущую сессию
+		// потому что сейчас между сервисами нет общения
+		// получаем загшулку
+		sess, err := auth.CheckSession(ctx,
+			&services.Cookie{
+				Key: "test",
+				Value: string(step),
+				Exp: time.Now().String(),
+			})
+		fmt.Println("get sess", step, sess, err)
+
+		time.Sleep(1500 * time.Millisecond)
+		step++
+	}
+}
+
 func RunOnlineServiceDiscovery(servers []string) {
 	currAddrs := make(map[string]struct{}, len(servers))
 	for _, addr := range servers {
@@ -158,3 +274,4 @@ func RunOnlineServiceDiscovery(servers []string) {
 		}
 	}
 }
+

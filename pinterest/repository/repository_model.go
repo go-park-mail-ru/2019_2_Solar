@@ -56,4 +56,6 @@ type ReposInterface interface {
 
 	SelectUsersByUsernameSearch(username string) (Users []models.User, Err error)
 
+	MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
+
 }

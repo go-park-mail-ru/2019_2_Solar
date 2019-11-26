@@ -1,8 +1,8 @@
 package delivery
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/labstack/echo"
 )
 
@@ -15,10 +15,12 @@ import (
 //	nameResolver *balancer.TestNameResolver
 //)
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface, auth services.AuthorizationServiceClient) error {
+func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface) error {
 	h.PUsecase = useCase
 
-	h.AuthSessManager = auth
+	h.AuthSessManager = functions.Auth{}
+	h.AuthSessManager.AuthServiceCreate()
+
 
 	e.GET("/", h.HandleEmpty)
 
@@ -36,6 +38,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface,
 
 	e.POST("/service/registration", h.ServiceRegUser)
 	e.POST("/service/login", h.ServiceLoginUser)
+	e.POST( "/service/logout", h.ServiceLogoutUser)
 
 	// ==============================================================
 

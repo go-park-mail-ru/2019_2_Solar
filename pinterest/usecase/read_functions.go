@@ -233,3 +233,17 @@ func (USC *UseStruct) GetSessionsByCookieValue(cookieValue string) (models.UserS
 	}
 	return userSession[0], nil
 }
+
+func (USC *UseStruct) MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	userSession, err := USC.PRepository.MSelectSessionsByCookieValue(cookieValue)
+	if err != nil {
+		return models.UserSession{}, err
+	}
+	if len(userSession) == 0 {
+		return models.UserSession{}, errors.New("cookie not found")
+	}
+	if len(userSession) > 1 {
+		return models.UserSession{}, errors.New("several same cookies")
+	}
+	return userSession[0], nil
+}

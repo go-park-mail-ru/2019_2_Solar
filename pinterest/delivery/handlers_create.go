@@ -41,7 +41,7 @@ func (h *HandlersStruct) ServiceRegUser(ctx echo.Context) (Err error) {
 	//serviceCtx := context.WithValue(context.Background(), "userReg", newUserReg)
 	ctx2 := context.Background()
 
-	cookie, err := h.AuthSessManager.RegUser(ctx2, &sUserReg)
+	cookie, err := h.AuthSessManager.Client.RegUser(ctx2, &sUserReg)
 	if err != nil {
 		return err
 	}
@@ -83,25 +83,33 @@ func (h *HandlersStruct) ServiceLoginUser(ctx echo.Context) (Err error) {
 	if err := decoder.Decode(newUserLogin); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	var User models.User
-	User, err = h.PUsecase.GetUserByEmail(newUserLogin.Email)
+
+	userLogin := services.UserLogin{
+		Email:               newUserLogin.Email,
+		Password:             newUserLogin.Password,
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
+	}
+
+	ctx2 := context.Background()
+	cookie, err := h.AuthSessManager.Client.LoginUser(ctx2, &userLogin)
 	if err != nil {
 		return err
 	}
 
-	if err := h.PUsecase.ComparePassword(User.Password, User.Salt, newUserLogin.Password); err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
-	}
+	cookies := new(http.Cookie)
+	cookies.Name = "session_key"
+	cookies.Value = cookie.Value
+	cookies.Path = "/"
+	cookies.Expires = time.Now().Add(365 * 24 * time.Hour)
 
-	cookies, err := h.PUsecase.AddNewUserSession(User.ID)
-	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
-	}
-	ctx.SetCookie(&cookies)
-	data := h.PUsecase.SetJSONData(User, "","OK")
+	ctx.SetCookie(cookies)
+	data := h.PUsecase.SetJSONData("", "","OK")
 	err = encoder.Encode(data)
 	if err != nil {
 		return err
 	}
 	return nil
 }
+

@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 )
 
 type MiddlewareStruct struct {
 	MUsecase useCaseMiddleware.MUseCaseInterface
-	MAuth services.AuthorizationServiceClient
+	MAuth functions.Auth
 }
 
 /*type MiddlewareInterface interface {

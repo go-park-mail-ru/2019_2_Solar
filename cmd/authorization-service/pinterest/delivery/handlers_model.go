@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	//"github.com/go-park-mail-ru/2019_2_Solar/cmd/authorization-service/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
@@ -31,10 +31,22 @@ func NewAuthorizationService(use usecase.UseInterface,
 func (auth *AuthorizationService) CheckSession(ctx context.Context, cookie *services.Cookie) (*services.UserSession, error) {
 
 
-	value := ctx.Value( "session-key")
-	serviceCookie, ok := value.(http.Cookie)
-	if !ok {
-		return &services.UserSession{}, errors.New("session_key is nil")
+	//value := ctx.Value( "session-key")
+	//serviceCookie, ok := value.(http.Cookie)
+	//if !ok {
+	//	return &services.UserSession{}, errors.New("session_key is nil")
+	//}
+	fmt.Println("get sess", cookie.Key, cookie.Value, cookie.Exp)
+	//tik := time.Now()
+	//println(tik.Format(tik.String()))
+	//exp, err := time.Parse("Mon, 02 Jan 2006 15:04:05 -0700", cookie.Exp)
+	//if err != nil {
+	//	return &services.UserSession{}, err
+	//}
+	serviceCookie := http.Cookie{
+		Name:       cookie.Key,
+		Value:      cookie.Value,
+		Path:       "/",
 	}
 
 
@@ -43,20 +55,15 @@ func (auth *AuthorizationService) CheckSession(ctx context.Context, cookie *serv
 	//	return err
 	//}
 
-	userSession, err := auth.Usecase.GetSessionsByCookieValue(serviceCookie.Value)
+	userSession, err := auth.Usecase.MGetSessionsByCookieValue(serviceCookie.Value)
 	if err != nil {
 		return &services.UserSession{}, err
 	}
-
-	serviceCookie.Expires = userSession.Expiration
-
-	ctx = context.WithValue(ctx, "session-key", serviceCookie)
 
 	return &services.UserSession{
 		ID:                   userSession.ID,
 		UserID:               userSession.UserID,
 		Value:                userSession.Value,
-		Exp:                  userSession.Expiration.String(),
 
 	}, nil
 }
@@ -101,15 +108,43 @@ func (auth *AuthorizationService) RegUser(ctx context.Context, in *services.User
 }
 
 func (auth *AuthorizationService) LoginUser(ctx context.Context, userLogin *services.UserLogin) (*services.Cookie, error) {
+	var err error
+
+	newUserLogin := models.UserLogin{
+		Email:    userLogin.Email,
+		Password: userLogin.Password,
+	}
+
+	var User models.User
+	User, err = auth.Usecase.GetUserByEmail(newUserLogin.Email)
+	if err != nil {
+		return &services.Cookie{}, err
+	}
+
+	if err := auth.Usecase.ComparePassword(User.Password, User.Salt, newUserLogin.Password); err != nil {
+		return &services.Cookie{}, &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+
+	cookies, err := auth.Usecase.AddNewUserSession(User.ID)
+	if err != nil {
+		return &services.Cookie{}, &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
 
 	return &services.Cookie{
-		Key:                  "key",
-		Value:                "123",
-		Exp:                  "23:00",
+		Key:                  cookies.Name,
+		Value:                cookies.Value,
 	}, nil
 }
 
 func (auth *AuthorizationService) LogoutUser(ctx context.Context, cookie *services.Cookie) (*services.Nothing, error) {
+
+
+
+	err := auth.Usecase.RemoveOldUserSession(cookie.Value)
+	if err != nil {
+		return &services.Nothing{}, err
+	}
+
 
 	return &services.Nothing{
 		Dummy:                false,

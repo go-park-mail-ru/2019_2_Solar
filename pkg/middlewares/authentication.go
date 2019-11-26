@@ -27,23 +27,15 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 		}
 
 		sctx := context.Background()
-		sUserSession, err := MS.MAuth.CheckSession(sctx, &sCookie)
+		sUserSession, err := MS.MAuth.Client.CheckSession(sctx, &sCookie)
 		if err != nil {
 			return err
 		}
 
-		exp, err := time.Parse(time.RFC3339, sUserSession.Exp)
-		if err != nil {
-			return err
-		}
 
 		userSession := models.UserSession{
 			ID:         sUserSession.ID,
 			UserID:     sUserSession.UserID,
-			UserCookie: models.UserCookie{
-				Value: sUserSession.Value,
-				Expiration: exp,
-			},
 		}
 
 		user, err := MS.MUsecase.GetUserByCookieValue(cookie.Value)
@@ -59,11 +51,6 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 		userCookie := models.UserCookie{
 			Value:      cookie.Value,
 			Expiration: cookie.Expires,
-		}
-
-		if userCookie.Expiration.Before(time.Now()) {
-			//delete Coockie!!!!
-			return next(ctx)
 		}
 
 		sess := functions.Session{

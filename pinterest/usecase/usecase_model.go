@@ -95,4 +95,6 @@ type UseInterface interface {
 	GetUserByCookieValue(cookieValue string) (models.User, error)
 	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
 
+	MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
+
 }
