@@ -256,7 +256,7 @@ func (RS *ReposStruct) SelectCategories() (Categories []models.Category, Err err
 	return categories, nil
 }
 
-func (RS *ReposStruct) InsertBoard(ownerID uint64, title string, description string, category string, createdTime time.Time) (uint64, error) {
+func (RS *ReposStruct) InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTBoard, ownerID, title, description, category, createdTime).Scan(&id)
 	if err != nil {
@@ -815,26 +815,4 @@ func (RS *ReposStruct) InsertPinAndTag (PinID uint64, TagName string) (Err error
 		return err
 	}
 	return nil
-}
-
-func (RS *ReposStruct) MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error) {
-	userSessionsSlice := make([]models.UserSession, 0)
-	rows, err := RS.DataBase.Query(consts.SELECTSessionByCookieValue, cookieValue)
-	if err != nil {
-		return userSessionsSlice, err
-	}
-	defer func() {
-		if err := rows.Close(); err != nil {
-			Err = err
-		}
-	}()
-	for rows.Next() {
-		userSession := models.UserSession{}
-		err := rows.Scan(&userSession.ID, &userSession.UserID, &userSession.Value, &userSession.Expiration)
-		if err != nil {
-			return userSessionsSlice, err
-		}
-		userSessionsSlice = append(userSessionsSlice, userSession)
-	}
-	return userSessionsSlice, nil
 }

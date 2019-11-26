@@ -9,12 +9,16 @@ import (
 	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
 	"sync"
 )
 
 func main() {
+
+	pinBoardService := functions.ServiceCreate("pinboard-service")
+
 	e := echo.New()
 	middlewares := customMiddleware.MiddlewareStruct{}
 	mRep := repositoryMiddleware.MRepositoryStruct{}
@@ -50,7 +54,7 @@ func main() {
 
 	useCase := usecase.UseStruct{}
 	useCase.NewUseCase(&mutex, &rep, &san, hub)
-	err = handlers.NewHandlers(e, &useCase)
+	err = handlers.NewHandlers(e, &useCase, pinBoardService)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}

@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package pinboard_service;
+
+// grpc-сервис создание и получения пинов и досок
+service PinBoardService {
+    rpc CreateBoard (NewBoard) returns (LastID);
+    rpc GetBoard (BoardID) returns (BoardAndPins);
+    rpc CreatePin (NewPin) returns (LastID);
+    rpc GetPin (PinID) returns (PinAndComments);
+}
+
+
+message Nothing {
+    bool dummy = 1;
+}
+
+message LastID {
+    uint64 LastID = 1;
+}
+
+message NewBoard {
+    uint64 OwnerID = 1;
+    string Title = 2;
+    string Description = 3;
+    string Category = 4;
+}
+
+message BoardID {
+    uint64 boardID = 1;
+}
+message PinID {
+    uint64 pinID = 1;
+}
+
+message Board {
+    uint64 ID = 1;
+    uint64 OwnerID = 2;
+    string Title = 3;
+    string Description = 4;
+    string Category = 5;
+    string CreatedTime = 6;
+    bool IsDeleted = 7;
+}
+
+//message Pin {
+//    uint64 ID = 1;
+//    uint64 OwnerID = 2;
+//    uint64 AuthorID = 3;
+//    uint64 BoardID = 4;
+//    string PinDir = 5;
+//    string Title = 6;
+//    string Description = 7;
+//    string CreatedTime = 8;
+//    bool IsDeleted = 9;
+//}
+
+message BoardAndPins {
+    Board board = 1;
+    message Pin {
+        uint64 ID = 1;
+        uint64 OwnerID = 2;
+        uint64 AuthorID = 3;
+        uint64 BoardID = 4;
+        string PinDir = 5;
+        string Title = 6;
+        string Description = 7;
+        string CreatedTime = 8;
+        bool IsDeleted = 9;
+    }
+    repeated Pin pins = 2;
+}
+
+message NewPin {
+    uint64 userID = 1;
+    uint64 BoardID = 2;
+    string Title = 3;
+    string Description = 4;
+    string PinDir = 5;
+}
+
+message Pin {
+    uint64 ID = 1;
+    uint64 OwnerID = 2;
+    uint64 AuthorID = 3;
+    uint64 BoardID = 4;
+    string pinDir = 5;
+    string title = 6;
+    string description = 7;
+    string createdTime = 8;
+    bool isDeleted = 9;
+}
+
+message FullPin {
+    uint64 ID = 1;
+    string OwnerUsername = 2;
+    string AuthorUsername = 3;
+    uint64 BoardID = 4;
+    string PinDir = 5;
+    string Title = 6;
+    string Description = 7;
+    string CratedTime = 8;
+    bool IsDeleted = 9;
+}
+
+message CommentDisplay {
+    string text = 1;
+    string createdTime = 2;
+    string Author = 3;
+    string AuthorPincture = 4;
+}
+
+message PinAndComments {
+    FullPin pin = 1;
+    message CommentDisplay {
+        string text = 1;
+        string createdTime = 2;
+        string Author = 3;
+        string AuthorPincture = 4;
+    }
+    repeated CommentDisplay comments = 2;
+}

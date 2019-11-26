@@ -6,27 +6,25 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
-	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
-	san *sanitizer.SanitStruct, hub webSocket.HubStruct) {
+	san *sanitizer.SanitStruct) {
 	USC.Mu = mu
 	USC.PRepository = rep
 	USC.Sanitizer = san
-	USC.Hub = hub
-	go USC.Hub.Run()
+
+
+
 }
 
 func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
@@ -162,91 +160,5 @@ func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err e
 	if _, err = io.Copy(newFile, fileByte); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	return nil
-}
-
-func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
-
-	//categoies, err := USC.PRepository.SelectCategoryByName(Board.Category)
-	//if err != nil || len(categoies) != 1 {
-	//	return 0, err
-	//}
-
-
-	lastID, err := USC.PRepository.InsertBoard(Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
-	if err != nil {
-		return 0, err
-	}
-	return lastID, nil
-}
-
-func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
-	var params []interface{}
-	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
-	lastID, err := USC.PRepository.InsertPin(Pin)
-	if err != nil {
-		return 0, err
-	}
-	return lastID, nil
-}
-
-func (USC *UseStruct) AddNotice(notice models.Notice) (uint64, error) {
-	lastID, err := USC.PRepository.InsertNotice(notice)
-	if err != nil {
-		return 0, err
-	}
-	return lastID, nil
-}
-
-func (USC *UseStruct) AddComment(pinID, userID uint64, newComment models.NewComment) error {
-	_, err := USC.PRepository.InsertComment(pinID, newComment.Text, userID, time.Now())
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (USC *UseStruct) AddSubscribe(userID uint64, followeeName string) error {
-	var params []interface{}
-	params = append(params, userID, followeeName)
-	_, err := USC.PRepository.InsertSubscribe(userID, followeeName)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (USC *UseStruct) AddTags(description string, pinID uint64) error {
-	tags := validation.FindTags.FindAllString(description, -1)
-	for i := 0; i < len(tags); i++ {
-		//strings.Re
-		tags[i] = strings.TrimPrefix(tags[i], "#")
-	}
-	uniqueTags, err := USC.PRepository.SelectAllTags()
-	if err != nil {
-		return err
-	}
-
-	alredyExitstflag := false
-	for _, tag := range  tags {
-		for _, uniqueTag := range uniqueTags {
-			if uniqueTag == tag {
-				alredyExitstflag = true
-			}
-		}
-		if alredyExitstflag != true {
-			if err := USC.PRepository.InsertTag(tag); err != nil {
-				return err
-			}
-		}
-		alredyExitstflag = false
-	}
-
-	for _, tag := range  tags {
-		if err := USC.PRepository.InsertPinAndTag(pinID, tag); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }

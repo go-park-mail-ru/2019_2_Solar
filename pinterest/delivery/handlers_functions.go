@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	pinboard_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/pinboard-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/labstack/echo"
@@ -15,11 +16,12 @@ import (
 //	nameResolver *balancer.TestNameResolver
 //)
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface) error {
+func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface, pinBoardService pinboard_service.PinBoardServiceClient) error {
 	h.PUsecase = useCase
 
 	h.AuthSessManager = functions.Auth{}
 	h.AuthSessManager.AuthServiceCreate()
+	h.PinBoardService = pinBoardService
 
 
 	e.GET("/", h.HandleEmpty)
@@ -47,13 +49,26 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.POST("/profile/data", h.HandleEditProfileUserData)
 	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
 
+	// ==============================================================
+
 	e.POST("/board", h.HandleCreateBoard)
 	e.GET("/board/:id", h.HandleGetBoard)
-	e.GET("/board/list/my", h.HandleGetMyBoards)
 
 	e.POST("/pin", h.HandleCreatePin)
-	e.POST("/pin/:id/comment", h.HandleCreateComment)
 	e.GET("/pin/:id", h.HandleGetPin)
+
+
+	e.POST("/service/board", h.ServiceCreateBoard)
+	e.GET( "/service/board/:id", h.ServiceGetBoard)
+
+	e.POST("/service/pin", h.ServiceCreatePin)
+	e.GET("/service/pin/:id", h.ServiceGetPin)
+
+	// ==============================================================
+
+	e.GET("/board/list/my", h.HandleGetMyBoards)
+
+	e.POST("/pin/:id/comment", h.HandleCreateComment)
 	e.GET("/pin/list/new", h.HandleGetNewPins)
 	e.GET("/pin/list/my", h.HandleGetMyPins)
 	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
