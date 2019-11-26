@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	pinboard_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/pinboard-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
+	user_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/user-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
@@ -272,6 +273,35 @@ func (h *HandlersStruct) ServiceCreatePin(ctx echo.Context) (Err error) {
 		return err
 	}
 
+	return nil
+}
+
+func (h *HandlersStruct) ServiceCreateSubscribe(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	followeeName := ctx.Param("username")
+	if _, err := h.UserService.CreateSubscribe(context.Background(),
+		&user_service.UserIDAndFolloweeUsername{
+			UserID: user.ID,
+			FolloweeUsername: followeeName}); err != nil {
+		return err
+	}
+	body := struct {
+		Info string `json:"info"`
+	}{"data successfully saved"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
 	return nil
 }
 

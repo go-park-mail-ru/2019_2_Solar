@@ -19,6 +19,7 @@ func main() {
 
 	authorizationService := functions.AuthServiceCreate("authorization-service")
 	pinBoardService := functions. PinBoardServiceCreate("pinboard-service")
+	userService := functions.UserServiceCreate("user-service")
 
 	e := echo.New()
 	middlewares := customMiddleware.MiddlewareStruct{}
@@ -55,7 +56,7 @@ func main() {
 
 	useCase := usecase.UseStruct{}
 	useCase.NewUseCase(&mutex, &rep, &san, hub)
-	err = handlers.NewHandlers(e, &useCase, authorizationService, pinBoardService)
+	err = handlers.NewHandlers(e, &useCase, authorizationService, pinBoardService, userService)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}
