@@ -97,10 +97,10 @@ func (mr *MockUseInterfaceMockRecorder) GetUserByEmail(email interface{}) *gomoc
 }
 
 // GetUserIDByEmail mocks base method
-func (m *MockUseInterface) GetUserIDByEmail(email string) (string, error) {
+func (m *MockUseInterface) GetUserIDByEmail(email string) (uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserIDByEmail", email)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -140,18 +140,18 @@ func (mr *MockUseInterfaceMockRecorder) ComparePassword(password, salt, loginPas
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ComparePassword", reflect.TypeOf((*MockUseInterface)(nil).ComparePassword), password, salt, loginPassword)
 }
 
-// CheckRegData mocks base method
-func (m *MockUseInterface) CheckRegData(newUser *models.UserReg) error {
+// CheckRegDataValidation mocks base method
+func (m *MockUseInterface) CheckRegDataValidation(newUser *models.UserReg) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckRegData", newUser)
+	ret := m.ctrl.Call(m, "CheckRegDataValidation", newUser)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CheckRegData indicates an expected call of CheckRegData
-func (mr *MockUseInterfaceMockRecorder) CheckRegData(newUser interface{}) *gomock.Call {
+// CheckRegDataValidation indicates an expected call of CheckRegDataValidation
+func (mr *MockUseInterfaceMockRecorder) CheckRegDataValidation(newUser interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckRegData", reflect.TypeOf((*MockUseInterface)(nil).CheckRegData), newUser)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckRegDataValidation", reflect.TypeOf((*MockUseInterface)(nil).CheckRegDataValidation), newUser)
 }
 
 // CheckRegUsernameEmailIsUnique mocks base method
@@ -225,7 +225,7 @@ func (mr *MockUseInterfaceMockRecorder) CheckPinData(newPin interface{}) *gomock
 }
 
 // SetUserAvatarDir mocks base method
-func (m *MockUseInterface) SetUserAvatarDir(idUser, fileName string) (int, error) {
+func (m *MockUseInterface) SetUserAvatarDir(idUser uint64, fileName string) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetUserAvatarDir", idUser, fileName)
 	ret0, _ := ret[0].(int)
@@ -255,10 +255,10 @@ func (mr *MockUseInterfaceMockRecorder) SetUser(newUser, user interface{}) *gomo
 }
 
 // AddNewUser mocks base method
-func (m *MockUseInterface) AddNewUser(username, email, password string) (string, error) {
+func (m *MockUseInterface) AddNewUser(username, email, password string) (uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddNewUser", username, email, password)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -270,7 +270,7 @@ func (mr *MockUseInterfaceMockRecorder) AddNewUser(username, email, password int
 }
 
 // AddNewUserSession mocks base method
-func (m *MockUseInterface) AddNewUserSession(userID string) (http.Cookie, error) {
+func (m *MockUseInterface) AddNewUserSession(userID uint64) (http.Cookie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddNewUserSession", userID)
 	ret0, _ := ret[0].(http.Cookie)
@@ -314,6 +314,21 @@ func (mr *MockUseInterfaceMockRecorder) GetBoard(boardID interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoard", reflect.TypeOf((*MockUseInterface)(nil).GetBoard), boardID)
 }
 
+// GetMyBoards mocks base method
+func (m *MockUseInterface) GetMyBoards(UserID uint64) ([]models.Board, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMyBoards", UserID)
+	ret0, _ := ret[0].([]models.Board)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyBoards indicates an expected call of GetMyBoards
+func (mr *MockUseInterfaceMockRecorder) GetMyBoards(UserID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyBoards", reflect.TypeOf((*MockUseInterface)(nil).GetMyBoards), UserID)
+}
+
 // AddPin mocks base method
 func (m *MockUseInterface) AddPin(newPin models.Pin) (uint64, error) {
 	m.ctrl.T.Helper()
@@ -330,10 +345,10 @@ func (mr *MockUseInterfaceMockRecorder) AddPin(newPin interface{}) *gomock.Call 
 }
 
 // GetPin mocks base method
-func (m *MockUseInterface) GetPin(pinID string) (models.Pin, error) {
+func (m *MockUseInterface) GetPin(pinID uint64) (models.FullPin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPin", pinID)
-	ret0, _ := ret[0].(models.Pin)
+	ret0, _ := ret[0].(models.FullPin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -344,26 +359,41 @@ func (mr *MockUseInterfaceMockRecorder) GetPin(pinID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPin", reflect.TypeOf((*MockUseInterface)(nil).GetPin), pinID)
 }
 
-// GetPins mocks base method
-func (m *MockUseInterface) GetPins(boardID uint64) ([]models.Pin, error) {
+// GetPinsDisplay mocks base method
+func (m *MockUseInterface) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPins", boardID)
-	ret0, _ := ret[0].([]models.Pin)
+	ret := m.ctrl.Call(m, "GetPinsDisplay", boardID)
+	ret0, _ := ret[0].([]models.PinDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPins indicates an expected call of GetPins
-func (mr *MockUseInterfaceMockRecorder) GetPins(boardID interface{}) *gomock.Call {
+// GetPinsDisplay indicates an expected call of GetPinsDisplay
+func (mr *MockUseInterfaceMockRecorder) GetPinsDisplay(boardID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPins", reflect.TypeOf((*MockUseInterface)(nil).GetPins), boardID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinsDisplay", reflect.TypeOf((*MockUseInterface)(nil).GetPinsDisplay), boardID)
+}
+
+// GetPinsByUsername mocks base method
+func (m *MockUseInterface) GetPinsByUsername(useID int) ([]models.PinDisplay, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPinsByUsername", useID)
+	ret0, _ := ret[0].([]models.PinDisplay)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPinsByUsername indicates an expected call of GetPinsByUsername
+func (mr *MockUseInterfaceMockRecorder) GetPinsByUsername(useID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPinsByUsername", reflect.TypeOf((*MockUseInterface)(nil).GetPinsByUsername), useID)
 }
 
 // GetNewPins mocks base method
-func (m *MockUseInterface) GetNewPins() ([]models.PinForMainPage, error) {
+func (m *MockUseInterface) GetNewPins() ([]models.PinDisplay, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNewPins")
-	ret0, _ := ret[0].([]models.PinForMainPage)
+	ret0, _ := ret[0].([]models.PinDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -375,10 +405,10 @@ func (mr *MockUseInterfaceMockRecorder) GetNewPins() *gomock.Call {
 }
 
 // GetMyPins mocks base method
-func (m *MockUseInterface) GetMyPins(userID uint64) ([]models.PinForMainPage, error) {
+func (m *MockUseInterface) GetMyPins(userID uint64) ([]models.PinDisplay, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMyPins", userID)
-	ret0, _ := ret[0].([]models.PinForMainPage)
+	ret0, _ := ret[0].([]models.PinDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -390,10 +420,10 @@ func (mr *MockUseInterfaceMockRecorder) GetMyPins(userID interface{}) *gomock.Ca
 }
 
 // GetSubscribePins mocks base method
-func (m *MockUseInterface) GetSubscribePins(userID uint64) ([]models.PinForMainPage, error) {
+func (m *MockUseInterface) GetSubscribePins(userID uint64) ([]models.PinDisplay, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSubscribePins", userID)
-	ret0, _ := ret[0].([]models.PinForMainPage)
+	ret0, _ := ret[0].([]models.PinDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -405,7 +435,7 @@ func (mr *MockUseInterfaceMockRecorder) GetSubscribePins(userID interface{}) *go
 }
 
 // AddComment mocks base method
-func (m *MockUseInterface) AddComment(pinID string, userID uint64, newComment models.NewComment) error {
+func (m *MockUseInterface) AddComment(pinID, userID uint64, newComment models.NewComment) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddComment", pinID, userID, newComment)
 	ret0, _ := ret[0].(error)
@@ -419,10 +449,10 @@ func (mr *MockUseInterfaceMockRecorder) AddComment(pinID, userID, newComment int
 }
 
 // GetComments mocks base method
-func (m *MockUseInterface) GetComments(pinID string) ([]models.CommentForSend, error) {
+func (m *MockUseInterface) GetComments(pinID uint64) ([]models.CommentDisplay, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetComments", pinID)
-	ret0, _ := ret[0].([]models.CommentForSend)
+	ret0, _ := ret[0].([]models.CommentDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -448,8 +478,23 @@ func (mr *MockUseInterfaceMockRecorder) AddNotice(newNotice interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNotice", reflect.TypeOf((*MockUseInterface)(nil).AddNotice), newNotice)
 }
 
+// GetMyNotices mocks base method
+func (m *MockUseInterface) GetMyNotices(userID uint64) ([]models.Notice, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMyNotices", userID)
+	ret0, _ := ret[0].([]models.Notice)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyNotices indicates an expected call of GetMyNotices
+func (mr *MockUseInterfaceMockRecorder) GetMyNotices(userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyNotices", reflect.TypeOf((*MockUseInterface)(nil).GetMyNotices), userID)
+}
+
 // AddSubscribe mocks base method
-func (m *MockUseInterface) AddSubscribe(userID, followeeName string) error {
+func (m *MockUseInterface) AddSubscribe(userID uint64, followeeName string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddSubscribe", userID, followeeName)
 	ret0, _ := ret[0].(error)
@@ -463,7 +508,7 @@ func (mr *MockUseInterfaceMockRecorder) AddSubscribe(userID, followeeName interf
 }
 
 // RemoveSubscribe mocks base method
-func (m *MockUseInterface) RemoveSubscribe(userID, followeeName string) error {
+func (m *MockUseInterface) RemoveSubscribe(userID uint64, followeeName string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveSubscribe", userID, followeeName)
 	ret0, _ := ret[0].(error)
@@ -563,10 +608,10 @@ func (mr *MockUseInterfaceMockRecorder) ReturnHub() *gomock.Call {
 }
 
 // SearchPinsByTag mocks base method
-func (m *MockUseInterface) SearchPinsByTag(tag string) ([]models.PinForSearchResult, error) {
+func (m *MockUseInterface) SearchPinsByTag(tag string) ([]models.PinDisplay, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchPinsByTag", tag)
-	ret0, _ := ret[0].([]models.PinForSearchResult)
+	ret0, _ := ret[0].([]models.PinDisplay)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -577,29 +622,133 @@ func (mr *MockUseInterfaceMockRecorder) SearchPinsByTag(tag interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPinsByTag", reflect.TypeOf((*MockUseInterface)(nil).SearchPinsByTag), tag)
 }
 
-// CreateClient mocks base method
-func (m *MockUseInterface) CreateClient(conn *websocket.Conn, userId uint64) {
+// SearchUserByUsername mocks base method
+func (m *MockUseInterface) SearchUserByUsername(username string) ([]models.User, error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "CreateClient", conn, userId)
-}
-
-// CreateClient indicates an expected call of CreateClient
-func (mr *MockUseInterfaceMockRecorder) CreateClient(conn, userId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockUseInterface)(nil).CreateClient), conn, userId)
-}
-
-// GetBoards mocks base method
-func (m *MockUseInterface) GetBoards(UserID uint64) ([]models.Board, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBoards", UserID)
-	ret0, _ := ret[0].([]models.Board)
+	ret := m.ctrl.Call(m, "SearchUserByUsername", username)
+	ret0, _ := ret[0].([]models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetBoards indicates an expected call of GetBoards
-func (mr *MockUseInterfaceMockRecorder) GetBoards(UserID interface{}) *gomock.Call {
+// SearchUserByUsername indicates an expected call of SearchUserByUsername
+func (mr *MockUseInterfaceMockRecorder) SearchUserByUsername(username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoards", reflect.TypeOf((*MockUseInterface)(nil).GetBoards), UserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserByUsername", reflect.TypeOf((*MockUseInterface)(nil).SearchUserByUsername), username)
+}
+
+// CreateClient mocks base method
+func (m *MockUseInterface) CreateClient(conn *websocket.Conn, user models.User) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CreateClient", conn, user)
+}
+
+// CreateClient indicates an expected call of CreateClient
+func (mr *MockUseInterfaceMockRecorder) CreateClient(conn, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockUseInterface)(nil).CreateClient), conn, user)
+}
+
+// GetMySubscribeByUsername mocks base method
+func (m *MockUseInterface) GetMySubscribeByUsername(userId uint64, username string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMySubscribeByUsername", userId, username)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMySubscribeByUsername indicates an expected call of GetMySubscribeByUsername
+func (mr *MockUseInterfaceMockRecorder) GetMySubscribeByUsername(userId, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMySubscribeByUsername", reflect.TypeOf((*MockUseInterface)(nil).GetMySubscribeByUsername), userId, username)
+}
+
+// AddTags mocks base method
+func (m *MockUseInterface) AddTags(description string, pinID uint64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddTags", description, pinID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddTags indicates an expected call of AddTags
+func (mr *MockUseInterfaceMockRecorder) AddTags(description, pinID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTags", reflect.TypeOf((*MockUseInterface)(nil).AddTags), description, pinID)
+}
+
+// GetCategories mocks base method
+func (m *MockUseInterface) GetCategories() ([]models.Category, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCategories")
+	ret0, _ := ret[0].([]models.Category)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCategories indicates an expected call of GetCategories
+func (mr *MockUseInterfaceMockRecorder) GetCategories() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCategories", reflect.TypeOf((*MockUseInterface)(nil).GetCategories))
+}
+
+// GetMessages mocks base method
+func (m *MockUseInterface) GetMessages(senderId, receiverId uint64) ([]models.OutputMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMessages", senderId, receiverId)
+	ret0, _ := ret[0].([]models.OutputMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMessages indicates an expected call of GetMessages
+func (mr *MockUseInterfaceMockRecorder) GetMessages(senderId, receiverId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMessages", reflect.TypeOf((*MockUseInterface)(nil).GetMessages), senderId, receiverId)
+}
+
+// GetUserByCookieValue mocks base method
+func (m *MockUseInterface) GetUserByCookieValue(cookieValue string) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByCookieValue", cookieValue)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByCookieValue indicates an expected call of GetUserByCookieValue
+func (mr *MockUseInterfaceMockRecorder) GetUserByCookieValue(cookieValue interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByCookieValue", reflect.TypeOf((*MockUseInterface)(nil).GetUserByCookieValue), cookieValue)
+}
+
+// GetSessionsByCookieValue mocks base method
+func (m *MockUseInterface) GetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSessionsByCookieValue", cookieValue)
+	ret0, _ := ret[0].(models.UserSession)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSessionsByCookieValue indicates an expected call of GetSessionsByCookieValue
+func (mr *MockUseInterfaceMockRecorder) GetSessionsByCookieValue(cookieValue interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionsByCookieValue", reflect.TypeOf((*MockUseInterface)(nil).GetSessionsByCookieValue), cookieValue)
+}
+
+// MGetSessionsByCookieValue mocks base method
+func (m *MockUseInterface) MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MGetSessionsByCookieValue", cookieValue)
+	ret0, _ := ret[0].(models.UserSession)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MGetSessionsByCookieValue indicates an expected call of MGetSessionsByCookieValue
+func (mr *MockUseInterfaceMockRecorder) MGetSessionsByCookieValue(cookieValue interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MGetSessionsByCookieValue", reflect.TypeOf((*MockUseInterface)(nil).MGetSessionsByCookieValue), cookieValue)
 }

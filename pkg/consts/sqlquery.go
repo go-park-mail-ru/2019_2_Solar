@@ -29,7 +29,7 @@ const (
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
 
-	SELECTCategories     = "SELECT c.id, c.name FROM sunrise.category as c;"
+	SELECTCategories     = "SELECT c.name FROM sunrise.category as c;"
 
 	//SELECTCategories = "SELECT c.name FROM sunrise.category as c;"
 
