@@ -19,7 +19,6 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface,
 
 
 	e.GET("/", h.HandleEmpty)
-
 	// ==============================================================
 
 

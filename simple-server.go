@@ -12,6 +12,8 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/prometheus"
+	echov4 "github.com/labstack/echo/v4"
 	"sync"
 )
 
@@ -60,6 +62,12 @@ func main() {
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}
+
+	// Enable metrics middleware
+	ev4 := echov4.New()
+	p := prometheus.NewPrometheus("echo", nil)
+	p.Use(ev4)
+	go ev4.Logger.Fatal(e.Start(":8082"))
 
 	e.Logger.Warnf("start listening on %s", consts.HostAddress)
 	if err := e.Start(consts.HostAddress); err != nil {
