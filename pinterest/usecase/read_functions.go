@@ -127,6 +127,17 @@ func (USC *UseStruct) GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error
 	return pins, nil
 }
 
+func (USC *UseStruct) GetPinsByUsername(userID int) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectPinsDisplayByUsername(userID)
+	if err != nil {
+		return []models.PinDisplay{}, err
+	}
+	for _, pin := range pins {
+		USC.Sanitizer.SanitPinDisplay(&pin)
+	}
+	return pins, nil
+}
+
 func (USC *UseStruct) GetNewPins() ([]models.PinDisplay, error) {
 	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(0, consts.NumberOfPinsOnPage)
 	if err != nil {
@@ -184,4 +195,63 @@ func (USC *UseStruct) GetMySubscribeByUsername(userId uint64, username string) (
 		return false, nil
 	}
 	return true, nil
+}
+
+func (USC *UseStruct) GetCategories() (Categories []models.Category, Err error) {
+	categories, err := USC.PRepository.SelectCategories()
+	if err != nil {
+		return categories, err
+	}
+
+	return categories, nil
+}
+
+func (USC *UseStruct) GetMessages(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	messages, err := USC.PRepository.SelectMessagesByUsersId(senderId, receiverId)
+	if err != nil {
+		return messages, err
+	}
+	return messages, nil
+}
+
+func (USC *UseStruct) GetUserByCookieValue(cookieValue string) (models.User, error) {
+	user, err := USC.PRepository.SelectUsersByCookieValue(cookieValue)
+	if err != nil {
+		return models.User{}, err
+	}
+	if len(user) == 0 {
+		return models.User{}, errors.New("cookie not found")
+	}
+	if len(user) > 1 {
+		return models.User{}, errors.New("several same cookies")
+	}
+	return user[0], nil
+}
+
+func (USC *UseStruct) GetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	userSession, err := USC.PRepository.SelectSessionsByCookieValue(cookieValue)
+	if err != nil {
+		return models.UserSession{}, err
+	}
+	if len(userSession) == 0 {
+		return models.UserSession{}, errors.New("cookie not found")
+	}
+	if len(userSession) > 1 {
+		return models.UserSession{}, errors.New("several same cookies")
+	}
+	return userSession[0], nil
+}
+
+func (USC *UseStruct) MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error) {
+	userSession, err := USC.PRepository.MSelectSessionsByCookieValue(cookieValue)
+	if err != nil {
+		return models.UserSession{}, err
+	}
+	if len(userSession) == 0 {
+		return models.UserSession{}, errors.New("cookie not found")
+	}
+	if len(userSession) > 1 {
+		return models.UserSession{}, errors.New("several same cookies")
+	}
+	return userSession[0], nil
 }

@@ -1,0 +1,62 @@
+linters-settings:
+  funlen:
+    lines: 100
+    statements: 50
+  dupl:
+    threshold: 160
+  lll:
+    line-length: 150
+
+linters:
+  # please, do not use `enable-all`: it's deprecated and will be removed soon.
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  enable:
+    - errcheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - ineffassign
+    - dogsled
+    - funlen
+    - golint
+    - dupl
+    - gochecknoinits
+    - goconst
+    - gocyclo
+    - gofmt
+    - lll
+    - gosimple
+    - staticcheck
+    - unused
+    - govet
+    - interfacer
+    - misspell
+    - nakedret
+    - stylecheck
+    - unconvert
+    - typecheck
+    - unparam
+    - whitespace
+    - varcheck
+    - structcheck
+    - gocognit
+    - prealloc
+    - maligned
+    - godox
+    - ineffassign
+  # don't enable:
+#    - gocritic
+#    - goimports
+#    - gosec
+#    - scopelint
+#    - gochecknoglobals
+
+
+# golangci.com configuration
+# https://github.com/golangci/golangci/wiki/Configuration
+service:
+  golangci-lint-version: 1.20.x # use the fixed version to not introduce new linters unexpectedly
+  prepare:
+    - echo "here I can run custom commands, but no preparation needed for this repo"

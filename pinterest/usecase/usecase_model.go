@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
@@ -14,10 +15,11 @@ import (
 
 
 type UseStruct struct {
-	PRepository repository.ReposInterface
-	Sanitizer   sanitizer.SanitInterface
-	Hub         webSocket.HubStruct
-	Mu          *sync.Mutex
+	PRepository     repository.ReposInterface
+	Sanitizer       sanitizer.SanitInterface
+	Hub             webSocket.HubStruct
+	Mu              *sync.Mutex
+	AuthSessManager services.AuthorizationServiceClient
 }
 
 type UseInterface interface {
@@ -54,6 +56,9 @@ type UseInterface interface {
 	GetPin(pinID uint64) (models.FullPin, error)
 	//GetPins(boardID uint64) ([]models.Pin, error)
 	GetPinsDisplay(boardID uint64) ([]models.PinDisplay, error)
+
+	GetPinsByUsername(useID int) ([]models.PinDisplay, error)
+
 	GetNewPins() ([]models.PinDisplay, error)
 	GetMyPins(userID uint64) ([]models.PinDisplay, error)
 	GetSubscribePins(userID uint64) ([]models.PinDisplay, error)
@@ -76,14 +81,23 @@ type UseInterface interface {
 	ReturnHub() *webSocket.HubStruct
 	
 	SearchPinsByTag(tag string) ([]models.PinDisplay, error)
+	SearchUserByUsername(username string) (Users []models.User, Err error)
 
-	CreateClient(conn *websocket.Conn, userId uint64)
+	CreateClient(conn *websocket.Conn, user models.User)
 
 
 	GetMySubscribeByUsername(userId uint64, username string) (bool, error)
 
 	AddTags(description string, pinID uint64) error
 
+	GetCategories() (Categories []models.Category, Err error)
 
+
+	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
+
+	GetUserByCookieValue(cookieValue string) (models.User, error)
+	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
+
+	MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
 
 }

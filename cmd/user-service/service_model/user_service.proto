@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package user_service;
+
+// grpc-сервис создание и получения пинов и досок
+service UserService {
+    rpc GetUsers (Nothing) returns (Users);
+    rpc GetUserByUsername (Username) returns (UserAndPins);
+    rpc CreateSubscribe (UserIDAndFolloweeUsername) returns (Nothing);
+    rpc DeleteSubscribe (UserIDAndFolloweeUsername) returns (Nothing);
+}
+
+message Nothing {
+    bool dummy = 1;
+}
+
+message Username {
+    string Username = 1;
+}
+
+message AnotherUser {
+    uint64 ID = 1;
+    string Username = 2;
+    string Name = 3;
+    string Surname = 4;
+    string Password = 5;
+    string Email = 6;
+    uint64 Age = 7;
+    string Status = 8;
+    string AvatarDir = 9;
+    bool IsActive = 10;
+    bool IsFollowee = 11;
+}
+
+message Users {
+    repeated AnotherUser users = 1;
+}
+
+message PinDisplay {
+    uint64 ID = 1;
+    string PinDir = 2;
+    string Title = 3;
+}
+
+message UserAndPins {
+    AnotherUser user = 1;
+    repeated PinDisplay pins = 2;
+}
+
+message UserIDAndFolloweeUsername {
+    uint64 UserID = 1;
+    string FolloweeUsername = 2;
+}

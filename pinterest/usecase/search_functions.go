@@ -14,3 +14,12 @@ func (USC *UseStruct) SearchPinsByTag(tag string) ([]models.PinDisplay, error) {
 	}
 	return pins, nil
 }
+
+func (USC *UseStruct) SearchUserByUsername(username string) (Users []models.User, Err error) {
+	users, err := USC.PRepository.SelectUsersByUsernameSearch(username)
+	if err != nil {
+		return []models.User{}, err
+	}
+
+	return users, nil
+}

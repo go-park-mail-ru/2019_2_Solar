@@ -21,13 +21,12 @@ import (
 )
 
 func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
-	san *sanitizer.SanitStruct, hub webSocket.HubStruct) error {
+	san *sanitizer.SanitStruct, hub webSocket.HubStruct) {
 	USC.Mu = mu
 	USC.PRepository = rep
 	USC.Sanitizer = san
 	USC.Hub = hub
 	go USC.Hub.Run()
-	return nil
 }
 
 func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
@@ -167,6 +166,13 @@ func (USC *UseStruct) AddPictureFile(fileName string, fileByte io.Reader) (Err e
 }
 
 func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
+
+	//categoies, err := USC.PRepository.SelectCategoryByName(Board.Category)
+	//if err != nil || len(categoies) != 1 {
+	//	return 0, err
+	//}
+
+
 	lastID, err := USC.PRepository.InsertBoard(Board.OwnerID, Board.Title, Board.Description, Board.Category, Board.CreatedTime)
 	if err != nil {
 		return 0, err

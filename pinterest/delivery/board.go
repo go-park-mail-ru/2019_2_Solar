@@ -3,7 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"strconv"
 	"time"
@@ -155,5 +155,29 @@ func (h *HandlersStruct) HandleGetMyBoards(ctx echo.Context) (Err error) {
 		return err
 	}
 
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetCategories(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	categories, err := h.PUsecase.GetCategories()
+	if err != nil {
+		return err
+	}
+
+	body := struct {
+		Categories  []models.Category `json:"categories"`
+		Info  string     `json:"info"`
+	}{categories, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
 	return nil
 }

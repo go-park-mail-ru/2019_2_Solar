@@ -233,7 +233,30 @@ func (RS *ReposStruct) SelectCategoryByName(categoryName string) (categories []s
 	return categories, nil
 }
 
-func (RS *ReposStruct) InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error) {
+func (RS *ReposStruct) SelectCategories() (Categories []models.Category, Err error) {
+	categories := []models.Category{}
+	rows, err := RS.DataBase.Query(consts.SELECTCategories)
+	if err != nil {
+		return categories, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		scanCategory := models.Category{}
+		err := rows.Scan(&scanCategory.Name)
+		if err != nil {
+			return categories, err
+		}
+
+		categories = append(categories, scanCategory)
+	}
+	return categories, nil
+}
+
+func (RS *ReposStruct) InsertBoard(ownerID uint64, title string, description string, category string, createdTime time.Time) (uint64, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTBoard, ownerID, title, description, category, createdTime).Scan(&id)
 	if err != nil {
@@ -269,6 +292,29 @@ func (RS *ReposStruct) SelectBoardsByID(boardId uint64) (Boards []models.Board, 
 func (RS *ReposStruct) SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error) {
 	pins := make([]models.PinDisplay, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTPinsDisplayByBoardId, boardID)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
+func (RS *ReposStruct) SelectPinsDisplayByUsername(userID int) (Pins []models.PinDisplay, Err error) {
+	pins := make([]models.PinDisplay, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTPinsDisplayByUsername, userID)
 	if err != nil {
 		return pins, err
 	}
@@ -453,7 +499,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID,  &scanPin.PinDir, &scanPin.Title)
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
 		if err != nil {
 			return pins, err
 		}
@@ -462,7 +508,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 	return pins, nil
 }
 
-func (RS *ReposStruct)  SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
+func (RS *ReposStruct) SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
 	notices := make([]models.Notice, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTNoticesByUserID, userId)
 	if err != nil {
@@ -500,7 +546,7 @@ func (RS *ReposStruct) SelectSubscribePinsDisplayByNumber(userId uint64, first, 
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID, &scanPin.Title, &scanPin.PinDir)
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title, )
 		if err != nil {
 			return pins, err
 		}
@@ -624,6 +670,43 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 	return usersSlice, nil
 }
 
+func (RS *ReposStruct) SelectUsersByUsernameSearch(username string) (Users []models.User, Err error) {
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTUsersByUsernameSearch, "%"+username+"%")
+	if err != nil {
+		return usersSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.ID, &dbuser.Username, &dbuser.Name, &dbuser.Surname, &dbuser.Password, &dbuser.Email, &dbuser.Age,
+			&dbuser.Status, &dbuser.AvatarDir, &dbuser.IsActive, &dbuser.Salt, &dbuser.CreatedTime)
+		if err != nil {
+			return usersSlice, err
+		}
+		user := models.User{
+			ID:          dbuser.ID,
+			Username:    dbuser.Username,
+			Name:        dbuser.Name.String,
+			Surname:     dbuser.Surname.String,
+			Password:    dbuser.Password,
+			Email:       dbuser.Email,
+			Age:         uint(dbuser.Age.Int32),
+			Status:      dbuser.Status.String,
+			AvatarDir:   dbuser.AvatarDir.String,
+			IsActive:    dbuser.IsActive,
+			Salt:        dbuser.Salt,
+			CreatedTime: dbuser.CreatedTime,
+		}
+		usersSlice = append(usersSlice, user)
+	}
+	return usersSlice, nil
+}
+
 func (RS *ReposStruct) InsertSubscribe(userID uint64, followeeName string) (uint64, error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, userID, followeeName).Scan(&id)
@@ -641,9 +724,9 @@ func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string)
 	return nil
 }
 
-func (RS *ReposStruct) InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error) {
+func (RS *ReposStruct) InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error) {
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, message.IdSender, message.UserNameRecipient, message.Message, createdTime).Scan(&id)
+	err := RS.DataBase.QueryRow(consts.INSERTChatMessage, senderId, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -716,7 +799,7 @@ func (RS *ReposStruct) SelectAllTags() (Tag []string, Err error) {
 	return tags, nil
 }
 
-func (RS *ReposStruct) InsertTag (TagName string) (Err error) {
+func (RS *ReposStruct) InsertTag(TagName string) (Err error) {
 	var name string
 	err := RS.DataBase.QueryRow(consts.INSERTTag, TagName).Scan(&name)
 	if err != nil {
@@ -725,11 +808,55 @@ func (RS *ReposStruct) InsertTag (TagName string) (Err error) {
 	return nil
 }
 
-func (RS *ReposStruct) InsertPinAndTag (PinID uint64, TagName string) (Err error) {
+func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTPinAndTag, PinID, TagName).Scan(&id)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	chatMessageSlice := make([]models.OutputMessage, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTChatMessagesByUsersId, senderId, receiverId)
+	if err != nil {
+		return chatMessageSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+	for rows.Next() {
+		message := models.OutputMessage{}
+		err := rows.Scan(&message.Message, &message.SendTime)
+		if err != nil {
+			return chatMessageSlice, err
+		}
+		chatMessageSlice = append(chatMessageSlice, message)
+	}
+	return chatMessageSlice, nil
+}
+
+func (RS *ReposStruct) MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error) {
+	userSessionsSlice := make([]models.UserSession, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTSessionByCookieValue, cookieValue)
+	if err != nil {
+		return userSessionsSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			Err = err
+		}
+	}()
+	for rows.Next() {
+		userSession := models.UserSession{}
+		err := rows.Scan(&userSession.ID, &userSession.UserID, &userSession.Value, &userSession.Expiration)
+		if err != nil {
+			return userSessionsSlice, err
+		}
+		userSessionsSlice = append(userSessionsSlice, userSession)
+	}
+	return userSessionsSlice, nil
 }
