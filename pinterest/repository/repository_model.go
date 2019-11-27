@@ -24,7 +24,7 @@ type ReposInterface interface {
 	SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error)
 	SelectBoardsByOwnerId(ownerId uint64) (Boards []models.Board, Err error)
 	SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error)
-    SelectPinsDisplayByUsername(userID int) (Pins []models.PinDisplay, Err error)
+	SelectPinsDisplayByUsername(userID int) (Pins []models.PinDisplay, Err error)
 	SelectAllUsers() (Users []models.User, Err error)
 	InsertNotice(notice models.Notice) (uint64, error)
 	InsertPin(pin models.Pin) (uint64, error)
@@ -41,7 +41,7 @@ type ReposInterface interface {
 	SelectUsersByUsername(username string) (Users []models.User, Err error)
 	InsertSubscribe(userID uint64, followeeName string) (uint64, error)
 	DeleteSubscribeByName(userID uint64, followeeName string) error
-	InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error)
+	InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error)
 	SelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
 
 	SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error)
@@ -52,10 +52,11 @@ type ReposInterface interface {
 
 	InsertTag(Tag string) (Err error)
 
-	InsertPinAndTag (PinID uint64, TagName string) (Err error)
+	InsertPinAndTag(PinID uint64, TagName string) (Err error)
 
 	SelectUsersByUsernameSearch(username string) (Users []models.User, Err error)
 
+	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
 	MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
 
 }

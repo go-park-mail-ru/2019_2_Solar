@@ -83,7 +83,7 @@ type UseInterface interface {
 	SearchPinsByTag(tag string) ([]models.PinDisplay, error)
 	SearchUserByUsername(username string) (Users []models.User, Err error)
 
-	CreateClient(conn *websocket.Conn, userId uint64)
+	CreateClient(conn *websocket.Conn, user models.User)
 
 
 	GetMySubscribeByUsername(userId uint64, username string) (bool, error)
@@ -91,6 +91,9 @@ type UseInterface interface {
 	AddTags(description string, pinID uint64) error
 
 	GetCategories() (Categories []models.Category, Err error)
+
+
+	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
 
 	GetUserByCookieValue(cookieValue string) (models.User, error)
 	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)

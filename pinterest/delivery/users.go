@@ -36,7 +36,7 @@ func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 
 	pins, err := h.PUsecase.GetPinsByUsername(int(userProfile.ID))
 	if err != nil {
-
+		return err
 	}
 
 

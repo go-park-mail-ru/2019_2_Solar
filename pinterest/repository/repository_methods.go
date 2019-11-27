@@ -499,7 +499,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 
 	for rows.Next() {
 		scanPin := models.PinDisplay{}
-		err := rows.Scan(&scanPin.ID,  &scanPin.PinDir, &scanPin.Title)
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
 		if err != nil {
 			return pins, err
 		}
@@ -508,7 +508,7 @@ func (RS *ReposStruct) SelectMyPinsDisplayByNumber(userId uint64, number int) (P
 	return pins, nil
 }
 
-func (RS *ReposStruct)  SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
+func (RS *ReposStruct) SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error) {
 	notices := make([]models.Notice, 0)
 	rows, err := RS.DataBase.Query(consts.SELECTNoticesByUserID, userId)
 	if err != nil {
@@ -672,7 +672,7 @@ func (RS *ReposStruct) SelectUsersByUsername(username string) (Users []models.Us
 
 func (RS *ReposStruct) SelectUsersByUsernameSearch(username string) (Users []models.User, Err error) {
 	usersSlice := make([]models.User, 0)
-	rows, err := RS.DataBase.Query(consts.SELECTUsersByUsernameSearch, "%" + username + "%")
+	rows, err := RS.DataBase.Query(consts.SELECTUsersByUsernameSearch, "%"+username+"%")
 	if err != nil {
 		return usersSlice, err
 	}
@@ -724,9 +724,9 @@ func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string)
 	return nil
 }
 
-func (RS *ReposStruct) InsertChatMessage(message models.NewChatMessage, createdTime time.Time) (uint64, error) {
+func (RS *ReposStruct) InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error) {
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTSubscribeByName, message.IdSender, message.UserNameRecipient, message.Message, createdTime).Scan(&id)
+	err := RS.DataBase.QueryRow(consts.INSERTChatMessage, senderId, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -799,7 +799,7 @@ func (RS *ReposStruct) SelectAllTags() (Tag []string, Err error) {
 	return tags, nil
 }
 
-func (RS *ReposStruct) InsertTag (TagName string) (Err error) {
+func (RS *ReposStruct) InsertTag(TagName string) (Err error) {
 	var name string
 	err := RS.DataBase.QueryRow(consts.INSERTTag, TagName).Scan(&name)
 	if err != nil {
@@ -808,13 +808,35 @@ func (RS *ReposStruct) InsertTag (TagName string) (Err error) {
 	return nil
 }
 
-func (RS *ReposStruct) InsertPinAndTag (PinID uint64, TagName string) (Err error) {
+func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error) {
 	var id uint64
 	err := RS.DataBase.QueryRow(consts.INSERTPinAndTag, PinID, TagName).Scan(&id)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	chatMessageSlice := make([]models.OutputMessage, 0)
+	rows, err := RS.DataBase.Query(consts.SELECTChatMessagesByUsersId, senderId, receiverId)
+	if err != nil {
+		return chatMessageSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+	for rows.Next() {
+		message := models.OutputMessage{}
+		err := rows.Scan(&message.Message, &message.SendTime)
+		if err != nil {
+			return chatMessageSlice, err
+		}
+		chatMessageSlice = append(chatMessageSlice, message)
+	}
+	return chatMessageSlice, nil
 }
 
 func (RS *ReposStruct) MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error) {

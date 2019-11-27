@@ -206,6 +206,14 @@ func (USC *UseStruct) GetCategories() (Categories []models.Category, Err error) 
 	return categories, nil
 }
 
+func (USC *UseStruct) GetMessages(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	messages, err := USC.PRepository.SelectMessagesByUsersId(senderId, receiverId)
+	if err != nil {
+		return messages, err
+	}
+	return messages, nil
+}
+
 func (USC *UseStruct) GetUserByCookieValue(cookieValue string) (models.User, error) {
 	user, err := USC.PRepository.SelectUsersByCookieValue(cookieValue)
 	if err != nil {
