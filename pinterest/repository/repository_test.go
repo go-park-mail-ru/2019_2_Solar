@@ -1,13 +1,13 @@
 package repository
 
 import (
+	"database/sql"
 	_ "database/sql"
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	_ "github.com/lib/pq"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -26,62 +26,14 @@ func TestReposStruct_NewDataBaseWorker(t *testing.T) {
 	}
 }
 
-func TestReposStruct_WriteData(t *testing.T) {
+func TestSelectFullUser(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
 	}
 	defer db.Close()
 
-	var email string = "mari@mail.ru"
 	var username string = "Mari"
-	var password string = "Qw12##!NFkq"
-
-	// good query
-	rows := sqlmock.NewRows([]string{"id",})
-	expect := []uint64{
-		68,
-	}
-
-	for _, id := range expect {
-		rows = rows.AddRow(id)
-	}
-
-	mock.
-		ExpectQuery("INSERT INTO").
-		WithArgs(username, email, password).
-		WillReturnRows(rows)
-
-	repo := &ReposStruct{
-		connectionString: consts.ConnStr,
-		DataBase:         db,
-	}
-	var params []interface{}
-	params = append(params, username, email, password)
-	id, err := repo.Insert(consts.INSERTRegistration, params)
-
-	if err != nil {
-		t.Errorf("inexpected err: %s", err)
-		return
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were infilfilled expectations: %s", err)
-		return
-	}
-	if id != strconv.Itoa(int(expect[0])) {
-		t.Errorf("result not match, want %v, have %v", expect[0], id)
-	}
-}
-
-
-func TestReposStruct_ReadUser(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("cannot create mock: %s", err)
-	}
-	defer db.Close()
-
-	var email string = "mari@mail.ru"
 
 	// good query
 	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age",
@@ -98,8 +50,8 @@ func TestReposStruct_ReadUser(t *testing.T) {
 
 	mock.
 		ExpectQuery("SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
-		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where").
-		WithArgs(email).
+			" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where").
+		WithArgs(username).
 		WillReturnRows(rows)
 
 	repo := &ReposStruct{
@@ -107,9 +59,7 @@ func TestReposStruct_ReadUser(t *testing.T) {
 		DataBase:         db,
 	}
 
-	var params []interface{}
-	params = append(params, email)
-	user, err := repo.SelectFullUser(consts.SELECTUserByEmail, params)
+	user, err := repo.SelectUsersByUsername(username)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -123,6 +73,7 @@ func TestReposStruct_ReadUser(t *testing.T) {
 		t.Errorf("result not match, want %v, have %v", expect[0], user)
 	}
 }
+
 
 func TestReposStruct_ReadUserCookies(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -144,7 +95,7 @@ func TestReposStruct_ReadUserCookies(t *testing.T) {
 
 	mock.
 		ExpectQuery("SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
-		" as s where").
+			" as s where").
 		WithArgs(CookieValue).
 		WillReturnRows(rows)
 
@@ -155,7 +106,7 @@ func TestReposStruct_ReadUserCookies(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, CookieValue)
-	cookie, err := repo.SelectUserCookies(consts.SELECTCookiesExpirationByCookieValue, params)
+	cookie, err := repo.SelectCookiesByCookieValue(CookieValue)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -173,51 +124,10 @@ func TestReposStruct_ReadUserCookies(t *testing.T) {
 	}
 }
 
-func TestReposStruct_ReadOneCol(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("cannot create mock: %s", err)
-	}
-	defer db.Close()
 
-	var email string = "my@mail.ru"
 
-	// good query
-	rows := sqlmock.NewRows([]string{"id"})
-	expect := []uint64{1}
 
-	for _, id := range expect {
-		rows = rows.AddRow(id)
-	}
-
-	mock.
-		ExpectQuery("SELECT u.id from sunrise.user as u where").
-		WithArgs(email).
-		WillReturnRows(rows)
-
-	repo := &ReposStruct{
-		connectionString: consts.ConnStr,
-		DataBase:         db,
-	}
-
-	var params []interface{}
-	params = append(params, email)
-	id, err := repo.SelectOneCol(consts.SELECTUserIDByEmail, params)
-
-	if err != nil {
-		t.Errorf("inexpected err: %s", err)
-		return
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were infilfilled expectations: %s", err)
-		return
-	}
-	if id[0] != strconv.Itoa(int(expect[0])) {
-		t.Errorf("result not match, want %v, have %v", expect[0], id[0])
-	}
-}
-
-func TestReposStruct_DeleteSession(t *testing.T) {
+func TestDeleteSession(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -238,7 +148,7 @@ func TestReposStruct_DeleteSession(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, sessionKey)
-	err = repo.DeleteSession(consts.DELETESessionByKey, params)
+	err = repo.DeleteSessionByKey(sessionKey)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -250,14 +160,14 @@ func TestReposStruct_DeleteSession(t *testing.T) {
 	}
 }
 
-func TestReposStruct_DeleteSubscribe(t *testing.T) {
+func TestDeleteSubscribe(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
 	}
 	defer db.Close()
 
-	var userID string = "1"
+	var userID = 1
 	var followeeName = "Max"
 
 	mock.
@@ -272,7 +182,7 @@ func TestReposStruct_DeleteSubscribe(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, userID, followeeName)
-	err = repo.DeleteSubscribe(consts.DELETESubscribeByName, params)
+	err = repo.DeleteSubscribeByName(uint64(userID), followeeName)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -284,7 +194,7 @@ func TestReposStruct_DeleteSubscribe(t *testing.T) {
 	}
 }
 
-func TestReposStruct_SelectBoard(t *testing.T) {
+func TestSelectBoard(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -304,7 +214,7 @@ func TestReposStruct_SelectBoard(t *testing.T) {
 			board.IsDeleted)
 	}
 
-	var boardID string = "1"
+	var boardID uint64 = 1
 
 	mock.
 		ExpectQuery("SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
@@ -319,7 +229,7 @@ func TestReposStruct_SelectBoard(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, boardID)
-	_, err = repo.SelectBoard(consts.SELECTBoardByID, params)
+	_, err = repo.SelectBoardsByID(boardID)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -334,7 +244,7 @@ func TestReposStruct_SelectBoard(t *testing.T) {
 	}
 }
 
-func TestReposStruct_SelectCategory(t *testing.T) {
+func TestSelectCategory(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -350,7 +260,7 @@ func TestReposStruct_SelectCategory(t *testing.T) {
 	}
 
 	mock.
-		ExpectQuery("SELECT c.name FROM sunrise.category as c").
+		ExpectQuery("SELECT c.name FROM sunrise.category as c;").
 		WithArgs().
 		WillReturnRows(rows)
 
@@ -361,7 +271,7 @@ func TestReposStruct_SelectCategory(t *testing.T) {
 
 	var params []interface{}
 	params = append(params)
-	categories, err := repo.SelectCategory("SELECT c.name FROM sunrise.category as c", params)
+	categories, err := repo.SelectCategories()
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -371,15 +281,12 @@ func TestReposStruct_SelectCategory(t *testing.T) {
 		t.Errorf("there were infilfilled expectations: %s", err)
 		return
 	}
-	if categories[0] != expect[0] {
-		t.Errorf("result not match, want %v, have %v", expect[0], categories[0])
-	}
-	if categories[1] != expect[1] {
-		t.Errorf("result not match, want %v, have %v", expect[1], categories[1])
+	if len(categories) != 2 {
+		t.Errorf("result not match, want 2 categoies")
 	}
 }
 
-/*
+
 func TestReposStruct_SelectComments(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -388,19 +295,19 @@ func TestReposStruct_SelectComments(t *testing.T) {
 	defer db.Close()
 
 	// good query
-	rows := sqlmock.NewRows([]string{"id", "pin_id", "text", "created_time", "author_id"})
-	expect := []*models.Comment{
-		{1, 1, "Text", time.Now(), 1},
+	rows := sqlmock.NewRows([]string{"text", "username", "avatardir", "created_time"})
+	expect := []*models.CommentDisplay{
+		{"vooooo",time.Now(), "Name", "/dir"},
 	}
 
 	for _, comment := range expect {
-		rows = rows.AddRow(comment.ID, comment.PinID, comment.Text, comment.CreatedTime, comment.AuthorID)
+		rows = rows.AddRow(comment.Text, comment.Author, comment.AuthorPicture, comment.CreatedTime)
 	}
 
-	var pinID string = "1"
+	var pinID uint64 = 1
 
 	mock.
-		ExpectQuery("SELECT c.text, u.username, c.created_time FROM comment as c").
+		ExpectQuery("SELECT c.text, u.username, u.avatardir, c.created_time FROM sunrise.comment").
 		WithArgs(pinID).
 		WillReturnRows(rows)
 
@@ -409,9 +316,7 @@ func TestReposStruct_SelectComments(t *testing.T) {
 		DataBase:         db,
 	}
 
-	var params []interface{}
-	params = append(params, pinID)
-	comments, err := repo.SelectComments(consts.SELECTComments, params)
+	comments, err := repo.SelectCommentsByPinId(pinID)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -425,9 +330,9 @@ func TestReposStruct_SelectComments(t *testing.T) {
 		t.Errorf("result not match, want %v, have %v", expect[0], comments[0])
 	}
 }
-*/
 
-func TestReposStruct_SelectPin(t *testing.T) {
+
+func TestSelectPin(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -446,12 +351,10 @@ func TestReposStruct_SelectPin(t *testing.T) {
 			pin.CreatedTime, pin.IsDeleted)
 	}
 
-	var pinID string = "1"
+	var pinID uint64 = 1
 
 	mock.
-		ExpectQuery("SELECT p.id, p.owner_id, p.author_id, p.board_id, p.title," +
-		" p.description, p.pindir, p.createdTime, p.isDeleted " +
-		"FROM sunrise.pin as p WHERE").
+		ExpectQuery("SELECT p.id, o.username, a.username, p.board_id, p.title, p.description, p.pindir, p.createdTime, p.isDeleted ").
 		WithArgs(pinID).
 		WillReturnRows(rows)
 
@@ -462,7 +365,7 @@ func TestReposStruct_SelectPin(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, pinID)
-	pins, err := repo.SelectPin(consts.SELECTPinByID, params)
+	pins, err := repo.SelectPinsById(pinID)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -477,7 +380,7 @@ func TestReposStruct_SelectPin(t *testing.T) {
 	}
 }
 
-func TestReposStruct_SelectPinsByTag(t *testing.T) {
+func TestSelectPinsByTag(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -509,7 +412,7 @@ func TestReposStruct_SelectPinsByTag(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, tagName)
-	pins, err := repo.SelectPinsByTag(consts.SELECTPinsByTag, params)
+	pins, err := repo.SelectPinsByTag(tagName)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -544,7 +447,7 @@ func TestReposStruct_SelectSessions(t *testing.T) {
 	var cookieValue string = "val"
 
 	mock.
-		ExpectQuery("SELECT s.id, s.userid FROM sunrise.usersession as s WHERE").
+		ExpectQuery("SELECT s.id, s.userid, s.cookiesvalue, s.cookiesexpiration FROM sunrise.usersession as s").
 		WithArgs(cookieValue).
 		WillReturnRows(rows)
 
@@ -555,7 +458,7 @@ func TestReposStruct_SelectSessions(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, cookieValue)
-	sessions, err := repo.SelectSessions(consts.SELECTSessionByCookieValue, params)
+	sessions, err := repo.SelectSessionsByCookieValue(cookieValue)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -570,7 +473,7 @@ func TestReposStruct_SelectSessions(t *testing.T) {
 	}
 }
 
-func TestReposStruct_SelectIDUsernameEmailUser(t *testing.T) {
+func TestSelectIDUsernameEmailUser(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("cannot create mock: %s", err)
@@ -602,7 +505,7 @@ func TestReposStruct_SelectIDUsernameEmailUser(t *testing.T) {
 
 	var params []interface{}
 	params = append(params, username, email)
-	users, err := repo.SelectIDUsernameEmailUser(consts.SELECTUserIDUsernameEmailByUsernameOrEmail, params)
+	users, err := repo.SelectIDUsernameEmailUser(username, email)
 
 	if err != nil {
 		t.Errorf("inexpected err: %s", err)
@@ -613,6 +516,328 @@ func TestReposStruct_SelectIDUsernameEmailUser(t *testing.T) {
 		return
 	}
 	if users[0].ID != expect[0].ID || users[0].Email != expect[0].Email || users[0].Username != expect[0].Username {
+		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
+	}
+}
+
+func TestSelectUsersByCookieValue(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age", "status",
+		"avatardir", "isactive", "salt", "created_time"})
+	expect := []*models.DBUser{
+		{1, "Vo1",  sql.NullString{"Vov", true}, sql.NullString{"Voi", true}, "123", "emil1@com.er",
+			sql.NullInt32{32, true}, sql.NullString{"", true}, sql.NullString{"", true},
+			true, "500", time.Now()},
+	}
+
+	for _, user:= range expect {
+		rows = rows.AddRow(user.ID, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status,
+			user.AvatarDir, user.IsActive, user.Salt, user.CreatedTime)
+	}
+
+	var cookieValue string = "FF"
+
+	mock.
+		ExpectQuery("SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status,").
+		WithArgs(cookieValue).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	users, err := repo.SelectUsersByCookieValue(cookieValue)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if users[0].ID != expect[0].ID || users[0].Email != expect[0].Email || users[0].Username != expect[0].Username {
+		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
+	}
+}
+
+func TestSelectUsersByEmail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age", "status",
+		"avatardir", "isactive", "salt", "created_time"})
+	expect := []*models.DBUser{
+		{1, "Vo1",  sql.NullString{"Vov", true}, sql.NullString{"Voi", true}, "123", "emil1@com.er",
+			sql.NullInt32{32, true}, sql.NullString{"", true}, sql.NullString{"", true},
+			true, "500", time.Now()},
+	}
+
+	for _, user:= range expect {
+		rows = rows.AddRow(user.ID, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status,
+			user.AvatarDir, user.IsActive, user.Salt, user.CreatedTime)
+	}
+
+	var email string = expect[0].Email
+
+	mock.
+		ExpectQuery("SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status").
+		WithArgs(email).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	users, err := repo.SelectUsersByEmail(email)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if users[0].ID != expect[0].ID || users[0].Email != expect[0].Email || users[0].Username != expect[0].Username {
+		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
+	}
+}
+
+func TestSelectCategoryByName(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"name"})
+	expect := []string{"cars"}
+
+	for _, category := range expect {
+		rows = rows.AddRow(category)
+	}
+
+	var categoryName string = "cars"
+
+	mock.
+		ExpectQuery("SELECT c.name FROM sunrise.category as c WHERE").
+		WithArgs().
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+	categories, err := repo.SelectCategoryByName(categoryName)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if len(categories) != 1 {
+		t.Errorf("result not match, want 1 categoies")
+	}
+}
+
+
+func TestSelectPinsDisplayByBoardId(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "title", "pindir"})
+	expect := []*models.PinDisplay{
+		{uint64(1), "/dir", "hello"},
+	}
+
+	for _, pin := range expect {
+		rows = rows.AddRow(pin.ID, pin.Title, pin.PinDir)
+	}
+
+	var boardID uint64 = 1
+
+	mock.
+		ExpectQuery("SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE").
+		WithArgs(boardID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	pins, err := repo.SelectPinsDisplayByBoardId(boardID)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(pins[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], pins[0])
+	}
+}
+
+
+
+func TestSelectPinsDisplayByUsernam(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "title", "pindir"})
+	expect := []*models.PinDisplay{
+		{uint64(1), "/dir", "hello"},
+	}
+
+	for _, pin := range expect {
+		rows = rows.AddRow(pin.ID, pin.Title, pin.PinDir)
+	}
+
+	var userID int = 1
+
+	mock.
+		ExpectQuery("SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE").
+		WithArgs(userID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	pins, err := repo.SelectPinsDisplayByUsername(userID)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(pins[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], pins[0])
+	}
+}
+
+
+func TestSelectBoardsByOwnerId(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "owner_id", "title", "description", "category", "createdTime",
+		"isDeleted"})
+	expect := []*models.Board{
+		{1, 1, "MyBoard", "MyDesc", "cars",
+			time.Now(), false},
+	}
+
+	for _, board := range expect {
+		rows = rows.AddRow(board.ID, board.OwnerID, board.Title, board.Description, board.Category, board.CreatedTime,
+			board.IsDeleted)
+	}
+
+	var ownerID uint64 = 1
+
+	mock.
+		ExpectQuery("SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
+			"FROM sunrise.board as b WHERE").
+		WithArgs(ownerID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	boards, err := repo.SelectBoardsByOwnerId(ownerID)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if len(boards) != 1 {
+		t.Errorf("result not match, want 1 board")
+	}
+}
+
+
+func TestSSelectAllUsers(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age",
+		"status", "avatardir", "isactive", "salt", "created_time"})
+	expect := []*models.User{
+		{1, "Mari", "Mari", "Frolova", "Qw12##!NFkq",
+			"mari@mail.ru", 32, "I'am okey", "img/p1.png", true, "", time.Now()},
+	}
+
+	for _, user := range expect {
+		rows = rows.AddRow(user.ID, user.Username, user.Name, user.Surname, user.Password,
+			user.Email, user.Age, user.Status, user.AvatarDir, user.IsActive, user.Salt, user.CreatedTime)
+	}
+
+	mock.
+		ExpectQuery("SELECT U.id, U.userna).
+		WithArgs().
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	users, err := repo.SelectAllUsers()
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(users[0], expect[0]) {
 		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
 	}
 }
