@@ -55,4 +55,6 @@ type ReposInterface interface {
 	InsertPinAndTag(PinID uint64, TagName string) (Err error)
 
 	SelectUsersByUsernameSearch(username string) (Users []models.User, Err error)
+
+	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
 }

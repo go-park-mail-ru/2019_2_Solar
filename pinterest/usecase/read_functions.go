@@ -205,3 +205,11 @@ func (USC *UseStruct) GetCategories() (Categories []models.Category, Err error) 
 
 	return categories, nil
 }
+
+func (USC *UseStruct) GetMessages(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
+	messages, err := USC.PRepository.SelectMessagesByUsersId(senderId, receiverId)
+	if err != nil {
+		return messages, err
+	}
+	return messages, nil
+}

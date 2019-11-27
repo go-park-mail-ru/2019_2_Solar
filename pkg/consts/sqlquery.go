@@ -15,6 +15,8 @@ const (
 		"where s.cookiesvalue = $1"
 	SELECTCookiesByCookieValue = "SELECT s.cookiesvalue, s.cookiesexpiration from sunrise.usersession" +
 		" as s where s.cookiesvalue = $1"
+	SELECTChatMessagesByUsersId = `SELECT cm.text, cm.send_time from sunrise.chat_message as cm
+		where cm.sender_id = $1 AND cm.receiver_id = $2 AND cm.is_deleted = false`
 	SELECTUsersByUsername = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
 		" U.avatardir, U.isactive, U.salt, U.created_time from sunrise.User as U where U.username = $1"
 	SELECTUsersByEmail = "SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status," +
@@ -26,7 +28,7 @@ const (
 	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
-	SELECTCategories = "SELECT c.id, c.name FROM sunrise.category as c;"
+	SELECTCategories     = "SELECT c.id, c.name FROM sunrise.category as c;"
 	INSERTBoard          = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
 	SELECTBoardByID      = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
 		"FROM sunrise.board as b WHERE b.id = $1"
@@ -41,7 +43,7 @@ const (
 		" p.description, p.pindir, p.createdTime, p.isDeleted " +
 		"FROM sunrise.pin as p WHERE p.board_id = $1"
 	SELECTPinsDisplayByBoardId   = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.board_id = $1"
-	SELECTPinsDisplayByUsername   = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.owner_id = $1"
+	SELECTPinsDisplayByUsername  = "SELECT p.id, p.title, p.pindir FROM sunrise.pin as p WHERE p.isDeleted = false AND p.owner_id = $1"
 	SELECTNewPinsDisplayByNumber = "SELECT p.id, p.pindir, p.title FROM (select id, pindir, title, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime desc) " +
 		"from sunrise.pin WHERE isdeleted = false) as p WHERE p.ROW_NUMBER BETWEEN $1 AND $2;"
 	//SELECTMyPinsByNumber = "SELECT p.id, p.pindir FROM (select id, pindir, isdeleted, ROW_NUMBER() OVER (ORDER BY createdtime) " +
@@ -82,8 +84,8 @@ const (
 		"WHERE n.receiver_id = $1 and n.isread = false;"
 
 	SELECTTagAll = "SELECT t.name from sunrise.tag as t;"
-	INSERTTag = "INSERT INTO sunrise.tag (name)" +
+	INSERTTag    = "INSERT INTO sunrise.tag (name)" +
 		" VALUES ($1) RETURNING name"
 	INSERTPinAndTag = "INSERT INTO sunrise.pinandtag (pin_id, tag_name)" +
-" VALUES ($1,$2) RETURNING id"
+		" VALUES ($1,$2) RETURNING id"
 )
