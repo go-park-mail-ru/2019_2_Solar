@@ -818,7 +818,7 @@ func TestSSelectAllUsers(t *testing.T) {
 	}
 
 	mock.
-		ExpectQuery("SELECT U.id, U.userna).
+		ExpectQuery("SELECT *").
 		WithArgs().
 		WillReturnRows(rows)
 
@@ -839,5 +839,326 @@ func TestSSelectAllUsers(t *testing.T) {
 	}
 	if reflect.DeepEqual(users[0], expect[0]) {
 		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
+	}
+}
+
+
+func TestSelectNewPinsDisplayByNumber(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "title", "pindir"})
+	expect := []*models.PinDisplay{
+		{uint64(1), "/dir", "hello"},
+	}
+
+	for _, pin := range expect {
+		rows = rows.AddRow(pin.ID, pin.Title, pin.PinDir)
+	}
+
+	var first int = 0;
+	var last int = 9
+
+	mock.
+		ExpectQuery("SELECT p.id, p.pindir, p.title FROM").
+		WithArgs(first, last).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	pins, err := repo.SelectNewPinsDisplayByNumber(first, last)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(pins[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], pins[0])
+	}
+}
+
+
+
+func TestSelectMyPinsDisplayByNumber(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "title", "pindir"})
+	expect := []*models.PinDisplay{
+		{uint64(1), "/dir", "hello"},
+	}
+
+	for _, pin := range expect {
+		rows = rows.AddRow(pin.ID, pin.Title, pin.PinDir)
+	}
+
+	var userID uint64 = 1
+	var number int = 20
+
+	mock.
+		ExpectQuery("SELECT p.id, p.pindir, p.title FROM").
+		WithArgs(number, userID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	pins, err := repo.SelectMyPinsDisplayByNumber(userID, number)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(pins[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], pins[0])
+	}
+}
+
+
+
+func TestSelectSubscribePinsDisplayByNumber(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "title", "pindir"})
+	expect := []*models.PinDisplay{
+		{uint64(1), "/dir", "hello"},
+	}
+
+	for _, pin := range expect {
+		rows = rows.AddRow(pin.ID, pin.Title, pin.PinDir)
+	}
+
+	var userID uint64 = 1
+	var first int = 0;
+	var last int = 9
+
+	mock.
+		ExpectQuery("SELECT p.id, p.pindir, p.title FROM").
+		WithArgs(first, last, userID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	pins, err := repo.SelectSubscribePinsDisplayByNumber(userID, first, last)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(pins[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], pins[0])
+	}
+}
+
+
+
+func TestSelectUsersByUsernameSearch(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "username", "name", "surname", "hashpassword", "email", "age",
+		"status", "avatardir", "isactive", "salt", "created_time"})
+	expect := []*models.User{
+		{1, "Mari", "Mari", "Frolova", "Qw12##!NFkq",
+			"mari@mail.ru", 32, "I'am okey", "img/p1.png", true, "", time.Now()},
+	}
+
+	for _, user := range expect {
+		rows = rows.AddRow(user.ID, user.Username, user.Name, user.Surname, user.Password,
+			user.Email, user.Age, user.Status, user.AvatarDir, user.IsActive, user.Salt, user.CreatedTime)
+	}
+
+	username := expect[0].Username
+
+	mock.
+		ExpectQuery("SELECT U.id, U.username, U.name, U.surname, U.hashpassword, U.email, U.age, U.status").
+		WithArgs("%" + username + "%").
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	users, err := repo.SelectUsersByUsernameSearch(username)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(users[0], expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], users[0])
+	}
+}
+
+
+func TestSelectMySubscribeByUsername(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "subscriber_id", "followee_id"})
+	expect := []*models.Subscribe{
+		{1, 2, 1},
+	}
+
+	for _, sub := range expect {
+		rows = rows.AddRow(sub.Id, sub.IdSubscriber, sub.FolloweeId)
+	}
+
+	var userID uint64 = 1
+	var followeeName string = "Add"
+
+	mock.
+		ExpectQuery("SELECT s.id, s.subscriber_id, s.followee_id FROM sunrise.subscribe as s").
+		WithArgs(userID, followeeName).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	sub, err := repo.SelectMySubscribeByUsername(userID, followeeName)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if reflect.DeepEqual(sub, expect[0]) {
+		t.Errorf("result not match, want %v, have %v", expect[0], sub)
+	}
+}
+
+
+func TestSelectAllTags(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+	// good query
+	rows := sqlmock.NewRows([]string{"name"})
+	expect := []string{"car", "forest"}
+
+	for _, tag := range expect {
+		rows = rows.AddRow(tag)
+	}
+
+	mock.
+		ExpectQuery("SELECT t.name from sunrise.tag as t").
+		WithArgs().
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	tags, err := repo.SelectAllTags()
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if tags[0] != expect[0] {
+		t.Errorf("result not match, want %v, have %v", expect[0], tags[0])
+	}
+	if tags[1] != expect[1] {
+		t.Errorf("result not match, want %v, have %v", expect[1], tags[1])
+	}
+}
+
+
+func TestSelectNoticesByUserID(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cannot create mock: %s", err)
+	}
+	defer db.Close()
+	// good query
+	rows := sqlmock.NewRows([]string{"id", "user_id", "receiver_id", "message", "createdtime", "isread"})
+	expect := []*models.Notice{
+		{1, 1, 1, "Text", time.Now(), false},
+	}
+
+	for _, notice := range expect {
+		rows = rows.AddRow(notice.ID, notice.UserID, notice.ReceiverID, notice.Message, notice.CreatedTime, notice.IsRead)
+	}
+
+	var userID uint64 = 1
+
+	mock.
+		ExpectQuery("SELECT n.id, n.user_id, n.receiver_id, n.message, n.createdtime, isread FROM").
+		WithArgs(userID).
+		WillReturnRows(rows)
+
+	repo := &ReposStruct{
+		connectionString: consts.ConnStr,
+		DataBase:         db,
+	}
+
+	notices, err := repo.SelectNoticesByUserID(userID)
+
+	if err != nil {
+		t.Errorf("inexpected err: %s", err)
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were infilfilled expectations: %s", err)
+		return
+	}
+	if notices[0] != *expect[0] {
+		t.Errorf("result not match, want %v, have %v", expect[0], notices[0])
 	}
 }
