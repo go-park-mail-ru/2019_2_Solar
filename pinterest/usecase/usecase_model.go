@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
@@ -14,10 +15,11 @@ import (
 
 
 type UseStruct struct {
-	PRepository repository.ReposInterface
-	Sanitizer   sanitizer.SanitInterface
-	Hub         webSocket.HubStruct
-	Mu          *sync.Mutex
+	PRepository     repository.ReposInterface
+	Sanitizer       sanitizer.SanitInterface
+	Hub             webSocket.HubStruct
+	Mu              *sync.Mutex
+	AuthSessManager services.AuthorizationServiceClient
 }
 
 type UseInterface interface {
@@ -90,6 +92,12 @@ type UseInterface interface {
 
 	GetCategories() (Categories []models.Category, Err error)
 
+
 	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
+
+	GetUserByCookieValue(cookieValue string) (models.User, error)
+	GetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
+
+	MGetSessionsByCookieValue(cookieValue string) (models.UserSession, error)
 
 }

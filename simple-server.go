@@ -9,12 +9,18 @@ import (
 	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	customMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pkg/middlewares"
 	"github.com/labstack/echo"
 	"sync"
 )
 
 func main() {
+
+	authorizationService := functions.AuthServiceCreate("authorization-service")
+	pinBoardService := functions. PinBoardServiceCreate("pinboard-service")
+	userService := functions.UserServiceCreate("user-service")
+
 	e := echo.New()
 	middlewares := customMiddleware.MiddlewareStruct{}
 	mRep := repositoryMiddleware.MRepositoryStruct{}
@@ -25,7 +31,7 @@ func main() {
 	}
 	mUseCase := useCaseMiddleware.MUseCaseStruct{}
 	mUseCase.NewUseCase(&mRep)
-	middlewares.NewMiddleware(e, &mUseCase)
+	middlewares.NewMiddleware(e, &mUseCase, authorizationService)
 	//e.Use(customMiddleware.CORSMiddleware)
 	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))
 	//e.Use(customMiddleware.PanicMiddleware)
@@ -50,7 +56,7 @@ func main() {
 
 	useCase := usecase.UseStruct{}
 	useCase.NewUseCase(&mutex, &rep, &san, hub)
-	err = handlers.NewHandlers(e, &useCase)
+	err = handlers.NewHandlers(e, &useCase, authorizationService, pinBoardService, userService)
 	if err != nil {
 		e.Logger.Errorf("server error: %s", err)
 	}

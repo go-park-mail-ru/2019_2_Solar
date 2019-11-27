@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"context"
+	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
@@ -15,24 +17,40 @@ func (MS *MiddlewareStruct) AuthenticationMiddleware(next echo.HandlerFunc) echo
 			return next(ctx)
 		}
 
+		sCookie := services.Cookie{
+			Key:                  cookie.Name,
+			Value:                cookie.Value,
+			Exp:                  cookie.Expires.String(),
+			XXX_NoUnkeyedLiteral: struct{}{},
+			XXX_unrecognized:     nil,
+			XXX_sizecache:        0,
+		}
+
+		sctx := context.Background()
+		sUserSession, err := MS.MAuth.CheckSession(sctx, &sCookie)
+		if err != nil {
+			return err
+		}
+
+
+		userSession := models.UserSession{
+			ID:         sUserSession.ID,
+			UserID:     sUserSession.UserID,
+		}
+
 		user, err := MS.MUsecase.GetUserByCookieValue(cookie.Value)
 		if err != nil {
 			return err
 		}
 
-		userSession, err := MS.MUsecase.GetSessionsByCookieValue(cookie.Value)
-		if err != nil {
-			return err
-		}
+		//userSession, err := MS.MUsecase.GetSessionsByCookieValue(cookie.Value)
+		//if err != nil {
+		//	return err
+		//}
 
 		userCookie := models.UserCookie{
-			Value:      userSession.Value,
-			Expiration: userSession.Expiration,
-		}
-
-		if userCookie.Expiration.Before(time.Now()) {
-			//delete Coockie!!!!
-			return next(ctx)
+			Value:      cookie.Value,
+			Expiration: cookie.Expires,
 		}
 
 		sess := functions.Session{

@@ -18,9 +18,9 @@ type ReposInterface interface {
 	InsertUser(username, email, salt string, hashPassword []byte, createdTime time.Time) (uint64, error)
 	InsertSession(userId uint64, cookieValue string, cookieExpires time.Time) (uint64, error)
 	DeleteSessionByKey(cookieValue string) error
-	SelectCategoryByName(categoryName string) (categories []string, Err error)
+    SelectCategoryByName(categoryName string) (categories []string, Err error)
 	SelectCategories() (Categories []models.Category, Err error)
-	InsertBoard(ownerID uint64, title, description, category string, createdTime time.Time) (uint64, error)
+	InsertBoard(ownerID uint64, title string, description string, category string, createdTime time.Time) (uint64, error)
 	SelectBoardsByID(boardId uint64) (Boards []models.Board, Err error)
 	SelectBoardsByOwnerId(ownerId uint64) (Boards []models.Board, Err error)
 	SelectPinsDisplayByBoardId(boardID uint64) (Pins []models.PinDisplay, Err error)
@@ -57,4 +57,6 @@ type ReposInterface interface {
 	SelectUsersByUsernameSearch(username string) (Users []models.User, Err error)
 
 	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
+	MSelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
+
 }

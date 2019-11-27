@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package services;
+
+// grpc-сервис регистрации и авторизации
+service AuthorizationService {
+    rpc RegUser (UserReg) returns (Cookie);
+    rpc LoginUser (UserLogin) returns (Cookie);
+    rpc LogoutUser (Cookie) returns (Nothing);
+    rpc CheckSession (Cookie) returns (UserSession);
+}
+
+
+message Nothing {
+    bool dummy = 1;
+}
+
+message UserReg {
+    string Email = 1;
+    string Password = 2;
+    string Username = 3;
+}
+
+message UserLogin {
+    string Email = 1;
+    string Password = 2;
+}
+
+message Cookie {
+    string Key = 1;
+    string Value = 2;
+    string Exp = 3;
+}
+
+message UserSession {
+    uint64 ID = 1;
+    uint64 UserID = 2;
+    string Value = 3;
+    string Exp = 4;
+}
