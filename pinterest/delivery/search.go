@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 

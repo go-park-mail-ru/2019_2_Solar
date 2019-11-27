@@ -8,7 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	user_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/user-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"

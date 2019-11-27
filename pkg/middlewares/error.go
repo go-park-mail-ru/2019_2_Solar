@@ -1,16 +1,16 @@
 package middlewares
 
 import (
-	"github.com/labstack/echo"
+	echov4 "github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
-func (MS *MiddlewareStruct) PanicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) (err error) {
+func (MS *MiddlewareStruct) PanicMiddleware(next echov4.HandlerFunc) echov4.HandlerFunc {
+	return func(ctx echov4.Context) (err error) {
 		defer func() {
 			if panicErr := recover(); panicErr != nil {
 				ctx.Logger().Error("recovered ", panicErr)
-				err = &echo.HTTPError{Code: 500, Message: "Internal server error"}
+				err = &echov4.HTTPError{Code: 500, Message: "Internal server error"}
 			}
 		}()
 		err = next(ctx)
@@ -18,14 +18,14 @@ func (MS *MiddlewareStruct) PanicMiddleware(next echo.HandlerFunc) echo.HandlerF
 	}
 }
 
-func (MS *MiddlewareStruct) CustomHTTPErrorHandler(err error, ctx echo.Context) {
+func (MS *MiddlewareStruct) CustomHTTPErrorHandler(err error, ctx echov4.Context) {
 	var jsonError error
 	switch err := errors.Cause(err); err.(type) {
-	case *echo.HTTPError:
+	case *echov4.HTTPError:
 		ctx.Logger().Warn(err)
-		jsonError = ctx.JSON(err.(*echo.HTTPError).Code, struct {
+		jsonError = ctx.JSON(err.(*echov4.HTTPError).Code, struct {
 			Body string `json:"body"`
-		}{Body: err.(*echo.HTTPError).Message.(string)})
+		}{Body: err.(*echov4.HTTPError).Message.(string)})
 	case nil:
 		return
 	default:

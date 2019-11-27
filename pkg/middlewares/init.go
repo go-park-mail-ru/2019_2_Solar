@@ -4,8 +4,9 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	useCaseMiddleware "github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase/middleware"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	echov4 "github.com/labstack/echo/v4"
+	//"github.com/labstack/echo"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 //var (
@@ -18,11 +19,10 @@ import (
 //)
 
 
-func (MS *MiddlewareStruct) NewMiddleware(e *echo.Echo, mRep useCaseMiddleware.MUseCaseInterface, auth services.AuthorizationServiceClient) {
+func (MS *MiddlewareStruct) NewMiddleware(e *echov4.Echo, mRep useCaseMiddleware.MUseCaseInterface, auth services.AuthorizationServiceClient) {
 	MS.MUsecase = mRep
 
 	MS.MAuth = auth
-
 
 	e.Use(MS.CORSMiddleware)
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: consts.LoggerFormat}))

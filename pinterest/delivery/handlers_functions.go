@@ -5,11 +5,11 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	user_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/user-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/usecase"
-	"github.com/labstack/echo"
+	echov4 "github.com/labstack/echo/v4"
 )
 
 
-func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface, auth services.AuthorizationServiceClient,
+func (h *HandlersStruct) NewHandlers(e *echov4.Echo, useCase usecase.UseInterface, auth services.AuthorizationServiceClient,
 	pinBoardService pinboard_service.PinBoardServiceClient, userService user_service.UserServiceClient) error {
 	h.PUsecase = useCase
 
@@ -20,7 +20,6 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface,
 
 	e.GET("/", h.HandleEmpty)
 	// ==============================================================
-
 
 	e.GET("/users", h.HandleListUsers)
 	e.GET("/users/:username", h.HandleGetUserByUsername)

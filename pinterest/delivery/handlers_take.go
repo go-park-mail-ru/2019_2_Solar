@@ -6,7 +6,7 @@ import (
 	pinboard_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/pinboard-service/service_model"
 	user_service "github.com/go-park-mail-ru/2019_2_Solar/cmd/user-service/service_model"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"strconv"
 	"time"
@@ -224,15 +224,15 @@ func (h *HandlersStruct) ServiceGetUserByUsername(ctx echo.Context) (Err error) 
 			return err
 		}
 	}
-	
-	
-	userAndPinsMessage, err := h.UserService.GetUserByUsername(context.Background(), 
+
+
+	userAndPinsMessage, err := h.UserService.GetUserByUsername(context.Background(),
 		&user_service.Username{
 			Username: username})
 	if err != nil {
 		return err
 	}
-	
+
 	userProfile := models.AnotherUser{
 		ID:         userAndPinsMessage.User.ID,
 		Username:   userAndPinsMessage.User.Username,
@@ -278,7 +278,7 @@ func (h *HandlersStruct) ServiceGetUserByUsername(ctx echo.Context) (Err error) 
 	//if err != nil {
 	//
 	//}
-	
+
 	body := struct {
 		User models.AnotherUser `json:"user"`
 		Pins  []models.PinDisplay `json:"pins"`

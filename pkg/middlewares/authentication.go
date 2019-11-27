@@ -5,7 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/cmd/services"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"time"
 )
 
