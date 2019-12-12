@@ -57,7 +57,7 @@ type UseInterface interface {
 
 	GetPinsByUsername(useID int) ([]models.PinDisplay, error)
 
-	GetNewPins() ([]models.PinDisplay, error)
+	GetNewPins(limit, since int) ([]models.PinDisplay, error)
 	GetMyPins(userID uint64) ([]models.PinDisplay, error)
 	GetSubscribePins(userID uint64) ([]models.PinDisplay, error)
 

@@ -150,8 +150,27 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		}
 	}()
 	ctx.Response().Header().Set("Content-Type", "application/jsonStruct")
-	var pins []models.PinDisplay
-	pins, err := h.PUsecase.GetNewPins()
+	limitStr := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		ctx.Logger().Warn(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	if limit < 0 {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "limit < 0"}
+	}
+
+	sinceStr := ctx.QueryParam("since")
+	since, err := strconv.Atoi(sinceStr)
+	if err != nil {
+		ctx.Logger().Warn(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	if since < 0 {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "since < 0"}
+	}
+
+	pins, err := h.PUsecase.GetNewPins(limit, since)
 	if err != nil {
 		return err
 	}
