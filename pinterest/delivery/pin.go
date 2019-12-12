@@ -160,17 +160,14 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "limit < 0"}
 	}
 
-	sinceStr := ctx.QueryParam("since")
-	since, err := strconv.Atoi(sinceStr)
+	idStr := ctx.QueryParam("id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		ctx.Logger().Warn(err)
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	if since < 0 {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "since < 0"}
-	}
 
-	pins, err := h.PUsecase.GetNewPins(limit, since)
+	pins, err := h.PUsecase.GetNewPins(limit, id)
 	if err != nil {
 		return err
 	}

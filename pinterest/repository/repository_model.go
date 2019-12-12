@@ -30,7 +30,7 @@ type ReposInterface interface {
 	InsertPin(pin models.Pin) (uint64, error)
 	SelectPinsById(pinId uint64) (Pins []models.FullPin, Err error)
 	SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error)
-	SelectNewPinsDisplayByNumber(limit, since int) (Pins []models.PinDisplay, Err error)
+	SelectNewPinsDisplayByNumber(limit, id int) (Pins []models.PinDisplay, Err error)
 	SelectMyPinsDisplayByNumber(userId uint64, number int) (Pins []models.PinDisplay, Err error)
 	SelectSubscribePinsDisplayByNumber(userId uint64, first, last int) (Pins []models.PinDisplay, Err error)
 	InsertComment(pinID uint64, commentText string, userID uint64, createdTime time.Time) (uint64, error)

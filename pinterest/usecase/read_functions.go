@@ -138,8 +138,8 @@ func (USC *UseStruct) GetPinsByUsername(userID int) ([]models.PinDisplay, error)
 	return pins, nil
 }
 
-func (USC *UseStruct) GetNewPins(limit, since int) ([]models.PinDisplay, error) {
-	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(limit, since)
+func (USC *UseStruct) GetNewPins(limit, id int) ([]models.PinDisplay, error) {
+	pins, err := USC.PRepository.SelectNewPinsDisplayByNumber(limit, id)
 	if err != nil {
 		return []models.PinDisplay{}, err
 	}

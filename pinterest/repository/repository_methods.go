@@ -462,15 +462,15 @@ func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.Co
 	return comments, nil
 }
 
-func (RS *ReposStruct) SelectNewPinsDisplayByNumber(limit, since int) (Pins []models.PinDisplay, Err error) {
+func (RS *ReposStruct) SelectNewPinsDisplayByNumber(limit, id int) (Pins []models.PinDisplay, Err error) {
 	pins := make([]models.PinDisplay, 0)
 	sqlQuery := `
 	SELECT p.id, p.pindir, p.title
-	from sunrise.pin as p
-	WHERE isdeleted = false 
+	FROM sunrise.pin as p
+	WHERE isdeleted = false AND p.id > $2
 	ORDER BY p.createdtime DESC
-	LIMIT $1 OFFSET $2;`
-	rows, err := RS.DataBase.Query(sqlQuery, limit, since)
+	LIMIT $1 OFFSET 0;`
+	rows, err := RS.DataBase.Query(sqlQuery, limit, id)
 	if err != nil {
 		return pins, err
 	}
