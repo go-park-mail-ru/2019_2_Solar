@@ -439,8 +439,15 @@ func (RS *ReposStruct) SelectPinsById(pinId uint64) (Pins []models.FullPin, Err 
 }
 
 func (RS *ReposStruct) SelectCommentsByPinId(pinId uint64) (Comments []models.CommentDisplay, Err error) {
+	sqlQuery := `
+	SELECT c.text, u.username, u.avatardir, c.created_time
+	FROM sunrise.comment as c
+			 join sunrise.pin as p on p.id = $1
+			 join sunrise.user as u on u.id = c.author_id
+	where c.pin_id = $1
+	ORDER BY c.created_time`
 	var comments []models.CommentDisplay
-	rows, err := RS.DataBase.Query(consts.SELECTCommentsByPinId, pinId)
+	rows, err := RS.DataBase.Query(sqlQuery, pinId)
 	if err != nil {
 		return comments, err
 	}
