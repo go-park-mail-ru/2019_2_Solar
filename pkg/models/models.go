@@ -195,8 +195,8 @@ type ChatMessage struct {
 }
 
 type OutputMessage struct {
-	Message        string    `json:"text"`
-	SendTime       time.Time `json:"send_time"`
+	Message  string    `json:"text"`
+	SendTime time.Time `json:"send_time"`
 }
 
 type Subscribe struct {
@@ -208,4 +208,12 @@ type Subscribe struct {
 type Category struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type AddPin struct {
+	AuthorId    uint64 `json:"author_id"`
+	BoardId     uint64 `json:"author_id"`
+	Description string `json:"description"`
+	PinDir      string `json:"pin_dir"`
+	Title       string `json:"title"`
 }

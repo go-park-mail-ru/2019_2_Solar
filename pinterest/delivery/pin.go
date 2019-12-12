@@ -86,15 +86,15 @@ func (h *HandlersStruct) HandleCreatePin(ctx echo.Context) (Err error) {
 
 	data := struct {
 		CSRFToken string `json:"csrf_token"`
-		Body struct {
+		Body      struct {
 			Pin  models.Pin `json:"pin"`
 			Info string     `json:"info"`
 		} `json:"body"`
-	}{	CSRFToken: ctx.Get("token").(string),
+	}{CSRFToken: ctx.Get("token").(string),
 		Body: struct {
-		Pin  models.Pin `json:"pin"`
-		Info string     `json:"info"`
-	}{Info: "data successfully saved", Pin: pin}}
+			Pin  models.Pin `json:"pin"`
+			Info string     `json:"info"`
+		}{Info: "data successfully saved", Pin: pin}}
 
 	if err := encoder.Encode(data); err != nil {
 		return err
@@ -131,11 +131,11 @@ func (h *HandlersStruct) HandleGetPin(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pin  models.FullPin `json:"pins"`
+		Pin      models.FullPin          `json:"pins"`
 		Comments []models.CommentDisplay `json:"comments"`
-		Info  string     `json:"info"`
-	}{pin, comments ,"OK"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+		Info     string                  `json:"info"`
+	}{pin, comments, "OK"}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
@@ -156,10 +156,10 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pins  []models.PinDisplay `json:"pins"`
-		Info  string     `json:"info"`
+		Pins []models.PinDisplay `json:"pins"`
+		Info string              `json:"info"`
 	}{pins, "OK"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
@@ -184,10 +184,10 @@ func (h *HandlersStruct) HandleGetMyPins(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pins  []models.PinDisplay `json:"pins"`
-		Info  string     `json:"info"`
+		Pins []models.PinDisplay `json:"pins"`
+		Info string              `json:"info"`
 	}{pins, "OK"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
@@ -212,10 +212,10 @@ func (h *HandlersStruct) HandleGetSubscribePins(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Pins  []models.PinDisplay `json:"pins"`
-		Info  string     `json:"info"`
+		Pins []models.PinDisplay `json:"pins"`
+		Info string              `json:"info"`
 	}{pins, "OK"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
@@ -251,11 +251,66 @@ func (h *HandlersStruct) HandleCreateComment(ctx echo.Context) (Err error) {
 		return err
 	}
 	body := struct {
-		Info  string     `json:"info"`
+		Info string `json:"info"`
 	}{"data successfully saved"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleAddPin(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(ctx.Response())
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+
+	addPin := models.AddPin{}
+	if err := ctx.Bind(&addPin); err != nil {
+		ctx.Logger().Warn(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	pin := models.Pin{
+		OwnerID:     user.ID,
+		AuthorID:    addPin.AuthorId,
+		BoardID:     addPin.BoardId,
+		Title:       addPin.Title,
+		Description: addPin.Description,
+		PinDir:      addPin.PinDir,
+		CreatedTime: time.Now(),
+	}
+	lastID, err := h.PUsecase.AddPin(pin)
+	err = h.PUsecase.AddTags(pin.Description, lastID)
+	if err != nil {
+		return err
+	}
+	pin.ID = lastID
+	pin.IsDeleted = false
+
+	data := struct {
+		CSRFToken string `json:"csrf_token"`
+		Body      struct {
+			Pin  models.Pin `json:"pin"`
+			Info string     `json:"info"`
+		} `json:"body"`
+	}{CSRFToken: ctx.Get("token").(string),
+		Body: struct {
+			Pin  models.Pin `json:"pin"`
+			Info string     `json:"info"`
+		}{Info: "data successfully saved", Pin: pin}}
+
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+
 	return nil
 }

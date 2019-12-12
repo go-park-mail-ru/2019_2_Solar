@@ -243,3 +243,8 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 
 	return nil
 }
+
+func (USC *UseStruct) HandleAddPin() error {
+
+
+}

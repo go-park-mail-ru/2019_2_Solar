@@ -31,6 +31,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.GET(prefix +"/board/list/my", h.HandleGetMyBoards)
 
 	e.POST(prefix +"/pin", h.HandleCreatePin)
+	e.POST(prefix +"/pin", h.HandleAddPin)
 	e.POST(prefix +"/pin/:id/comment", h.HandleCreateComment)
 	e.GET(prefix +"/pin/:id", h.HandleGetPin)
 	e.GET(prefix +"/pin/list/new", h.HandleGetNewPins)
