@@ -70,7 +70,7 @@ func (h *HandlersStruct) HandleGetMessages(ctx echo.Context) (Err error) {
 	}{messages, "OK"}
 
 	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
-	return ctx.JSON(http.StatusBadRequest, data)
+	return ctx.JSON(http.StatusOK, data)
 }
 
 func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
