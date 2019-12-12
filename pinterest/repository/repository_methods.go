@@ -856,7 +856,7 @@ func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Mes
 	SELECT chat.sender_id, chat.receiver_id, chat.text, max(send_time)
 	FROM sunrise.chat_message as chat
 	WHERE chat.is_deleted = false
-	  AND (chat.sender_id = 1 OR chat.receiver_id = 2)
+	  AND (chat.sender_id = $1 OR chat.receiver_id = $1)
 	GROUP BY chat.sender_id, chat.receiver_id, chat.text;`
 	messageSlice := make([]models.Message, 0)
 	rows, err := RS.DataBase.Query(sqlQuery, userId)
