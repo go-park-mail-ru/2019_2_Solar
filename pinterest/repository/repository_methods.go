@@ -467,7 +467,7 @@ func (RS *ReposStruct) SelectNewPinsDisplayByNumber(limit, id int) (Pins []model
 	sqlQuery := `
 	SELECT p.id, p.pindir, p.title
 	FROM sunrise.pin as p
-	WHERE isdeleted = false AND p.id > $2
+	WHERE isdeleted = false AND p.id < $2
 	ORDER BY p.createdtime DESC
 	LIMIT $1 OFFSET 0;`
 	rows, err := RS.DataBase.Query(sqlQuery, limit, id)
