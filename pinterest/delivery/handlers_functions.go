@@ -7,45 +7,46 @@ import (
 
 func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface) error {
 	h.PUsecase = useCase
+	prefix := "/api/v1"
 
-	e.GET("/", h.HandleEmpty)
+	e.GET(prefix + "/", h.HandleEmpty)
 
-	e.GET("/users", h.HandleListUsers)
-	e.GET("/users/:username", h.HandleGetUserByUsername)
+	e.GET(prefix + "/users", h.HandleListUsers)
+	e.GET(prefix + "/users/:username", h.HandleGetUserByUsername)
 
-	e.POST("/subscribe/:username", h.HandleCreateSubscribe)
-	e.DELETE("/subscribe/:username", h.HandleDeleteSubscribe)
+	e.POST(prefix + "/subscribe/:username", h.HandleCreateSubscribe)
+	e.DELETE(prefix +"/subscribe/:username", h.HandleDeleteSubscribe)
 
-	e.POST("/registration", h.HandleRegUser)
-	e.POST("/login", h.HandleLoginUser)
-	e.POST("/logout", h.HandleLogoutUser)
+	e.POST(prefix +"/registration", h.HandleRegUser)
+	e.POST(prefix +"/login", h.HandleLoginUser)
+	e.POST(prefix +"/logout", h.HandleLogoutUser)
 
-	e.GET("/profile/data", h.HandleGetProfileUserData)
+	e.GET(prefix +"/profile/data", h.HandleGetProfileUserData)
 
-	e.POST("/profile/data", h.HandleEditProfileUserData)
-	e.POST("/profile/picture", h.HandleEditProfileUserPicture)
+	e.POST(prefix +"/profile/data", h.HandleEditProfileUserData)
+	e.POST(prefix + "/profile/picture", h.HandleEditProfileUserPicture)
 
-	e.POST("/board", h.HandleCreateBoard)
-	e.GET("/board/:id", h.HandleGetBoard)
-	e.GET("/board/list/my", h.HandleGetMyBoards)
+	e.POST(prefix +"/board", h.HandleCreateBoard)
+	e.GET(prefix +"/board/:id", h.HandleGetBoard)
+	e.GET(prefix +"/board/list/my", h.HandleGetMyBoards)
 
-	e.POST("/pin", h.HandleCreatePin)
-	e.POST("/pin/:id/comment", h.HandleCreateComment)
-	e.GET("/pin/:id", h.HandleGetPin)
-	e.GET("/pin/list/new", h.HandleGetNewPins)
-	e.GET("/pin/list/my", h.HandleGetMyPins)
-	e.GET("/pin/list/subscribe", h.HandleGetSubscribePins)
+	e.POST(prefix +"/pin", h.HandleCreatePin)
+	e.POST(prefix +"/pin/:id/comment", h.HandleCreateComment)
+	e.GET(prefix +"/pin/:id", h.HandleGetPin)
+	e.GET(prefix +"/pin/list/new", h.HandleGetNewPins)
+	e.GET(prefix +"/pin/list/my", h.HandleGetMyPins)
+	e.GET(prefix +"/pin/list/subscribe", h.HandleGetSubscribePins)
 
-	e.POST("/notice/:receiver_id", h.HandleCreateNotice)
-	e.GET( "/notice", h.HandleGetNotices)
+	e.POST(prefix +"/notice/:receiver_id", h.HandleCreateNotice)
+	e.GET(prefix +"/notice", h.HandleGetNotices)
 
-	e.GET("/chat", h.HandleUpgradeWebSocket)
-	e.GET("/chat/messages/:senderId/:receiverId", h.HandleGetMessages)
+	e.GET(prefix +"/chat", h.HandleUpgradeWebSocket)
+	e.GET(prefix +"/chat/messages/:senderId/:receiverId", h.HandleGetMessages)
 
-	e.GET( "/find/pins/by/tag/:tag", h.HandlerFindPinByTag)
-	e.GET( "/find/users/by/username/:username", h.HandlerFindUserByUsername)
+	e.GET(prefix +"/find/pins/by/tag/:tag", h.HandlerFindPinByTag)
+	e.GET(prefix +"/find/users/by/username/:username", h.HandlerFindUserByUsername)
 
-	e.GET ("/categories", h.HandleGetCategories)
+	e.GET (prefix +"/categories", h.HandleGetCategories)
 
 	return nil
 }
