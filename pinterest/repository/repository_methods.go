@@ -825,7 +825,13 @@ func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error)
 
 func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
 	chatMessageSlice := make([]models.OutputMessage, 0)
-	rows, err := RS.DataBase.Query(consts.SELECTChatMessagesByUsersId, senderId, receiverId)
+	sqlQuery := `SELECT cm.sender_id, cm.receiver_id, cm.text, cm.send_time
+	from sunrise.chat_message as cm
+	where ((cm.sender_id = 3 AND cm.receiver_id = 4)
+		OR (cm.sender_id = 4 AND cm.receiver_id = 3))
+	  AND cm.is_deleted = false
+	ORDER BY cm.send_time DESC`
+	rows, err := RS.DataBase.Query(sqlQuery, senderId, receiverId)
 	if err != nil {
 		return chatMessageSlice, err
 	}
@@ -836,7 +842,7 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	}()
 	for rows.Next() {
 		message := models.OutputMessage{}
-		err := rows.Scan(&message.Message, &message.SendTime)
+		err := rows.Scan(&message.SenderId, &message.ReceiverId, &message.Message, &message.SendTime)
 		if err != nil {
 			return chatMessageSlice, err
 		}

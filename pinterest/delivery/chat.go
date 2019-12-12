@@ -48,23 +48,16 @@ func (h *HandlersStruct) HandleGetMessages(ctx echo.Context) (Err error) {
 	}
 	user := getUser.(models.User)
 
-	senderIdStr := ctx.Param("senderId")
-	senderIdInt, err := strconv.Atoi(senderIdStr)
-	if err != nil {
-		return nil
-	}
-	senderId := uint64(senderIdInt)
+	senderId := user.ID
 
-	receiverIdStr := ctx.Param("receiverId")
+	receiverIdStr := ctx.Param("recipientId")
+
 	receiverIdInt, err := strconv.Atoi(receiverIdStr)
 	if err != nil {
 		return err
 	}
-	receiverId := uint64(receiverIdInt)
 
-	if user.ID != senderId && user.ID != receiverId {
-		return errors.New("Not your chat!")
-	}
+	receiverId := uint64(receiverIdInt)
 
 	messages, err := h.PUsecase.GetMessages(senderId, receiverId)
 	if err != nil {
@@ -77,10 +70,7 @@ func (h *HandlersStruct) HandleGetMessages(ctx echo.Context) (Err error) {
 	}{messages, "OK"}
 
 	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
-	if err := ctx.JSON(200, data); err != nil {
-		return err
-	}
-	return nil
+	return ctx.JSON(http.StatusBadRequest, data)
 }
 
 func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {

@@ -195,8 +195,10 @@ type ChatMessage struct {
 }
 
 type OutputMessage struct {
-	Message  string    `json:"text"`
-	SendTime time.Time `json:"send_time"`
+	SenderId   uint64    `json:"senderId"`
+	ReceiverId uint64    `json:"receiverId"`
+	Message    string    `json:"text"`
+	SendTime   time.Time `json:"send_time"`
 }
 
 type Subscribe struct {
