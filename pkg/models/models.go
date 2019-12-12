@@ -217,3 +217,21 @@ type AddPin struct {
 	PinDir      string `json:"pin_dir"`
 	Title       string `json:"title"`
 }
+
+type ChatRecipient struct {
+	Id       uint64      `json:"id"`
+	Username string      `json:"username"`
+	Message  ChatMessage `json:"chatMessage"`
+}
+
+type Recipients struct {
+	ChatRecipients []ChatRecipient `json:"chatRecipient"`
+}
+
+type Message struct {
+	IdSender    uint64    `json:"id_sender"`
+	IdRecipient uint64    `json:"id_recipient"`
+	Message     string    `json:"text"`
+	SendTime    time.Time `json:"send_time"`
+	IsDeleted   bool      `json:"is_deleted"`
+}

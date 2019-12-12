@@ -92,4 +92,6 @@ type UseInterface interface {
 
 	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
 
+	GetRecipients(userId uint64) (mes []models.Message, er error)
+
 }

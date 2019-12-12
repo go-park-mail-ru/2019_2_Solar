@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
+	"net/http"
 	"strconv"
 )
 
@@ -80,4 +81,24 @@ func (h *HandlersStruct) HandleGetMessages(ctx echo.Context) (Err error) {
 		return err
 	}
 	return nil
+}
+
+func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	messages, err := h.PUsecase.GetRecipients(user.ID)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, messages)
 }

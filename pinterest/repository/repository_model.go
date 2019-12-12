@@ -57,4 +57,6 @@ type ReposInterface interface {
 	SelectUsersByUsernameSearch(username string) (Users []models.User, Err error)
 
 	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
+
+	SelectRecipientsByUserId(userId uint64) (mes []models.Message, er error)
 }
