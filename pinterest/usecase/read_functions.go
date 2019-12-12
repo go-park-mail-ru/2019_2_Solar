@@ -219,4 +219,5 @@ func (USC *UseStruct) GetRecipients(userId uint64) (rec []models.Message, er err
 	if err != nil {
 		return messages, err
 	}
+	return messages, nil
 }
