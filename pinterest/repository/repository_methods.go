@@ -827,8 +827,8 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	chatMessageSlice := make([]models.OutputMessage, 0)
 	sqlQuery := `SELECT cm.sender_id, cm.receiver_id, cm.text, cm.send_time
 	from sunrise.chat_message as cm
-	where ((cm.sender_id = 3 AND cm.receiver_id = 4)
-		OR (cm.sender_id = 4 AND cm.receiver_id = 3))
+	where ((cm.sender_id = $1 AND cm.receiver_id = $2)
+		OR (cm.sender_id = $2 AND cm.receiver_id = $1))
 	  AND cm.is_deleted = false
 	ORDER BY cm.send_time DESC`
 	rows, err := RS.DataBase.Query(sqlQuery, senderId, receiverId)
