@@ -858,14 +858,15 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	return chatMessageSlice, nil
 }
 
-func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Message, er error) {
+func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error) {
 	sqlQuery := `
-	SELECT chat.sender_id, chat.receiver_id, chat.text, max(send_time)
+	SELECT u1.username, u2.username, chat.text, max(send_time)
 	FROM sunrise.chat_message as chat
-	WHERE chat.is_deleted = false
-	  AND (chat.sender_id = $1 OR chat.receiver_id = $1)
+	JOIN sunrise.user as u1 ON u1.id = chat.sender_id
+	JOIN sunrise.user as u2 ON u2.id = chat.receiver_id
+	WHERE chat.is_deleted = false AND (chat.sender_id = $1 OR chat.receiver_id = $1)
 	GROUP BY chat.sender_id, chat.receiver_id, chat.text;`
-	messageSlice := make([]models.Message, 0)
+	messageSlice := make([]models.MessageWithUsername, 0)
 	rows, err := RS.DataBase.Query(sqlQuery, userId)
 	if err != nil {
 		return messageSlice, err
@@ -876,8 +877,8 @@ func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Mes
 		}
 	}()
 	for rows.Next() {
-		messageScan := models.Message{}
-		err := rows.Scan(&messageScan.IdSender, &messageScan.IdRecipient, &messageScan.Message, &messageScan.SendTime)
+		messageScan := models.MessageWithUsername{}
+		err := rows.Scan(&messageScan.SenderUserName, &messageScan.RecipientUserName, &messageScan.Message, &messageScan.SendTime)
 		if err != nil {
 			return messageSlice, err
 		}

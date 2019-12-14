@@ -58,5 +58,5 @@ type ReposInterface interface {
 
 	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
 
-	SelectRecipientsByUserId(userId uint64) (mes []models.Message, er error)
+	SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error)
 }

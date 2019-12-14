@@ -214,7 +214,7 @@ func (USC *UseStruct) GetMessages(senderId, receiverId uint64) (mes []models.Out
 	return messages, nil
 }
 
-func (USC *UseStruct) GetRecipients(userId uint64) (rec []models.Message, er error) {
+func (USC *UseStruct) GetRecipients(userId uint64) (rec []models.MessageWithUsername, er error) {
 	messages, err := USC.PRepository.SelectRecipientsByUserId(userId)
 	if err != nil {
 		return messages, err

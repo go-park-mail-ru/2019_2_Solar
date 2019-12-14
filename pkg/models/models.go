@@ -237,3 +237,11 @@ type Message struct {
 	SendTime    time.Time `json:"send_time"`
 	IsDeleted   bool      `json:"is_deleted"`
 }
+
+type MessageWithUsername struct {
+	SenderUserName    string    `json:"senderUserName"`
+	RecipientUserName string    `json:"recipientUserName"`
+	Message           string    `json:"text"`
+	SendTime          time.Time `json:"send_time"`
+	IsDeleted         bool      `json:"is_deleted"`
+}
