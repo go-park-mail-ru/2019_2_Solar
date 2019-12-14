@@ -837,7 +837,7 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	where ((cm.sender_id = $1 AND cm.receiver_id = $2)
 		OR (cm.sender_id = $2 AND cm.receiver_id = $1))
 	  AND cm.is_deleted = false
-	ORDER BY cm.send_time DESC`
+	ORDER BY cm.send_time`
 	rows, err := RS.DataBase.Query(sqlQuery, senderId, receiverId)
 	if err != nil {
 		return chatMessageSlice, err
