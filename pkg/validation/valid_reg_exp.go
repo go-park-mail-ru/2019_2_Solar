@@ -24,4 +24,6 @@ var (
 	PinDescription = regexp.MustCompile(`^.{0,200}$`)
 
 	FindTags = regexp.MustCompile(`#\w+`)
+
+	FindJpg = regexp.MustCompile(`https:\/\/.{1,100}.jpg`)
 )
