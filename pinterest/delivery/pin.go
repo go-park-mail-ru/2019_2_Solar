@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"io"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -168,7 +167,7 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 	if id == 0 {
-		id = math.MaxInt64
+		id = 1000000
 	}
 
 	pins, err := h.PUsecase.GetNewPins(limit, id)

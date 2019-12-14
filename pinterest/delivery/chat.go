@@ -90,5 +90,5 @@ func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(http.StatusOK, messages)
+	return ctx.JSON(http.StatusOK, messages[0])
 }
