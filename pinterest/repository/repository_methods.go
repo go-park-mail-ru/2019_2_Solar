@@ -737,9 +737,12 @@ func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string)
 	return nil
 }
 
-func (RS *ReposStruct) InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error) {
+func (RS *ReposStruct) InsertChatMessage(message models.SaveMessage) (uint64, error) {
+	sqlQuery := `INSERT INTO sunrise.chat_message (sender_id, receiver_id, text, send_time)
+	SELECT $1, $2, $3, $4
+	RETURNING id	`
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTChatMessage, senderId, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
+	err := RS.DataBase.QueryRow(sqlQuery, message.IdSender, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -909,8 +912,8 @@ func (RS *ReposStruct) SelectFolloweeByUserId(userId uint64) (mes []models.User,
 			return usersSlice, err
 		}
 		user := models.User{
-			Username:    dbuser.Username,
-			AvatarDir:   dbuser.AvatarDir.String,
+			Username:  dbuser.Username,
+			AvatarDir: dbuser.AvatarDir.String,
 		}
 		usersSlice = append(usersSlice, user)
 	}

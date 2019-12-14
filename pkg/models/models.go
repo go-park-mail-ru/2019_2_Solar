@@ -194,6 +194,14 @@ type ChatMessage struct {
 	IsDeleted      bool      `json:"is_deleted"`
 }
 
+type SaveMessage struct {
+	IdSender    uint64    `json:"-"`
+	IdRecipient uint64    `json:"-"`
+	Message     string    `json:"-"`
+	SendTime    time.Time `json:"-"`
+	IsDeleted   bool      `json:""`
+}
+
 type OutputMessage struct {
 	SenderId   uint64    `json:"senderId"`
 	ReceiverId uint64    `json:"receiverId"`
