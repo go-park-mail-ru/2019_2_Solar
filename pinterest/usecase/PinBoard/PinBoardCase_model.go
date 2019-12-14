@@ -7,7 +7,7 @@ import (
 )
 
 type PinBoardCase struct {
-	PinBoardRep repository.PinBoard
+	PinBoardRep repository.ReposStruct
 	Sanitizer   sanitizer.SanitInterface
 	Mu          *sync.Mutex
 }
