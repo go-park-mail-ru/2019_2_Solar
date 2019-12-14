@@ -221,3 +221,11 @@ func (USC *UseStruct) GetRecipients(userId uint64) (rec []models.MessageWithUser
 	}
 	return messages, nil
 }
+
+func (USC *UseStruct) GetFolloweeUserBySubscriberId(userId uint64) (users []models.User, er error) {
+	users, err := USC.PRepository.SelectFolloweeByUserId(userId)
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}

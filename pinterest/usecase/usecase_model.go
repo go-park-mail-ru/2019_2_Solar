@@ -94,4 +94,6 @@ type UseInterface interface {
 
 	GetRecipients(userId uint64) (mes []models.MessageWithUsername, er error)
 
+	GetFolloweeUserBySubscriberId(userId uint64) (users []models.User, er error)
+
 }

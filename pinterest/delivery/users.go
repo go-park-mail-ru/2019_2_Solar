@@ -39,20 +39,12 @@ func (h *HandlersStruct) HandleGetUserByUsername(ctx echo.Context) (Err error) {
 		return err
 	}
 
-
-	//data := h.PUsecase.SetJSONData(userProfile, ctx.Get("token").(string), "OK")
-	//err = encoder.Encode(data)
-	//if err != nil {
-	//	return err
-	//}
-	//return nil
-
 	body := struct {
-		User models.AnotherUser `json:"user"`
-		Pins  []models.PinDisplay `json:"pins"`
-		Info  string     `json:"info"`
+		User models.AnotherUser  `json:"user"`
+		Pins []models.PinDisplay `json:"pins"`
+		Info string              `json:"info"`
 	}{userProfile, pins, "OK"}
-	data := models.ValeraJSONResponse{ctx.Get("token").(string),body}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}
@@ -105,6 +97,30 @@ func (h *HandlersStruct) HandleDeleteSubscribe(ctx echo.Context) (Err error) {
 		Info string `json:"info"`
 	}{"data successfully saved"}
 	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *HandlersStruct) HandleGetFolloweeUser(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	getUser := ctx.Get("User")
+	if getUser != nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	ctx.Response().Header().Set("Content-Type", "application/json")
+
+	followeeUsers, err := h.PUsecase.GetFolloweeUserBySubscriberId(user.ID)
+	if err != nil {
+		return err
+	}
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), followeeUsers}
 	if err := ctx.JSON(200, data); err != nil {
 		return err
 	}

@@ -886,3 +886,33 @@ func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Mes
 	}
 	return messageSlice, nil
 }
+
+func (RS *ReposStruct) SelectFolloweeByUserId(userId uint64) (mes []models.User, er error) {
+	sqlQuery := `SELECT u.username, u.avatardir
+	FROM sunrise.user as u
+	JOIN sunrise.subscribe as sub ON sub.followee_id = u.id
+	WHERE sub.subscriber_id = $1`
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(sqlQuery, userId)
+	if err != nil {
+		return usersSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+	for rows.Next() {
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.Username, &dbuser.AvatarDir)
+		if err != nil {
+			return usersSlice, err
+		}
+		user := models.User{
+			Username:    dbuser.Username,
+			AvatarDir:   dbuser.AvatarDir.String,
+		}
+		usersSlice = append(usersSlice, user)
+	}
+	return usersSlice, nil
+}
