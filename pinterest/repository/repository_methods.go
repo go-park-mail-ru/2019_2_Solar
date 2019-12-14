@@ -863,7 +863,7 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 
 func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error) {
 	sqlQuery := `
-	SELECT chat.id, u1.username, u2.username, chat.send_time
+	SELECT u1.username, u2.username, chat.text, chat.send_time
 	FROM sunrise.chat_message as chat
 			 JOIN sunrise.user as u1 ON u1.id = chat.sender_id
 			 JOIN sunrise.user as u2 ON u2.id = chat.receiver_id
