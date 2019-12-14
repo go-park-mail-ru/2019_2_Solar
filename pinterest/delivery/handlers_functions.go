@@ -13,7 +13,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 
 	e.GET(prefix + "/users", h.HandleListUsers)
 	e.GET(prefix + "/users/:username", h.HandleGetUserByUsername)
-	e.GET(prefix + "/followee/", h.HandleGetFolloweeUser)
+	e.GET(prefix + "/followee", h.HandleGetFolloweeUser)
 
 
 	e.POST(prefix + "/subscribe/:username", h.HandleCreateSubscribe)
