@@ -863,12 +863,16 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 
 func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error) {
 	sqlQuery := `
-	SELECT u1.username, u2.username, chat.text, max(send_time)
+	SELECT chat.id, u1.username, u2.username
 	FROM sunrise.chat_message as chat
-	JOIN sunrise.user as u1 ON u1.id = chat.sender_id
-	JOIN sunrise.user as u2 ON u2.id = chat.receiver_id
-	WHERE chat.is_deleted = false AND (chat.sender_id = $1 OR chat.receiver_id = $1)
-	GROUP BY u1.username, u2.username, chat.text;`
+			 JOIN sunrise.user as u1 ON u1.id = chat.sender_id
+			 JOIN sunrise.user as u2 ON u2.id = chat.receiver_id
+	WHERE chat.is_deleted = false
+	  AND (chat.sender_id = $1 OR chat.receiver_id = $1)
+	  AND chat.send_time = (SELECT max(send_time)
+							FROM sunrise.chat_message as chat
+							WHERE chat.is_deleted = false
+							  AND (chat.sender_id = $1 OR chat.receiver_id = $1))`
 	messageSlice := make([]models.MessageWithUsername, 0)
 	rows, err := RS.DataBase.Query(sqlQuery, userId)
 	if err != nil {
