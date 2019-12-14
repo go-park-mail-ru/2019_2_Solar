@@ -115,7 +115,7 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 			SendTime:       saveMessage.SendTime,
 			IsDeleted:      saveMessage.IsDeleted,
 		}
-		
+
 		for client := range c.Hub.Clients {
 			if client.User.ID == chatMessage.IdRecipient {
 				client.Send <- chatMessage
