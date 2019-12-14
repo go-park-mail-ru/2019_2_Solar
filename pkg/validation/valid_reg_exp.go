@@ -25,5 +25,7 @@ var (
 
 	FindTags = regexp.MustCompile(`#\w+`)
 
-	FindJpg = regexp.MustCompile(`https:\/\/.{1,100}.jpg`)
+	//FindJpg = regexp.MustCompile(`(image_large_url|image_cover_hd_url)\\":\\"https:.{1,100}.jpg`)
+	FindJpg = regexp.MustCompile(`(orig.{1,150}.jpg|((image_large_url|image_cover_hd_url)\\":\\"https:.{1,100}.jpg)|3x, https:.{1,100}.jpg)`)
+	FindPinUrl = regexp.MustCompile(`https:.{1,100}.jpg`)
 )

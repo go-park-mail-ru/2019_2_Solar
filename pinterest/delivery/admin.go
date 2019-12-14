@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"io"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -75,6 +76,26 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 			0,
 			0,
 		},
+		{
+			"Int64",
+			0,
+			0,
+		},
+		{
+			"Kirik_2020",
+			0,
+			0,
+		},
+		{
+			"asgentos_lux",
+			0,
+			0,
+		},
+		{
+			"Mr_Fin",
+			0,
+			0,
+		},
 	}
 	//usersList := []string{
 	//	"ADN",
@@ -91,9 +112,13 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 
 	//encoder := json.NewEncoder(ctx.Response())
 	//decoder := json.NewDecoder(ctx.Request().Body)
-	PinUrls := validation.FindJpg.FindAllString(consts.PinterestPins, -1)
-	pinsIndex := 0
-	println(PinUrls)
+	pinsStrings := validation.FindJpg.FindAllString(consts.PinterestPins, -1)
+	PinUrls := []string{}
+	for _, url := range pinsStrings {
+		PinUrls = append(PinUrls, validation.FindPinUrl.FindString (url))
+	}
+
+	rand.Seed(time.Now().Unix())
 
 	for i := 0; i < len(myUsers); i++ {
 		var err error
@@ -101,11 +126,23 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 		if err != nil {
 			return err
 		}
+		user, _ := h.PUsecase.GetUserByEmail(myUsers[i].Username + "@email.eu")
+		newProfile := models.EditUserProfile{
+			Name:     consts.LatinoNames[rand.Intn(len(consts.LatinoNames))],
+			Surname:  consts.LatinoSurnames[rand.Intn(len(consts.LatinoSurnames))],
+			Age:      string(16 + rand.Intn(30)),
+			Status:   consts.LatinoDescription[rand.Intn(len(consts.LatinoDescription))],
+		}
+
+
+		_, err = h.PUsecase.SetUser(newProfile, user)
+
+
 		board := models.Board{
 			OwnerID:     myUsers[i].UserID,
 			Title:       myUsers[i].Username + " board",
-			Description: "",
-			Category:    "cars",
+			Description: consts.LatinoDescription[rand.Intn(len(consts.LatinoDescription))],
+			Category:    "default_category",
 			CreatedTime: time.Now(),
 		}
 		myUsers[i].boardID, err = h.PUsecase.AddBoard(board)
@@ -113,15 +150,18 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 			return err
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 20; i++ {
 		for i := 0; i < len(myUsers); i++ {
 			var err error
-			resp, err := http.Get(PinUrls[pinsIndex])
+
+			index := rand.Intn(len(PinUrls))
+			url := PinUrls[index]
+			PinUrls = append(PinUrls[:index], PinUrls[index+1:]...)
+
+			resp, err := http.Get(url)
 			if err != nil {
-				return err
+				continue
 			}
-			pinsIndex++
-			defer resp.Body.Close()
 
 			var buf bytes.Buffer
 			tee := io.TeeReader(resp.Body, &buf)
@@ -141,8 +181,8 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 				OwnerID:     myUsers[i].UserID,
 				AuthorID:    myUsers[i].UserID,
 				BoardID:     myUsers[i].boardID,
-				Title:       myUsers[i].Username + " pin",
-				Description: "",
+				Title:       consts.LatinoTitles[rand.Intn(len(consts.LatinoTitles))],
+				Description: consts.LatinoDescription[rand.Intn(len(consts.LatinoDescription))],
 				PinDir:      fileName,
 				CreatedTime: time.Now(),
 			}
@@ -150,8 +190,14 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 			if err != nil {
 				return err
 			}
+
+			resp.Body.Close()
 		}
 	}
 
+	data := models.ValeraJSONResponse{ctx.Get("token").(string),nil}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
 	return nil
 }
