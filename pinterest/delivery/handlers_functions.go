@@ -50,5 +50,8 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 
 	e.GET (prefix +"/categories", h.HandleGetCategories)
 
+	e.POST(prefix +"/admin/fill", h.HandleAdminFill)
+
+
 	return nil
 }
