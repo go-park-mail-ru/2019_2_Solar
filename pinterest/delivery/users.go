@@ -110,7 +110,7 @@ func (h *HandlersStruct) HandleGetFolloweeUser(ctx echo.Context) (Err error) {
 		}
 	}()
 	getUser := ctx.Get("User")
-	if getUser != nil {
+	if getUser == nil {
 		return errors.New("not authorized")
 	}
 	user := getUser.(models.User)
