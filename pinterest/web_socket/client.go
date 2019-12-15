@@ -107,7 +107,9 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 			fmt.Println(err)
 			break
 		}
-
+		if saveMessage.IdRecipient == saveMessage.IdSender {
+			continue
+		}
 		chatMessage := models.ChatMessage{
 			UserNameSender: c.User.Username,
 			IdRecipient:    saveMessage.IdRecipient,
