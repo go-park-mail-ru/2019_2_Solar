@@ -96,4 +96,6 @@ type UseInterface interface {
 	SetPin(pin models.EditPin, userId uint64) error
 	RemovePin(id uint64) error
 	SearchPinsByCategory(category string, desc bool) ([]models.PinDisplay, error)
+
+	AddFeedBack(newFeedBack models.NewFeedBack) error
 }

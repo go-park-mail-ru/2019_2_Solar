@@ -56,5 +56,6 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 
 	e.POST(prefix+"/admin/fill", h.HandleAdminFill)
 
+	e.POST(prefix+"/feedback", h.HandleFeedback)
 	return nil
 }

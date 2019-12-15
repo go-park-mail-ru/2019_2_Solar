@@ -253,3 +253,11 @@ func (USC *UseStruct) SetPin(pin models.EditPin, userId uint64) error {
 	}
 	return nil
 }
+
+func (USC *UseStruct) AddFeedBack(newFeedBack models.NewFeedBack) error {
+	err := USC.PRepository.InsertFeedBack(newFeedBack)
+	if err != nil {
+		return err
+	}
+	return nil
+}

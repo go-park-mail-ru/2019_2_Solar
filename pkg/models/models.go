@@ -261,3 +261,9 @@ type EditPin struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
+
+type NewFeedBack struct {
+	Id      uint64 `json:"-"`
+	UserId  uint64 `json:"-"`
+	Message string `json:"message"`
+}

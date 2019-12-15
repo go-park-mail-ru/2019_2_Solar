@@ -1013,3 +1013,13 @@ func (RS *ReposStruct) SelectPinsByCategoryDESC(category string) (pinSl []models
 	}
 	return pins, nil
 }
+
+func (RS *ReposStruct) InsertFeedBack(feedBack models.NewFeedBack) error {
+	sqlQuery := `INSERT INTO sunrise.feedback (user_id, message)
+	values ($1, $2)	`
+	_, err := RS.DataBase.Exec(sqlQuery, feedBack.UserId, feedBack.Message)
+	if err != nil {
+		return err
+	}
+	return nil
+}
