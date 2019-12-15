@@ -371,3 +371,32 @@ func (h *HandlersStruct) HandleEditPin(ctx echo.Context) (Err error) {
 	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: "ok"}
 	return ctx.JSON(http.StatusOK, data)
 }
+
+func (h *HandlersStruct) HandleDeletePin(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	//user := getUser.(models.User)
+	strId := ctx.Param("id")
+	if strId == "" {
+		return errors.New("incorrect id")
+	}
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		return err
+	}
+
+	if err := h.PUsecase.RemovePin(uint64(id)); err != nil {
+		return err
+	}
+
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: "ok"}
+	return ctx.JSON(http.StatusOK, data)
+}

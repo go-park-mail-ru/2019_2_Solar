@@ -835,8 +835,9 @@ func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error)
 
 func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
 	chatMessageSlice := make([]models.OutputMessage, 0)
-	sqlQuery := `SELECT cm.sender_id, cm.receiver_id, cm.text, cm.send_time
+	sqlQuery := `SELECT cm.sender_id, u.username, cm.receiver_id, cm.text, cm.send_time
 	from sunrise.chat_message as cm
+	JOIN sunrise.user AS u on cm.sender_id = u.id
 	where ((cm.sender_id = $1 AND cm.receiver_id = $2)
 		OR (cm.sender_id = $2 AND cm.receiver_id = $1))
 	  AND cm.is_deleted = false
@@ -852,7 +853,7 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	}()
 	for rows.Next() {
 		message := models.OutputMessage{}
-		err := rows.Scan(&message.SenderId, &message.ReceiverId, &message.Message, &message.SendTime)
+		err := rows.Scan(&message.SenderId, &message.SenderUsername, &message.ReceiverId, &message.Message, &message.SendTime)
 		if err != nil {
 			return chatMessageSlice, err
 		}
@@ -945,4 +946,14 @@ func (RS *ReposStruct) UpdatePin(pin models.EditPin, userId uint64) (int, error)
 		return 0, err
 	}
 	return int(rowsEdit), nil
+}
+
+func (RS *ReposStruct) DeletePinById(id uint64) error {
+	sqlQuery := `DELETE 
+	FROM sunrise.pin as p WHERE p.id = $1`
+	_, err := RS.DataBase.Exec(sqlQuery, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

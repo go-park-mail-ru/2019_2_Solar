@@ -33,6 +33,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 
 	e.POST(prefix+"/pin", h.HandleCreatePin)
 	e.PUT(prefix+"/pin/:id", h.HandleEditPin)
+	e.DELETE(prefix+"/pin/:id", h.HandleDeletePin)
 	e.POST(prefix+"/add/pin", h.HandleAddPin)
 	e.POST(prefix+"/pin/:id/comment", h.HandleCreateComment)
 	e.GET(prefix+"/pin/:id", h.HandleGetPin)
