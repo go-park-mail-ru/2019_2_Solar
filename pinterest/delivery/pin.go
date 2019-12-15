@@ -333,3 +333,38 @@ func (h *HandlersStruct) HandleAddPin(ctx echo.Context) (Err error) {
 
 	return nil
 }
+
+func (h *HandlersStruct) HandleEditPin(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	strId := ctx.Param("id")
+	if strId == "" {
+		return errors.New("incorrect id")
+	}
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		return err
+	}
+	editPin := models.EditPin{}
+	if err := ctx.Bind(&editPin); err != nil {
+		ctx.Logger().Warn(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	editPin.Id = uint64(id)
+
+	if err := h.PUsecase.SetPin(editPin, user.ID); err != nil {
+		return err
+	}
+
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: "ok"}
+	return ctx.JSON(http.StatusOK, data)
+}

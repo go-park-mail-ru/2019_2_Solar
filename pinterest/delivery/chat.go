@@ -90,5 +90,6 @@ func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(http.StatusOK, messages[0])
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: messages[0]}
+	return ctx.JSON(http.StatusOK, data)
 }

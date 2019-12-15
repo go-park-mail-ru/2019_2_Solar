@@ -11,6 +11,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"os"
@@ -221,7 +222,7 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 	}
 
 	alredyExitstflag := false
-	for _, tag := range  tags {
+	for _, tag := range tags {
 		for _, uniqueTag := range uniqueTags {
 			if uniqueTag == tag {
 				alredyExitstflag = true
@@ -235,7 +236,7 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 		alredyExitstflag = false
 	}
 
-	for _, tag := range  tags {
+	for _, tag := range tags {
 		if err := USC.PRepository.InsertPinAndTag(pinID, tag); err != nil {
 			return err
 		}
@@ -244,3 +245,13 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 	return nil
 }
 
+func (USC *UseStruct) SetPin(pin models.EditPin, userId uint64) error {
+	rowsAffected, err := USC.PRepository.UpdatePin(pin, userId)
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return errors.New("Ошибка при редактировании пина")
+	}
+	return nil
+}

@@ -253,3 +253,10 @@ type MessageWithUsername struct {
 	SendTime          time.Time `json:"send_time"`
 	IsDeleted         bool      `json:"is_deleted"`
 }
+
+type EditPin struct {
+	Id          uint64 `json:"-"`
+	BoardID     uint64 `json:"board_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}

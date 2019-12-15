@@ -923,3 +923,24 @@ func (RS *ReposStruct) SelectFolloweeByUserId(userId uint64) (mes []models.User,
 	}
 	return usersSlice, nil
 }
+
+func (RS *ReposStruct) UpdatePin(pin models.EditPin, userId uint64) (int, error) {
+	sqlQuery := `
+	UPDATE sunrise.pin as p
+	SET board_id    = $1,
+		title       = $2,
+		description = $3
+	FROM sunrise.user as u
+	where p.id = $4
+	  AND u.id = p.owner_id
+	  AND u.id = $5`
+	result, err := RS.DataBase.Exec(sqlQuery, pin.BoardID, pin.Title, pin.Description, pin.Id, userId)
+	if err != nil {
+		return 0, err
+	}
+	rowsEdit, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsEdit), nil
+}
