@@ -308,6 +308,9 @@ func (h *HandlersStruct) HandleAddPin(ctx echo.Context) (Err error) {
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddPin(pin)
+	if err != nil {
+		return err
+	}
 	err = h.PUsecase.AddTags(pin.Description, lastID)
 	if err != nil {
 		return err

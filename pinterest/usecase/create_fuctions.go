@@ -175,8 +175,6 @@ func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
 }
 
 func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
-	var params []interface{}
-	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
 	lastID, err := USC.PRepository.InsertPin(Pin)
 	if err != nil {
 		return 0, err
