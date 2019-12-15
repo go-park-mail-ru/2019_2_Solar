@@ -92,9 +92,9 @@ func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
 		return err
 	}
 	var uniqueMes []models.MessageWithUsername
-	for i := 0; i < len(messages)-1; i++ {
+	for i := 0; i < len(messages); i++ {
 		mes := messages[i]
-		for j := i + 1; j < len(messages); j++ {
+		for j := i; j < len(messages); j++ {
 			if messages[i].SenderUserName == messages[j].RecipientUserName && messages[i].RecipientUserName == messages[j].SenderUserName && messages[i].SendTime.Before(messages[j].SendTime) {
 				mes = messages[j]
 				continue
