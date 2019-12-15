@@ -95,4 +95,5 @@ type UseInterface interface {
 	GetFolloweeUserBySubscriberId(userId uint64) (users []models.User, er error)
 	SetPin(pin models.EditPin, userId uint64) error
 	RemovePin(id uint64) error
+	SearchPinsByCategory(category string, desc bool) ([]models.PinDisplay, error)
 }

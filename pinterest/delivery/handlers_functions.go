@@ -49,6 +49,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.GET(prefix+"/chat/recipients", h.HandleChatRecipient)
 
 	e.GET(prefix+"/find/pins/by/tag/:tag", h.HandlerFindPinByTag)
+	e.GET(prefix+"/find/pins/by/category/:category", h.HandlerFindPinByCategory)
 	e.GET(prefix+"/find/users/by/username/:username", h.HandlerFindUserByUsername)
 
 	e.GET(prefix+"/categories", h.HandleGetCategories)

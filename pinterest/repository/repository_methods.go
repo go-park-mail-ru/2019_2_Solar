@@ -957,3 +957,59 @@ func (RS *ReposStruct) DeletePinById(id uint64) error {
 	}
 	return nil
 }
+
+func (RS *ReposStruct) SelectPinsByCategory(category string) (pinSl []models.PinDisplay, er error) {
+	pins := make([]models.PinDisplay, 0)
+	sqlQuery := `SELECT DISTINCT p.id, p.pindir, p.title
+	FROM sunrise.pin as p
+			 JOIN sunrise.board as b ON b.id = p.board_id
+	WHERE upper(b.category) = upper($1) AND p.isdeleted = false 
+	ORDER BY p.createdtime;`
+	rows, err := RS.DataBase.Query(sqlQuery, category)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
+func (RS *ReposStruct) SelectPinsByCategoryDESC(category string) (pinSl []models.PinDisplay, er error) {
+	pins := make([]models.PinDisplay, 0)
+	sqlQuery := `SELECT DISTINCT p.id, p.pindir, p.title
+	FROM sunrise.pin as p
+			 JOIN sunrise.board as b ON b.id = p.board_id
+	WHERE upper(b.category) = upper($1) AND p.isdeleted = false 
+	ORDER BY p.createdtime DESC;`
+	rows, err := RS.DataBase.Query(sqlQuery, category)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}

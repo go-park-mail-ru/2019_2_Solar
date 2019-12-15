@@ -62,4 +62,6 @@ type ReposInterface interface {
 	SelectFolloweeByUserId(userId uint64) (mes []models.User, er error)
 	UpdatePin(pin models.EditPin, userId uint64) (int, error)
 	DeletePinById(id uint64) error
+	SelectPinsByCategory(category string) ([]models.PinDisplay, error)
+	SelectPinsByCategoryDESC(category string) ([]models.PinDisplay, error)
 }
