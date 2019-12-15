@@ -222,7 +222,7 @@ type Category struct {
 
 type AddPin struct {
 	AuthorId    uint64 `json:"author_id"`
-	BoardId     uint64 `json:"author_id"`
+	BoardId     uint64 `json:"board_id"`
 	Description string `json:"description"`
 	PinDir      string `json:"pin_dir"`
 	Title       string `json:"title"`
