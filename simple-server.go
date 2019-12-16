@@ -33,7 +33,7 @@ func main() {
 	//e.Use(customMiddleware.AuthenticationMiddleware)
 	//e.HTTPErrorHandler = customMiddleware.CustomHTTPErrorHandler
 
-	e.Static("/static", "static")
+	e.Static("/static", "api/v1/static")
 
 	handlers := delivery.HandlersStruct{}
 	var mutex sync.Mutex
