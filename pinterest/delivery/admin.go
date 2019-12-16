@@ -138,6 +138,33 @@ func (h *HandlersStruct) HandleAdminFill(ctx echo.Context) (Err error) {
 		_, err = h.PUsecase.SetUser(newProfile, user)
 
 
+		index := rand.Intn(len(PinUrls))
+		url := PinUrls[index]
+		PinUrls = append(PinUrls[:index], PinUrls[index+1:]...)
+
+		resp, err := http.Get(url)
+		if err != nil {
+			continue
+		}
+
+		var buf bytes.Buffer
+		tee := io.TeeReader(resp.Body, &buf)
+		fileHash, err := h.PUsecase.CalculateMD5FromFile(tee)
+		if err != nil {
+			return err
+		}
+		if err = h.PUsecase.AddDir("static/ava/" + fileHash[:2]); err != nil {
+			return err
+		}
+		fileName := "static/ava/" + fileHash[:2] + "/" + fileHash + ".jpg"
+		if err = h.PUsecase.AddPictureFile(fileName, &buf); err != nil {
+			return err
+		}
+		if _, err := h.PUsecase.SetUserAvatarDir(user.ID, fileName); err != nil {
+			return err
+		}
+
+
 		board := models.Board{
 			OwnerID:     myUsers[i].UserID,
 			Title:       myUsers[i].Username + " board",
