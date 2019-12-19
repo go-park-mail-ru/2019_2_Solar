@@ -246,7 +246,7 @@ func (RS *ReposStruct) SelectCategories() (Categories []models.Category, Err err
 	}()
 	for rows.Next() {
 		scanCategory := models.Category{}
-		err := rows.Scan(&scanCategory.ID, &scanCategory.Name)
+		err := rows.Scan(&scanCategory.Name)
 		if err != nil {
 			return categories, err
 		}
