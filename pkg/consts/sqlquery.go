@@ -28,7 +28,7 @@ const (
 	DELETESessionByKey = "DELETE FROM sunrise.usersession as s WHERE s.cookiesvalue = $1"
 
 	SELECTCategoryByName = "SELECT c.name FROM sunrise.category as c WHERE c.name = $1"
-	SELECTCategories     = "SELECT c.id, c.name FROM sunrise.category as c;"
+	SELECTCategories     = "SELECT c.name FROM sunrise.category as c;"
 	INSERTBoard          = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
 	SELECTBoardByID      = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
 		"FROM sunrise.board as b WHERE b.id = $1"
