@@ -40,6 +40,8 @@ func (h *HandlersStruct) HandleRegUser(ctx echo.Context) (Err error) {
 		return err
 	}
 
+	_, err = h.PUsecase.SetUserAvatarDir(newUserID, "static/default_ava.jpg")
+
 	cookies, err := h.PUsecase.AddNewUserSession(newUserID)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}

@@ -1,6 +1,7 @@
 # IDE
 .idea
 .vscode
-static
+static/pin
+static/ava
 # OS X files
 .DS_Store
