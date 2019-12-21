@@ -52,9 +52,10 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 	e.GET(prefix+"/find/pins/by/category/:category", h.HandlerFindPinByCategory)
 	e.GET(prefix+"/find/users/by/username/:username", h.HandlerFindUserByUsername)
 
-	e.GET(prefix+"/categories", h.HandleGetCategories)
+	e.GET (prefix +"/categories", h.HandleGetCategories)
 
-	e.POST(prefix+"/admin/fill", h.HandleAdminFill)
+	e.POST(prefix +"/admin/fill", h.HandleAdminFill)
+	e.POST(prefix +"/admin/fill/christmas", h.HandleAdminFillChristmas)
 
 	e.POST(prefix+"/feedback", h.HandleFeedback)
 	return nil
