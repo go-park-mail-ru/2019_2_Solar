@@ -194,11 +194,20 @@ type ChatMessage struct {
 	IsDeleted      bool      `json:"is_deleted"`
 }
 
+type SaveMessage struct {
+	IdSender    uint64    `json:"-"`
+	IdRecipient uint64    `json:"-"`
+	Message     string    `json:"-"`
+	SendTime    time.Time `json:"-"`
+	IsDeleted   bool      `json:""`
+}
+
 type OutputMessage struct {
-	SenderId   uint64    `json:"senderId"`
-	ReceiverId uint64    `json:"receiverId"`
-	Message    string    `json:"text"`
-	SendTime   time.Time `json:"send_time"`
+	SenderId       uint64    `json:"senderId"`
+	SenderUsername string    `json:"senderUsername"`
+	ReceiverId     uint64    `json:"receiverId"`
+	Message        string    `json:"text"`
+	SendTime       time.Time `json:"send_time"`
 }
 
 type Subscribe struct {
@@ -213,7 +222,7 @@ type Category struct {
 
 type AddPin struct {
 	AuthorId    uint64 `json:"author_id"`
-	BoardId     uint64 `json:"author_id"`
+	BoardId     uint64 `json:"board_id"`
 	Description string `json:"description"`
 	PinDir      string `json:"pin_dir"`
 	Title       string `json:"title"`
@@ -235,4 +244,25 @@ type Message struct {
 	Message     string    `json:"text"`
 	SendTime    time.Time `json:"send_time"`
 	IsDeleted   bool      `json:"is_deleted"`
+}
+
+type MessageWithUsername struct {
+	SenderUserName    string    `json:"senderUserName"`
+	RecipientUserName string    `json:"recipientUserName"`
+	Message           string    `json:"text"`
+	SendTime          time.Time `json:"send_time"`
+	IsDeleted         bool      `json:"is_deleted"`
+}
+
+type EditPin struct {
+	Id          uint64 `json:"-"`
+	BoardID     uint64 `json:"board_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+type NewFeedBack struct {
+	Id      uint64 `json:"-"`
+	UserId  uint64 `json:"-"`
+	Message string `json:"message"`
 }

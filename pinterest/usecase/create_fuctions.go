@@ -11,6 +11,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"os"
@@ -174,8 +175,6 @@ func (USC *UseStruct) AddBoard(Board models.Board) (uint64, error) {
 }
 
 func (USC *UseStruct) AddPin(Pin models.Pin) (uint64, error) {
-	var params []interface{}
-	params = append(params, Pin.OwnerID, Pin.AuthorID, Pin.BoardID, Pin.Title, Pin.Description, Pin.PinDir, Pin.CreatedTime)
 	lastID, err := USC.PRepository.InsertPin(Pin)
 	if err != nil {
 		return 0, err
@@ -221,7 +220,7 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 	}
 
 	alredyExitstflag := false
-	for _, tag := range  tags {
+	for _, tag := range tags {
 		for _, uniqueTag := range uniqueTags {
 			if uniqueTag == tag {
 				alredyExitstflag = true
@@ -235,7 +234,7 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 		alredyExitstflag = false
 	}
 
-	for _, tag := range  tags {
+	for _, tag := range tags {
 		if err := USC.PRepository.InsertPinAndTag(pinID, tag); err != nil {
 			return err
 		}
@@ -244,3 +243,21 @@ func (USC *UseStruct) AddTags(description string, pinID uint64) error {
 	return nil
 }
 
+func (USC *UseStruct) SetPin(pin models.EditPin, userId uint64) error {
+	rowsAffected, err := USC.PRepository.UpdatePin(pin, userId)
+	if err != nil {
+		return err
+	}
+	if rowsAffected != 1 {
+		return errors.New("Ошибка при редактировании пина")
+	}
+	return nil
+}
+
+func (USC *UseStruct) AddFeedBack(newFeedBack models.NewFeedBack) error {
+	err := USC.PRepository.InsertFeedBack(newFeedBack)
+	if err != nil {
+		return err
+	}
+	return nil
+}

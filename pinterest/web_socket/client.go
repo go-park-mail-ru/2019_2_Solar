@@ -82,26 +82,42 @@ func (c *Client) ReadPump(PRepository repository.ReposInterface) {
 			break
 		}
 
-		//newChatMessage.IdSender = c.User.ID
-		fmt.Println(newChatMessage.UserNameRecipient)
-		userRecipient, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
-		if len(userRecipient) != 1 {
-			fmt.Println(len(userRecipient))
+		userRecipients, err := PRepository.SelectUsersByUsername(newChatMessage.UserNameRecipient)
+		if err != nil {
 			fmt.Println(err)
 			break
 		}
+		if len(userRecipients) != 1 {
+			fmt.Println("Нет юзера")
+			break
+		}
 
+		userRecipient := userRecipients[0]
+
+		saveMessage := models.SaveMessage{
+			IdSender:    c.User.ID,
+			IdRecipient: userRecipient.ID,
+			Message:     newChatMessage.Message,
+			SendTime:    time.Now(),
+			IsDeleted:   false,
+		}
+
+		_, err = PRepository.InsertChatMessage(saveMessage)
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		if saveMessage.IdRecipient == saveMessage.IdSender {
+			continue
+		}
 		chatMessage := models.ChatMessage{
 			UserNameSender: c.User.Username,
-			IdRecipient:    userRecipient[0].ID,
-			Message:        newChatMessage.Message,
-			SendTime:       time.Now(),
-			IsDeleted:      false,
+			IdRecipient:    saveMessage.IdRecipient,
+			Message:        saveMessage.Message,
+			SendTime:       saveMessage.SendTime,
+			IsDeleted:      saveMessage.IsDeleted,
 		}
-		_, err = PRepository.InsertChatMessage(chatMessage, c.User.ID)
-		fmt.Println(err)
 
-		fmt.Println("Under send", chatMessage)
 		for client := range c.Hub.Clients {
 			if client.User.ID == chatMessage.IdRecipient {
 				client.Send <- chatMessage

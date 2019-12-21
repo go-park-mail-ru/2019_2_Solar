@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -90,5 +91,24 @@ func (h *HandlersStruct) HandleChatRecipient(ctx echo.Context) (Err error) {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(http.StatusOK, messages)
+	var uniqueMes []models.MessageWithUsername
+	for i := 0; i < len(messages); i++ {
+		mes := messages[i]
+		for j := i; j < len(messages); j++ {
+			if messages[i].SenderUserName == messages[j].RecipientUserName && messages[i].RecipientUserName == messages[j].SenderUserName && messages[i].SendTime.Before(messages[j].SendTime) {
+				mes = messages[j]
+				continue
+			}
+		}
+
+		elem := sort.Search(len(uniqueMes), func(elem int) bool { return uniqueMes[elem] == mes })
+		if elem < len(uniqueMes) && uniqueMes[elem] == mes {
+			continue
+		} else {
+			uniqueMes = append(uniqueMes, mes)
+		}
+	}
+
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: uniqueMes}
+	return ctx.JSON(http.StatusOK, data)
 }

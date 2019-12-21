@@ -41,7 +41,7 @@ type ReposInterface interface {
 	SelectUsersByUsername(username string) (Users []models.User, Err error)
 	InsertSubscribe(userID uint64, followeeName string) (uint64, error)
 	DeleteSubscribeByName(userID uint64, followeeName string) error
-	InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error)
+	InsertChatMessage(message models.SaveMessage) (uint64, error)
 	SelectSessionsByCookieValue(cookieValue string) (Sessions []models.UserSession, Err error)
 
 	SelectNoticesByUserID(userId uint64) (Notices []models.Notice, Err error)
@@ -58,5 +58,11 @@ type ReposInterface interface {
 
 	SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
 
-	SelectRecipientsByUserId(userId uint64) (mes []models.Message, er error)
+	SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error)
+	SelectFolloweeByUserId(userId uint64) (mes []models.User, er error)
+	UpdatePin(pin models.EditPin, userId uint64) (int, error)
+	DeletePinById(id uint64) error
+	SelectPinsByCategory(category string) ([]models.PinDisplay, error)
+	SelectPinsByCategoryDESC(category string) ([]models.PinDisplay, error)
+	InsertFeedBack(feedBack models.NewFeedBack) error
 }

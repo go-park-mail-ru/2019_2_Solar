@@ -12,7 +12,6 @@ import (
 	"sync"
 )
 
-
 type UseStruct struct {
 	PRepository repository.ReposInterface
 	Sanitizer   sanitizer.SanitInterface
@@ -77,12 +76,11 @@ type UseInterface interface {
 	AddPictureFile(fileName string, fileByte io.Reader) (Err error)
 
 	ReturnHub() *webSocket.HubStruct
-	
+
 	SearchPinsByTag(tag string) ([]models.PinDisplay, error)
 	SearchUserByUsername(username string) (Users []models.User, Err error)
 
 	CreateClient(conn *websocket.Conn, user models.User)
-
 
 	GetMySubscribeByUsername(userId uint64, username string) (bool, error)
 
@@ -90,8 +88,14 @@ type UseInterface interface {
 
 	GetCategories() (Categories []models.Category, Err error)
 
-	GetMessages(senderId, receiverId uint64)(mes []models.OutputMessage, er error)
+	GetMessages(senderId, receiverId uint64) (mes []models.OutputMessage, er error)
 
-	GetRecipients(userId uint64) (mes []models.Message, er error)
+	GetRecipients(userId uint64) (mes []models.MessageWithUsername, er error)
 
+	GetFolloweeUserBySubscriberId(userId uint64) (users []models.User, er error)
+	SetPin(pin models.EditPin, userId uint64) error
+	RemovePin(id uint64) error
+	SearchPinsByCategory(category string, desc bool) ([]models.PinDisplay, error)
+
+	AddFeedBack(newFeedBack models.NewFeedBack) error
 }
