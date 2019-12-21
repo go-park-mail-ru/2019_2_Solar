@@ -737,9 +737,12 @@ func (RS *ReposStruct) DeleteSubscribeByName(userID uint64, followeeName string)
 	return nil
 }
 
-func (RS *ReposStruct) InsertChatMessage(message models.ChatMessage, senderId uint64) (uint64, error) {
+func (RS *ReposStruct) InsertChatMessage(message models.SaveMessage) (uint64, error) {
+	sqlQuery := `INSERT INTO sunrise.chat_message (sender_id, receiver_id, text, send_time)
+	SELECT $1, $2, $3, $4
+	RETURNING id	`
 	var id uint64
-	err := RS.DataBase.QueryRow(consts.INSERTChatMessage, senderId, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
+	err := RS.DataBase.QueryRow(sqlQuery, message.IdSender, message.IdRecipient, message.Message, message.SendTime).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -832,12 +835,13 @@ func (RS *ReposStruct) InsertPinAndTag(PinID uint64, TagName string) (Err error)
 
 func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes []models.OutputMessage, er error) {
 	chatMessageSlice := make([]models.OutputMessage, 0)
-	sqlQuery := `SELECT cm.sender_id, cm.receiver_id, cm.text, cm.send_time
+	sqlQuery := `SELECT cm.sender_id, u.username, cm.receiver_id, cm.text, cm.send_time
 	from sunrise.chat_message as cm
+	JOIN sunrise.user AS u on cm.sender_id = u.id
 	where ((cm.sender_id = $1 AND cm.receiver_id = $2)
 		OR (cm.sender_id = $2 AND cm.receiver_id = $1))
 	  AND cm.is_deleted = false
-	ORDER BY cm.send_time DESC`
+	ORDER BY cm.send_time`
 	rows, err := RS.DataBase.Query(sqlQuery, senderId, receiverId)
 	if err != nil {
 		return chatMessageSlice, err
@@ -849,7 +853,7 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	}()
 	for rows.Next() {
 		message := models.OutputMessage{}
-		err := rows.Scan(&message.SenderId, &message.ReceiverId, &message.Message, &message.SendTime)
+		err := rows.Scan(&message.SenderId, &message.SenderUsername, &message.ReceiverId, &message.Message, &message.SendTime)
 		if err != nil {
 			return chatMessageSlice, err
 		}
@@ -858,14 +862,21 @@ func (RS *ReposStruct) SelectMessagesByUsersId(senderId, receiverId uint64) (mes
 	return chatMessageSlice, nil
 }
 
-func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Message, er error) {
+func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.MessageWithUsername, er error) {
 	sqlQuery := `
-	SELECT chat.sender_id, chat.receiver_id, chat.text, max(send_time)
+		WITH max_time as (SELECT chat.sender_id, chat.receiver_id, max(send_time) as s_time
+					  FROM sunrise.chat_message as chat
+					  WHERE chat.is_deleted = false
+						AND (chat.sender_id = $1 OR chat.receiver_id = $1)
+					  GROUP BY chat.sender_id, chat.receiver_id)
+	SELECT u1.username, u2.username, chat.text, chat.send_time
 	FROM sunrise.chat_message as chat
-	WHERE chat.is_deleted = false
-	  AND (chat.sender_id = $1 OR chat.receiver_id = $1)
-	GROUP BY chat.sender_id, chat.receiver_id, chat.text;`
-	messageSlice := make([]models.Message, 0)
+			 JOIN max_time as mt
+				  ON chat.sender_id = mt.sender_id AND chat.receiver_id = mt.receiver_id AND chat.send_time = mt.s_time
+			 JOIN sunrise.user as u1 ON u1.id = chat.sender_id
+			 JOIN sunrise.user as u2 ON u2.id = chat.receiver_id
+	WHERE chat.is_deleted = false`
+	messageSlice := make([]models.MessageWithUsername, 0)
 	rows, err := RS.DataBase.Query(sqlQuery, userId)
 	if err != nil {
 		return messageSlice, err
@@ -876,12 +887,139 @@ func (RS *ReposStruct) SelectRecipientsByUserId(userId uint64) (mes []models.Mes
 		}
 	}()
 	for rows.Next() {
-		messageScan := models.Message{}
-		err := rows.Scan(&messageScan.IdSender, &messageScan.IdRecipient, &messageScan.Message, &messageScan.SendTime)
+		messageScan := models.MessageWithUsername{}
+		err := rows.Scan(&messageScan.SenderUserName, &messageScan.RecipientUserName, &messageScan.Message, &messageScan.SendTime)
 		if err != nil {
 			return messageSlice, err
 		}
 		messageSlice = append(messageSlice, messageScan)
 	}
 	return messageSlice, nil
+}
+
+func (RS *ReposStruct) SelectFolloweeByUserId(userId uint64) (mes []models.User, er error) {
+	sqlQuery := `SELECT u.username, u.avatardir
+	FROM sunrise.user as u
+	JOIN sunrise.subscribe as sub ON sub.followee_id = u.id
+	WHERE sub.subscriber_id = $1`
+	usersSlice := make([]models.User, 0)
+	rows, err := RS.DataBase.Query(sqlQuery, userId)
+	if err != nil {
+		return usersSlice, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+	for rows.Next() {
+		dbuser := models.DBUser{}
+		err := rows.Scan(&dbuser.Username, &dbuser.AvatarDir)
+		if err != nil {
+			return usersSlice, err
+		}
+		user := models.User{
+			Username:  dbuser.Username,
+			AvatarDir: dbuser.AvatarDir.String,
+		}
+		usersSlice = append(usersSlice, user)
+	}
+	return usersSlice, nil
+}
+
+func (RS *ReposStruct) UpdatePin(pin models.EditPin, userId uint64) (int, error) {
+	sqlQuery := `
+	UPDATE sunrise.pin as p
+	SET board_id    = $1,
+		title       = $2,
+		description = $3
+	FROM sunrise.user as u
+	where p.id = $4
+	  AND u.id = p.owner_id
+	  AND u.id = $5`
+	result, err := RS.DataBase.Exec(sqlQuery, pin.BoardID, pin.Title, pin.Description, pin.Id, userId)
+	if err != nil {
+		return 0, err
+	}
+	rowsEdit, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsEdit), nil
+}
+
+func (RS *ReposStruct) DeletePinById(id uint64) error {
+	sqlQuery := `DELETE 
+	FROM sunrise.pin as p WHERE p.id = $1`
+	_, err := RS.DataBase.Exec(sqlQuery, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (RS *ReposStruct) SelectPinsByCategory(category string) (pinSl []models.PinDisplay, er error) {
+	pins := make([]models.PinDisplay, 0)
+	sqlQuery := `SELECT DISTINCT p.id, p.pindir, p.title
+	FROM sunrise.pin as p
+			 JOIN sunrise.board as b ON b.id = p.board_id
+	WHERE upper(b.category) = upper($1) AND p.isdeleted = false 
+	ORDER BY p.createdtime;`
+	rows, err := RS.DataBase.Query(sqlQuery, category)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
+func (RS *ReposStruct) SelectPinsByCategoryDESC(category string) (pinSl []models.PinDisplay, er error) {
+	pins := make([]models.PinDisplay, 0)
+	sqlQuery := `SELECT DISTINCT p.id, p.pindir, p.title
+	FROM sunrise.pin as p
+			 JOIN sunrise.board as b ON b.id = p.board_id
+	WHERE upper(b.category) = upper($1) AND p.isdeleted = false 
+	ORDER BY p.createdtime DESC;`
+	rows, err := RS.DataBase.Query(sqlQuery, category)
+	if err != nil {
+		return pins, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			er = err
+		}
+	}()
+
+	for rows.Next() {
+		scanPin := models.PinDisplay{}
+		err := rows.Scan(&scanPin.ID, &scanPin.PinDir, &scanPin.Title)
+		if err != nil {
+			return pins, err
+		}
+		pins = append(pins, scanPin)
+	}
+	return pins, nil
+}
+
+func (RS *ReposStruct) InsertFeedBack(feedBack models.NewFeedBack) error {
+	sqlQuery := `INSERT INTO sunrise.feedback (user_id, message)
+	values ($1, $2)	`
+	_, err := RS.DataBase.Exec(sqlQuery, feedBack.UserId, feedBack.Message)
+	if err != nil {
+		return err
+	}
+	return nil
 }

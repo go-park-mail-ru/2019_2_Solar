@@ -166,6 +166,9 @@ func (h *HandlersStruct) HandleGetNewPins(ctx echo.Context) (Err error) {
 		ctx.Logger().Warn(err)
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
+	if id == 0 {
+		id = 1000000
+	}
 
 	pins, err := h.PUsecase.GetNewPins(limit, id)
 	if err != nil {
@@ -305,6 +308,9 @@ func (h *HandlersStruct) HandleAddPin(ctx echo.Context) (Err error) {
 		CreatedTime: time.Now(),
 	}
 	lastID, err := h.PUsecase.AddPin(pin)
+	if err != nil {
+		return err
+	}
 	err = h.PUsecase.AddTags(pin.Description, lastID)
 	if err != nil {
 		return err
@@ -329,4 +335,68 @@ func (h *HandlersStruct) HandleAddPin(ctx echo.Context) (Err error) {
 	}
 
 	return nil
+}
+
+func (h *HandlersStruct) HandleEditPin(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	user := getUser.(models.User)
+	strId := ctx.Param("id")
+	if strId == "" {
+		return errors.New("incorrect id")
+	}
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		return err
+	}
+	editPin := models.EditPin{}
+	if err := ctx.Bind(&editPin); err != nil {
+		ctx.Logger().Warn(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	editPin.Id = uint64(id)
+
+	if err := h.PUsecase.SetPin(editPin, user.ID); err != nil {
+		return err
+	}
+
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: "ok"}
+	return ctx.JSON(http.StatusOK, data)
+}
+
+func (h *HandlersStruct) HandleDeletePin(ctx echo.Context) (Err error) {
+	defer func() {
+		if bodyErr := ctx.Request().Body.Close(); bodyErr != nil {
+			Err = errors.Wrap(Err, bodyErr.Error())
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	//user := getUser.(models.User)
+	strId := ctx.Param("id")
+	if strId == "" {
+		return errors.New("incorrect id")
+	}
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		return err
+	}
+
+	if err := h.PUsecase.RemovePin(uint64(id)); err != nil {
+		return err
+	}
+
+	data := models.ValeraJSONResponse{CSRF: ctx.Get("token").(string), Body: "ok"}
+	return ctx.JSON(http.StatusOK, data)
 }

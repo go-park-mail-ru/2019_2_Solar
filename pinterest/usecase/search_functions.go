@@ -23,3 +23,25 @@ func (USC *UseStruct) SearchUserByUsername(username string) (Users []models.User
 
 	return users, nil
 }
+
+func (USC *UseStruct) SearchPinsByCategory(category string, desc bool) ([]models.PinDisplay, error) {
+	if desc == false {
+		pins, err := USC.PRepository.SelectPinsByCategory(category)
+		if err != nil {
+			return []models.PinDisplay{}, err
+		}
+		for _, pin := range pins {
+			USC.Sanitizer.SanitPinDisplay(&pin)
+		}
+		return pins, nil
+	}
+
+	pins, err := USC.PRepository.SelectPinsByCategoryDESC(category)
+	if err != nil {
+		return []models.PinDisplay{}, err
+	}
+	for _, pin := range pins {
+		USC.Sanitizer.SanitPinDisplay(&pin)
+	}
+	return pins, nil
+}
