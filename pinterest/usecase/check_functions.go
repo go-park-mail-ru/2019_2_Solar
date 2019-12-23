@@ -24,31 +24,22 @@ func UsernameCheck(username string) error {
 	if len(username) >= 3 && len(username) <= 30 && validation.UsernameIsCorrect.MatchString(username) {
 		return nil
 	}
-	return errors.New("incorrect username")
+	return errors.New("Некорректное имя пользователя")
 }
 
 func EmailCheck(email string) error {
 	if validation.EmailIsCorrect.MatchString(email) {
 		return nil
 	}
-	return errors.New("incorrect email")
+	return errors.New("Некорректный e-mail")
 }
 
 func PasswordCheck(password string) error {
-	if len(password) < 8 {
-		return errors.New("too short password")
+	if len(password) < 6 {
+		return errors.New("Слишком короткий пароль")
 	}
 	if len(password) > 30 {
-		return errors.New("too long password")
-	}
-	if !validation.PasswordHasChar.MatchString(password) {
-		return errors.New("password has not char")
-	}
-	if !validation.PasswordHasNumber.MatchString(password) {
-		return errors.New("password has not number")
-	}
-	if !validation.PasswordIsCorrect.MatchString(password) {
-		return errors.New("incorrect password")
+		return errors.New("Слишком длинный пароль")
 	}
 	return nil
 }
@@ -57,56 +48,56 @@ func NameCheck(name string) error {
 	if len(name) >= 1 && len(name) <= 30 && validation.NameIsCorrect.MatchString(name) {
 		return nil
 	}
-	return errors.New("incorrect name")
+	return errors.New("Некорректное имя")
 }
 
 func SurnameCheck(surname string) error {
 	if len(surname) >= 1 && len(surname) <= 30 && validation.SurnameIsCorrect.MatchString(surname) {
 		return nil
 	}
-	return errors.New("incorrect surname")
+	return errors.New("Некорректная фамилия")
 }
 
 func AgeCheck(age string) error {
 	if validation.AgeIsCorrect.MatchString(age) {
 		return nil
 	}
-	return errors.New("incorrect age")
+	return errors.New("Некорректный возраст")
 }
 
 func StatusCheck(status string) error {
 	if len(status) >= 1 && len(status) <= 200 && validation.StatusIsCorrect.MatchString(status) {
 		return nil
 	}
-	return errors.New("incorrect status")
+	return errors.New("Некорректный статус")
 }
 
 func CheckBoardTitle(title string) error {
 	if validation.BoardTitle.MatchString(title) {
 		return nil
 	}
-	return errors.New("incorrect title")
+	return errors.New("Некорректный заголовок")
 }
 
 func CheckBoardDescription(description string) error {
 	if validation.BoardDescription.MatchString(description) {
 		return nil
 	}
-	return errors.New("incorrect description")
+	return errors.New("Некорректное описание")
 }
 
 func CheckPinTitle(title string) error {
 	if validation.PinTitle.MatchString(title) {
 		return nil
 	}
-	return errors.New("incorrect title")
+	return errors.New("Некорректный заголовок")
 }
 
 func CheckPinDescription(description string) error {
 	if validation.PinDescription.MatchString(description) {
 		return nil
 	}
-	return errors.New("incorrect description")
+	return errors.New("Некорректное описание")
 }
 
 func (USC *UseStruct) CheckBoardCategory(category string) error {
@@ -117,7 +108,7 @@ func (USC *UseStruct) CheckBoardCategory(category string) error {
 		return err
 	}
 	if len(categories) != 1 {
-		return errors.New("incorrect category")
+		return errors.New("Некорректное категория")
 	}
 	return nil
 }
@@ -132,10 +123,10 @@ func (USC *UseStruct) CheckRegUsernameEmailIsUnique(username, email string) erro
 	}
 	for _, user := range userSlice {
 		if user.Username == username {
-			return errors.New("username is not unique")
+			return errors.New("Никнейм уже занят")
 		}
 		if user.Email == email {
-			return errors.New("email is not unique")
+			return errors.New("Аккаунт с таким email уже существует")
 		}
 	}
 	return nil
@@ -219,10 +210,10 @@ func (USC *UseStruct) CheckUsernameEmailIsUnique(newUsername, newEmail, username
 			continue
 		}
 		if user.Username == newUsername {
-			return errors.New("username is not unique")
+			return errors.New("Никнейм уже занят")
 		}
 		if user.Email == newEmail {
-			return errors.New("email is not unique")
+			return errors.New("Аккаунт с таким email уже существует")
 		}
 	}
 	return nil
@@ -232,5 +223,5 @@ func (USC *UseStruct) ComparePassword(password, salt, loginPassword string) erro
 	if bytes.Equal([]byte(password), HashPassword(loginPassword, salt)) {
 		return nil
 	}
-	return errors.New("different passwords")
+	return errors.New("Неверный пароль")
 }
