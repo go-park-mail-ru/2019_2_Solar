@@ -4,9 +4,12 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"time"
 )
@@ -99,4 +102,39 @@ func (tk *CryptToken) Check(s *Session, inputToken string) (bool, error) {
 	expected := TokenData{SessionID: s.ID, UserID: s.UserID}
 	td.Exp = 0
 	return td == expected, nil
+}
+
+
+func GenSessionKey(length int) (string, error) {
+	result := make([]byte, length)
+	bufferSize := int(float64(length) * 1.3)
+	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
+		if j%bufferSize == 0 {
+			var err error
+			randomBytes, err = SecureRandomBytes(bufferSize)
+			if err != nil {
+				return "", err
+			}
+		}
+		if idx := int(randomBytes[j%length] & consts.LetterIdxMask); idx < len(consts.LetterBytes) {
+			result[i] = consts.LetterBytes[idx]
+			i++
+		}
+	}
+
+	return string(result), nil
+}
+
+// SecureRandomBytes returns the requested number of bytes using crypto/rand
+func SecureRandomBytes(length int) ([]byte, error) {
+	var randomBytes = make([]byte, length)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return []byte(""), err
+	}
+	return randomBytes, nil
+}
+
+func HashPassword(password, salt string) []byte {
+	return pbkdf2.Key([]byte(password), []byte(salt), 4096, 32, sha1.New)
 }

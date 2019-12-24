@@ -2,12 +2,11 @@ package usecase
 
 import (
 	"crypto/md5"
-	"crypto/rand"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/repository"
 	"github.com/go-park-mail-ru/2019_2_Solar/pinterest/sanitizer"
 	webSocket "github.com/go-park-mail-ru/2019_2_Solar/pinterest/web_socket"
-	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/validation"
 	"github.com/labstack/echo"
@@ -31,7 +30,7 @@ func (USC *UseStruct) NewUseCase(mu *sync.Mutex, rep repository.ReposInterface,
 }
 
 func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
-	sessionKeyValue, err := GenSessionKey(12)
+	sessionKeyValue, err := functions.GenSessionKey(12)
 	if err != nil {
 		return http.Cookie{}, err
 	}
@@ -47,42 +46,13 @@ func (USC UseStruct) AddNewUserSession(userID uint64) (http.Cookie, error) {
 	return *cookieSessionKey, nil
 }
 
-func GenSessionKey(length int) (string, error) {
-	result := make([]byte, length)
-	bufferSize := int(float64(length) * 1.3)
-	for i, j, randomBytes := 0, 0, []byte{}; i < length; j++ {
-		if j%bufferSize == 0 {
-			var err error
-			randomBytes, err = SecureRandomBytes(bufferSize)
-			if err != nil {
-				return "", err
-			}
-		}
-		if idx := int(randomBytes[j%length] & consts.LetterIdxMask); idx < len(consts.LetterBytes) {
-			result[i] = consts.LetterBytes[idx]
-			i++
-		}
-	}
-
-	return string(result), nil
-}
-
-// SecureRandomBytes returns the requested number of bytes using crypto/rand
-func SecureRandomBytes(length int) ([]byte, error) {
-	var randomBytes = make([]byte, length)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return []byte(""), err
-	}
-	return randomBytes, nil
-}
 
 func (USC *UseStruct) AddNewUser(username, email, password string) (uint64, error) {
-	salt, err := GenSessionKey(10)
+	salt, err := functions.GenSessionKey(10)
 	if err != nil {
 		return 0, err
 	}
-	hashPassword := HashPassword(password, salt)
+	hashPassword := functions.HashPassword(password, salt)
 	lastID, err := USC.PRepository.InsertUser(username, email, salt, hashPassword, time.Now())
 	if err != nil {
 		return 0, err
