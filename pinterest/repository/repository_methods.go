@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
+	"github.com/go-park-mail-ru/2019_2_Solar/pkg/functions"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -600,7 +601,14 @@ func (RS *ReposStruct) SelectIDUsernameEmailUser(username, email string) (Users 
 }
 
 func (RS *ReposStruct) UpdateUser(user models.User) (int, error) {
-	result, err := RS.DataBase.Exec(consts.UPDATEUserByID, user.Username, user.Name, user.Surname, user.Password, user.Email, user.Age, user.Status, user.ID)
+	// Crutch
+	salt, err := functions.GenSessionKey(10)
+	if err != nil {
+		return 0, err
+	}
+	hashPassword := functions.HashPassword(user.Password, salt)
+
+	result, err := RS.DataBase.Exec(consts.UPDATEUserByID, user.Username, user.Name, user.Surname, hashPassword, user.Email, user.Age, user.Status, user.ID, salt)
 	if err != nil {
 		return 0, err
 	}
@@ -1018,6 +1026,18 @@ func (RS *ReposStruct) InsertFeedBack(feedBack models.NewFeedBack) error {
 	sqlQuery := `INSERT INTO sunrise.feedback (user_id, message)
 	values ($1, $2)	`
 	_, err := RS.DataBase.Exec(sqlQuery, feedBack.UserId, feedBack.Message)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (RS *ReposStruct) DeleteBoardByID(boardID uint64) error {
+	result, err := RS.DataBase.Exec(consts.DELETEBoardByID, true, boardID)
+	if err != nil {
+		return err
+	}
+	_, err = result.RowsAffected()
 	if err != nil {
 		return err
 	}

@@ -41,6 +41,7 @@ func PasswordCheck(password string) error {
 	if len(password) > 30 {
 		return errors.New("Слишком длинный пароль")
 	}
+
 	return nil
 }
 

@@ -120,6 +120,45 @@ func (h *HandlersStruct) HandleGetBoard(ctx echo.Context) (Err error) {
 	return nil
 }
 
+func (h *HandlersStruct) HandleDeleteBoard(ctx echo.Context) (Err error) {
+	defer func() {
+		if err := ctx.Request().Body.Close(); err != nil {
+			Err = err
+		}
+	}()
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	getUser := ctx.Get("User")
+	if getUser == nil {
+		return errors.New("not authorized")
+	}
+	//user := getUser.(models.User)
+
+	id := ctx.Param("id")
+	if id == "" {
+		return errors.New("incorrect id")
+	}
+	boardID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	err = h.PUsecase.DeleteBoard(uint64(boardID))
+	if err != nil {
+		return err
+	}
+
+	body := struct {
+		Info string	`json:"info"`
+	}{"OK"}
+
+	data := models.ValeraJSONResponse{ctx.Get("token").(string), body}
+	if err := ctx.JSON(200, data); err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func (h *HandlersStruct) HandleGetMyBoards(ctx echo.Context) (Err error) {
 	defer func() {
 		if err := ctx.Request().Body.Close(); err != nil {
