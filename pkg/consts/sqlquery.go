@@ -31,9 +31,9 @@ const (
 	SELECTCategories     = "SELECT c.name FROM sunrise.category as c;"
 	INSERTBoard          = "INSERT INTO sunrise.board (owner_id, title, description, category, createdTime) VALUES ($1,$2,$3,$4,$5) RETURNING id"
 	SELECTBoardByID      = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
-		"FROM sunrise.board as b WHERE b.id = $1"
+		"FROM sunrise.board as b WHERE b.id = $1 AND b.isDeleted = false"
 	SELECTBoardsByOwnerId = "SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted " +
-		"FROM sunrise.board as b WHERE b.owner_id = $1"
+		"FROM sunrise.board as b WHERE b.owner_id = $1 AND b.isDeleted = false"
 
 	INSERTPin = "INSERT INTO sunrise.pin (owner_id, author_id, board_id, title, description, pindir, createdTime)" +
 		" VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id"
@@ -88,4 +88,6 @@ const (
 		" VALUES ($1) RETURNING name"
 	INSERTPinAndTag = "INSERT INTO sunrise.pinandtag (pin_id, tag_name)" +
 		" VALUES ($1,$2) RETURNING id"
+
+	DELETEBoardByID = "UPDATE sunrise_db.sunrise.board SET isDeleted = $1 where id = $2"
 )

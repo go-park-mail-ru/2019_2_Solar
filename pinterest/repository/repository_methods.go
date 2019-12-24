@@ -1031,3 +1031,15 @@ func (RS *ReposStruct) InsertFeedBack(feedBack models.NewFeedBack) error {
 	}
 	return nil
 }
+
+func (RS *ReposStruct) DeleteBoardByID(boardID uint64) error {
+	result, err := RS.DataBase.Exec(consts.DELETEBoardByID, true, boardID)
+	if err != nil {
+		return err
+	}
+	_, err = result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	return nil
+}

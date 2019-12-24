@@ -65,4 +65,6 @@ type ReposInterface interface {
 	SelectPinsByCategory(category string) ([]models.PinDisplay, error)
 	SelectPinsByCategoryDESC(category string) ([]models.PinDisplay, error)
 	InsertFeedBack(feedBack models.NewFeedBack) error
+
+	DeleteBoardByID(boardID uint64) error
 }

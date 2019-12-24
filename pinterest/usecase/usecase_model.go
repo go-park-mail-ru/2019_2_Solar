@@ -98,4 +98,6 @@ type UseInterface interface {
 	SearchPinsByCategory(category string, desc bool) ([]models.PinDisplay, error)
 
 	AddFeedBack(newFeedBack models.NewFeedBack) error
+
+	DeleteBoard(boardID uint64) error
 }
