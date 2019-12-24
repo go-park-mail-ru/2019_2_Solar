@@ -23,3 +23,12 @@ func (USC *UseStruct) RemovePin(id uint64) error {
 	}
 	return nil
 }
+
+func (USC *UseStruct) DeleteBoard(boardID uint64) error {
+	err := USC.PRepository.DeleteBoardByID(boardID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

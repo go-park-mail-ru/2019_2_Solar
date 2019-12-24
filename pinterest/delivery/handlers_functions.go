@@ -29,6 +29,7 @@ func (h *HandlersStruct) NewHandlers(e *echo.Echo, useCase usecase.UseInterface)
 
 	e.POST(prefix+"/board", h.HandleCreateBoard)
 	e.GET(prefix+"/board/:id", h.HandleGetBoard)
+	e.DELETE(prefix+"/board/:id", h.HandleDeleteBoard)
 	e.GET(prefix+"/board/list/my", h.HandleGetMyBoards)
 
 	e.POST(prefix+"/pin", h.HandleCreatePin)
