@@ -35,21 +35,21 @@ func EmailCheck(email string) error {
 }
 
 func PasswordCheck(password string) error {
-	if len(password) < 8 {
+	if len(password) < 6 {
 		return errors.New("too short password")
 	}
 	if len(password) > 30 {
 		return errors.New("too long password")
 	}
-	if !validation.PasswordHasChar.MatchString(password) {
-		return errors.New("password has not char")
-	}
-	if !validation.PasswordHasNumber.MatchString(password) {
-		return errors.New("password has not number")
-	}
-	if !validation.PasswordIsCorrect.MatchString(password) {
-		return errors.New("incorrect password")
-	}
+	//if !validation.PasswordHasChar.MatchString(password) {
+	//	return errors.New("password has not char")
+	//}
+	//if !validation.PasswordHasNumber.MatchString(password) {
+	//	return errors.New("password has not number")
+	//}
+	//if !validation.PasswordIsCorrect.MatchString(password) {
+	//	return errors.New("incorrect password")
+	//}
 	return nil
 }
 
