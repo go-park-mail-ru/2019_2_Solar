@@ -12,7 +12,7 @@ func (USC *UseStruct) GetUserIDByEmail(email string) (uint64, error) {
 		return 0, err
 	}
 	if len(userSlice) != 1 {
-		return 0, errors.New("several users or no one user")
+		return 0, errors.New("Ошибка")
 	}
 	return userSlice[0].ID, nil
 }
@@ -23,7 +23,7 @@ func (USC *UseStruct) GetUserByUsername(username string) (models.AnotherUser, er
 		return models.AnotherUser{}, err
 	}
 	if len(userSlice) != 1 {
-		return models.AnotherUser{}, errors.New("several users or no one user")
+		return models.AnotherUser{}, errors.New("Ошибка")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	anotherUser := models.AnotherUser{
@@ -47,10 +47,10 @@ func (USC *UseStruct) GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, err
 	}
 	if len(userSlice) == 0 {
-		return models.User{}, errors.New("user not found")
+		return models.User{}, errors.New("Пользователь не найден")
 	}
 	if len(userSlice) > 1 {
-		return models.User{}, errors.New("several same users")
+		return models.User{}, errors.New("Ошибка")
 	}
 	USC.Sanitizer.SanitUser(&userSlice[0])
 	return userSlice[0], nil
@@ -96,10 +96,10 @@ func (USC *UseStruct) GetBoard(boardID uint64) (models.Board, error) {
 		return models.Board{}, err
 	}
 	if len(board) == 0 {
-		return models.Board{}, errors.New("board not found")
+		return models.Board{}, errors.New("Доска не найдена")
 	}
 	if len(board) > 1 {
-		return models.Board{}, errors.New("several same boards")
+		return models.Board{}, errors.New("Ошибка")
 	}
 	USC.Sanitizer.SanitBoard(&board[0])
 	return board[0], nil

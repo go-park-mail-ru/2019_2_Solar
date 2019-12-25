@@ -12,7 +12,7 @@ func (USC *UseStruct) ExtractFormatFile(fileName string) (string, error) {
 			return fileName[i:], nil
 		}
 }
-	return "", errors.New("invalid file name")
+	return "", errors.New("Некорректное имя файла")
 }
 
 func HashPassword(password, salt string) []byte {
