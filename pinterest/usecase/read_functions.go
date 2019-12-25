@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_Solar/pkg/models"
@@ -112,7 +113,10 @@ func (USC *UseStruct) GetMyBoards(UserID uint64) ([]models.Board, error) {
 	}
 	for i := 0; i < len(boards); i++ {
 		pin, err := USC.PRepository.SelectPinByBoard(boards[i].ID)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			boards[i].PinDir = "static/default_board.png"
+		}
+		if err != nil && err != sql.ErrNoRows {
 			return boards, err
 		}
 		boards[i].PinDir = pin
