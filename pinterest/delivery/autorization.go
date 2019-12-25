@@ -84,7 +84,7 @@ func (h *HandlersStruct) HandleLoginUser(ctx echo.Context) (Err error) {
 	}
 
 	if err := h.PUsecase.ComparePassword(User.Password, User.Salt, newUserLogin.Password); err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+		return err
 	}
 
 	cookies, err := h.PUsecase.AddNewUserSession(User.ID)

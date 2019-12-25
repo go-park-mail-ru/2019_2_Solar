@@ -16,7 +16,7 @@ func (h *HandlersStruct) HandleListUsers(ctx echo.Context) (Err error) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(ctx.Response())
 
-	users, err := h.PUsecase.GetAllUsers()
+	users, err := h.PUsecase.DataJSON()
 	if err != nil {
 		return err
 	}
