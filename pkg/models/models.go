@@ -96,6 +96,7 @@ type Board struct {
 	Category    string    `json:"category"`
 	CreatedTime time.Time `json:"created_time"`
 	IsDeleted   bool      `json:"is_deleted"`
+	PinDir      string    `json:"view_pin"`
 }
 
 type NewPin struct {

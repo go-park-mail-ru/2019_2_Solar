@@ -110,8 +110,13 @@ func (USC *UseStruct) GetMyBoards(UserID uint64) ([]models.Board, error) {
 	if err != nil {
 		return boards, err
 	}
-	for _, board := range boards {
-		USC.Sanitizer.SanitBoard(&board)
+	for i := 0; i < len(boards); i++ {
+		pin, err := USC.PRepository.SelectPinByBoard(boards[i].ID)
+		if err != nil {
+			return boards, err
+		}
+		boards[i].PinDir = pin
+		USC.Sanitizer.SanitBoard(&boards[i])
 	}
 	return boards, nil
 }

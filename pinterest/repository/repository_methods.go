@@ -336,12 +336,16 @@ func (RS *ReposStruct) SelectPinsDisplayByUsername(userID int) (Pins []models.Pi
 	return pins, nil
 }
 
-func (RS *ReposStruct) SelectBoardsByOwnerId(boardId uint64) (Boards []models.Board, Err error) {
-	var boards []models.Board
-	rows, err := RS.DataBase.Query(consts.SELECTBoardsByOwnerId, boardId)
+func (RS *ReposStruct) SelectBoardsByOwnerId(boardId uint64) (boards []models.Board, Err error) {
+	sqlQuery := `
+	SELECT b.id, b.owner_id, b.title, b.description, b.category, b.createdTime, b.isDeleted
+	FROM sunrise.board as b 
+	WHERE b.owner_id = $1 AND b.isDeleted = false`
+	rows, err := RS.DataBase.Query(sqlQuery, boardId)
 	if err != nil {
-		return boards, err
+		return
 	}
+
 	defer func() {
 		if err := rows.Close(); err != nil {
 			Err = err
@@ -353,10 +357,11 @@ func (RS *ReposStruct) SelectBoardsByOwnerId(boardId uint64) (Boards []models.Bo
 		err := rows.Scan(&scanBoard.ID, &scanBoard.OwnerID, &scanBoard.Title,
 			&scanBoard.Description, &scanBoard.Category, &scanBoard.CreatedTime, &scanBoard.IsDeleted)
 		if err != nil {
-			return boards, err
+			return
 		}
 		boards = append(boards, scanBoard)
 	}
+
 	return boards, nil
 }
 
@@ -1042,4 +1047,13 @@ func (RS *ReposStruct) DeleteBoardByID(boardID uint64) error {
 		return err
 	}
 	return nil
+}
+
+func (RS *ReposStruct) SelectPinByBoard(boardId uint64) (pinDir string, err error) {
+	const sqlQuery = `SELECT p.pindir 
+	FROM sunrise.pin as p 
+	WHERE p.isDeleted = false AND p.board_id = $1
+	LIMIT 1`
+	err = RS.DataBase.QueryRow(sqlQuery, boardId).Scan(&pinDir)
+	return
 }

@@ -67,4 +67,6 @@ type ReposInterface interface {
 	InsertFeedBack(feedBack models.NewFeedBack) error
 
 	DeleteBoardByID(boardID uint64) error
+
+	SelectPinByBoard(boardId uint64) (pinDir string, err error)
 }
