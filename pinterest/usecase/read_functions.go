@@ -119,7 +119,9 @@ func (USC *UseStruct) GetMyBoards(UserID uint64) ([]models.Board, error) {
 		if err != nil && err != sql.ErrNoRows {
 			return boards, err
 		}
-		boards[i].PinDir = pin
+		if err == nil {
+			boards[i].PinDir = pin
+		}
 		USC.Sanitizer.SanitBoard(&boards[i])
 	}
 	return boards, nil
