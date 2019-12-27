@@ -795,3 +795,12 @@ ALTER TABLE ONLY sunrise.subscribe
 -- PostgreSQL database dump complete
 --
 
+insert into sunrise.category
+(name)
+VALUES ('default_category'),
+       ('cars'),
+       ('cook'),
+       ('natural'),
+       ('BMSTU'),
+       ('programming'),
+       ('countries');
