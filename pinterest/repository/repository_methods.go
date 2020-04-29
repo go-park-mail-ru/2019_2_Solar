@@ -612,10 +612,10 @@ func (RS *ReposStruct) UpdateUser(user models.User) (int, error) {
 	//}
 	//hashPassword := functions.HashPassword(user.Password, salt)
 	sqlQuery := `
-	UPDATE sunrise_db.sunrise.user SET name = $1, surname = $2, status = $3
-	where id = $4
+	UPDATE sunrise_db.sunrise.user SET name = $1, surname = $2, status = $3, username = $4
+	where id = $5
 	`
-	result, err := RS.DataBase.Exec(sqlQuery, user.Name, user.Surname, user.Status, user.ID)
+	result, err := RS.DataBase.Exec(sqlQuery, user.Name, user.Surname, user.Status, user.Username, user.ID)
 	if err != nil {
 		return 0, err
 	}
