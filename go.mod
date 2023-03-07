@@ -13,7 +13,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.6
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/lib/pq v1.2.0
-	github.com/microcosm-cc/bluemonday v1.0.2
+	github.com/microcosm-cc/bluemonday v1.0.20
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
